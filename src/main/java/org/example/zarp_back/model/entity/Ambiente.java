@@ -1,4 +1,19 @@
 package org.example.zarp_back.model.entity;
 
-public class Ambiente {
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+@Entity
+public class Ambiente extends Base {
+
+    private String Denominacion;
 }
