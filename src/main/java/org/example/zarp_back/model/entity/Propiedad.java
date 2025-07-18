@@ -1,11 +1,14 @@
 package org.example.zarp_back.model.entity;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.VerificacionPropiedad;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,5 +16,32 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Propiedad {
+public class Propiedad extends Base {
+
+    private String nombre;
+    private String descripcion;
+    private Double precioPorNoche;
+    private VerificacionPropiedad verificacionPropiedad;
+
+    @OneToOne
+    private Direccion direccion;
+
+    @OneToOne
+    private TipoPropiedad tipoPropiedad;
+
+    @OneToMany(mappedBy = "propiedad", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<Reseña> reseñas;
+
+    @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleTipoPersona> detalleTipoPersonas;
+
+    @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleCaracteristica> detalleCaracteristicas;
+
+    @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleImagenPropiedad> detalleImagenes;
+
+    @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleAmbiente> detalleAmbientes;
+
 }

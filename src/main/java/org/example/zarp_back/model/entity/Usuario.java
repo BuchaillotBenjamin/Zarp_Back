@@ -13,5 +13,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Usuario {
+public class Usuario extends Base{
+
+    private String nombreCompleto;
+    private String correoElectronico;
+    private String contrasena;
+
 }

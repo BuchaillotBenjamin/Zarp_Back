@@ -13,5 +13,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class TipoPropiedad {
+public class TipoPropiedad extends Base {
+
+    private String denominacion;
+
 }

@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Caracteristica {
+public class Caracteristica extends Base{
+
+    private String denominacion;
+    private String descripcion;
+    @OneToOne
+    private Imagen imagen;
+
 }

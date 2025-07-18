@@ -15,5 +15,6 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class Ambiente extends Base {
 
-    private String Denominacion;
+    private String denominacion;
+
 }

@@ -13,5 +13,16 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Direccion {
+public class Direccion extends Base {
+
+    private String calle;
+    private String numero;
+    private String piso;
+    private String departamento;
+    private String codigoPostal;
+    private String localidad;
+    private Double latitud;
+    private Double longitud;
+
+
 }

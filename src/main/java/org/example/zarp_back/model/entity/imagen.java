@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class imagen extends Base {
+public class Imagen extends Base {
 
     private String urlImagen;
 
