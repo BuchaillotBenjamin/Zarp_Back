@@ -27,6 +27,6 @@ public class Mensaje extends Base{
     @ManyToOne
     private Conversacion conversacion;
     private LocalDate fechaEnvio;
-    private LocalTime hora;
+    private LocalTime horaEnvio;
 
 }

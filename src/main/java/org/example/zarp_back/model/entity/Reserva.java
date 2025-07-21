@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.Estado;
+import org.example.zarp_back.model.enums.FormaPago;
 
 import java.time.LocalDate;
 
@@ -28,6 +30,8 @@ public class Reserva extends Base {
     @ManyToOne
     @JoinColumn(name = "propiedad_id")
     private Propiedad propiedad;
+    private Estado estado;
+    private FormaPago formaPago;
 
 
 }
