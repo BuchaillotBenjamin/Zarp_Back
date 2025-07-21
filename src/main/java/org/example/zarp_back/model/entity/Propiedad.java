@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
-
 import java.util.List;
 
 @Getter
@@ -30,7 +29,7 @@ public class Propiedad extends Base {
     private TipoPropiedad tipoPropiedad;
 
     @OneToMany(mappedBy = "propiedad", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
-    private List<Reseña> reseñas;
+    private List<Resenia> resenias;
 
     @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleTipoPersona> detalleTipoPersonas;

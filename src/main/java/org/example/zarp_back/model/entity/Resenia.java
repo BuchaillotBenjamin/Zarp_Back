@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Reseña extends Base {
+public class Resenia extends Base {
 
     @ManyToOne
     @JoinColumn(name = "propiedad_id")
