@@ -13,8 +13,8 @@ import org.example.zarp_back.model.entity.Conversacion;
 public class MensajeDTO {
 
     private String contenido;
-    private Cliente emisor;
-    private Cliente receptor;
-    private Conversacion conversacion;
+    private Long emisorId;
+    private Long receptorId;
+    private Long conversacionId;
 
 }

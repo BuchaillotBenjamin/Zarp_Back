@@ -21,8 +21,8 @@ public class PropiedadDTO {
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
     private Direccion direccion;
-    private TipoPropiedad tipoPropiedad;
-     private List<Resenia> resenias;
+    private Long tipoPropiedadId;
+    private List<Resenia> resenias;
     private List<DetalleTipoPersona> detalleTipoPersonas;
     private List<DetalleCaracteristica> detalleCaracteristicas;
     private List<DetalleImagenPropiedad> detalleImagenes;

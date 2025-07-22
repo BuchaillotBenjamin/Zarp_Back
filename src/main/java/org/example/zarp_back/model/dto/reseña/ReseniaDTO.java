@@ -14,7 +14,7 @@ import org.example.zarp_back.model.entity.Propiedad;
 public class ReseniaDTO {
 
     private Propiedad propiedad;
-    private Cliente usuario;
+    private Long usuarioId;
     private String comentario;
     private Integer calificacion;
 }

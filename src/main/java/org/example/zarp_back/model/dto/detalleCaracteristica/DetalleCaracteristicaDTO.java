@@ -12,7 +12,7 @@ import org.example.zarp_back.model.entity.Propiedad;
 @Builder
 public class DetalleCaracteristicaDTO {
 
-    private Propiedad propiedad;
-    private Caracteristica caracteristica;
+    private Long propiedadId;
+    private Long caracteristicaId;
 
 }

@@ -1,5 +1,6 @@
 package org.example.zarp_back.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class Caracteristica extends Base{
 
     private String denominacion;
     private String descripcion;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Imagen imagen;
 
 }

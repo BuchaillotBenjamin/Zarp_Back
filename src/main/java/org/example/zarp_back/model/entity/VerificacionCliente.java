@@ -1,5 +1,6 @@
 package org.example.zarp_back.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -16,11 +17,11 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class VerificacionCliente extends Base {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Imagen fotoFrontal;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Imagen fotoDocumentoFrontal;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Imagen fotoDocumentoTrasero;
 
 }

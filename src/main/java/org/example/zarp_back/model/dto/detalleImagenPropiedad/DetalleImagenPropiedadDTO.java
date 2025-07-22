@@ -13,5 +13,5 @@ public class DetalleImagenPropiedadDTO {
 
     private Boolean imgPrincipal;
     private Imagen imagen;
-    private Propiedad propiedad;
+    private Long propiedadId;
 }

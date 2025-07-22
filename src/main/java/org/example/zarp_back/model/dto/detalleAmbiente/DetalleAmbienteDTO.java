@@ -12,7 +12,7 @@ import org.example.zarp_back.model.entity.Propiedad;
 public class DetalleAmbienteDTO {
 
     private Integer cantidad;
-    private Propiedad propiedad;
-    private Ambiente ambiente;
+    private Long propiedadId;
+    private Long ambienteId;
 
 }
