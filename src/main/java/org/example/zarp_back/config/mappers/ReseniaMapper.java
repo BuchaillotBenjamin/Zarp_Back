@@ -1,0 +1,30 @@
+package org.example.zarp_back.config.mappers;
+
+import org.example.zarp_back.model.dto.reseña.ReseniaDTO;
+import org.example.zarp_back.model.dto.reseña.ReseniaResponseDTO;
+import org.example.zarp_back.model.entity.Resenia;
+import org.example.zarp_back.model.interfaces.GenericoMapper;
+import org.example.zarp_back.config.mappers.ClienteMapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = {ClienteMapper.class})
+public interface ReseniaMapper extends GenericoMapper<Resenia, ReseniaDTO, ReseniaResponseDTO> {
+
+    @Override
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "activo", ignore = true)
+        // El usuarioId del DTO debe ser convertido a Cliente en el service manualmente
+    Resenia toEntity(ReseniaDTO dto);
+
+    @Override
+    List<Resenia> toEntityList(List<ReseniaDTO> dtos);
+
+    @Override
+    ReseniaResponseDTO toResponseDTO(Resenia entity);
+
+    @Override
+    List<ReseniaResponseDTO> toResponseDTOList(List<Resenia> entityList);
+}
