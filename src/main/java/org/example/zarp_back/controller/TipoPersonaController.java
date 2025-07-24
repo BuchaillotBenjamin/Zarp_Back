@@ -1,4 +1,15 @@
 package org.example.zarp_back.controller;
 
-public class TipoPersonaController {
+import org.example.zarp_back.model.dto.tipoPersona.TipoPersonaDTO;
+import org.example.zarp_back.model.dto.tipoPersona.TipoPersonaResponseDTO;
+import org.example.zarp_back.model.entity.TipoPersona;
+import org.example.zarp_back.service.TipoPersonaService;
+
+public class TipoPersonaController extends GenericoControllerImpl<TipoPersona, TipoPersonaDTO, TipoPersonaResponseDTO, Long, TipoPersonaService> {
+
+    public TipoPersonaController(TipoPersonaService servicio) {
+        super(servicio);
+    }
+
+    // Aquí puedes agregar métodos específicos para el controlador de TipoPersona si es necesario
 }

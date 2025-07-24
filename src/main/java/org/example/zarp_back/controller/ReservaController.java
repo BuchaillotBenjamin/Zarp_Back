@@ -1,4 +1,15 @@
 package org.example.zarp_back.controller;
 
-public class ReservaController {
+import org.example.zarp_back.model.dto.reserva.ReservaDTO;
+import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
+import org.example.zarp_back.model.entity.Reserva;
+import org.example.zarp_back.service.ReservaService;
+
+public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long, ReservaService> {
+
+    public ReservaController(ReservaService servicio) {
+        super(servicio);
+    }
+
+    // Aquí puedes agregar métodos específicos para el controlador de Reserva si es necesario
 }

@@ -1,4 +1,15 @@
 package org.example.zarp_back.controller;
 
-public class VerificacionClienteController {
+import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
+import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
+import org.example.zarp_back.model.entity.VerificacionCliente;
+import org.example.zarp_back.service.VerificacionClienteService;
+
+public class VerificacionClienteController extends GenericoControllerImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long, VerificacionClienteService> {
+
+    public VerificacionClienteController(VerificacionClienteService servicio) {
+        super(servicio);
+    }
+
+    // Aquí puedes agregar métodos específicos para el controlador de VerificacionCliente si es necesario
 }
