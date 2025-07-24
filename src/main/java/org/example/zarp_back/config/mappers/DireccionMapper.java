@@ -13,8 +13,6 @@ import java.util.List;
 public interface DireccionMapper extends GenericoMapper<Direccion, DireccionDTO, DireccionResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Direccion toEntity(DireccionDTO dto);
 
     @Override

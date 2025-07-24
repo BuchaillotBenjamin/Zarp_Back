@@ -15,8 +15,6 @@ import java.util.List;
 public interface DetalleTipoPersonaMapper extends GenericoMapper<DetalleTipoPersona, DetalleTipoPersonaDTO, DetalleTipoPersonaResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     DetalleTipoPersona toEntity(DetalleTipoPersonaDTO dto);
 
     @Override

@@ -13,8 +13,6 @@ import java.util.List;
 public interface CaracteristicaMapper extends GenericoMapper<Caracteristica, CaracteristicaDTO, CaracteristicaResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Caracteristica toEntity(CaracteristicaDTO dto);
 
     @Override

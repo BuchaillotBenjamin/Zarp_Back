@@ -16,8 +16,6 @@ import java.util.List;
 public interface DetalleImagenPropiedadMapper extends GenericoMapper<DetalleImagenPropiedad, DetalleImagenPropiedadDTO, DetalleImagenPropiedadResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         // Recuerda que la propiedadId en el DTO debe mapearse manualmente a la entidad Propiedad en el service
     DetalleImagenPropiedad toEntity(DetalleImagenPropiedadDTO dto);
 

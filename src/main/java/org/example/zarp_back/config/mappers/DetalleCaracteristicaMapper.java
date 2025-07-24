@@ -16,8 +16,6 @@ import java.util.List;
 public interface DetalleCaracteristicaMapper extends GenericoMapper<DetalleCaracteristica, DetalleCaracteristicaDTO, DetalleCaracteristicaResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     DetalleCaracteristica toEntity(DetalleCaracteristicaDTO dto);
 
 

@@ -28,8 +28,6 @@ import java.util.List;
 public interface PropiedadMapper extends GenericoMapper<Propiedad, PropiedadDTO, PropiedadResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         // Convertir tipoPropiedadId (Long) a TipoPropiedad se debe hacer manualmente en el service
     Propiedad toEntity(PropiedadDTO dto);
 

@@ -13,8 +13,6 @@ import java.util.List;
 public interface VerificacionClienteMapper extends GenericoMapper<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     VerificacionCliente toEntity(VerificacionClienteDTO dto);
 
     @Override

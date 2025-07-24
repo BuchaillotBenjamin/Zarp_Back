@@ -14,8 +14,6 @@ import java.util.List;
 public interface ReseniaMapper extends GenericoMapper<Resenia, ReseniaDTO, ReseniaResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         // El usuarioId del DTO debe ser convertido a Cliente en el service manualmente
     Resenia toEntity(ReseniaDTO dto);
 

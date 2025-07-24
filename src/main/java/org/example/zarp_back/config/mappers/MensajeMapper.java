@@ -16,8 +16,6 @@ import java.util.List;
 public interface MensajeMapper extends GenericoMapper<Mensaje, MensajeDTO, MensajeResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         // La conversión de emisorId, receptorId y conversacionId a entidades se hace en el service manualmente
     Mensaje toEntity(MensajeDTO dto);
 

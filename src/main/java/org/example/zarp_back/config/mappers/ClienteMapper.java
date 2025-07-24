@@ -14,8 +14,6 @@ import java.util.List;
 public interface ClienteMapper extends GenericoMapper<Cliente, ClienteDTO, ClienteResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Cliente toEntity(ClienteDTO dto);
 
     @Override

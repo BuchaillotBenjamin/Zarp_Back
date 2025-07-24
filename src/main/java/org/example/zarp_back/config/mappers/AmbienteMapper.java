@@ -14,8 +14,6 @@ public interface AmbienteMapper extends GenericoMapper<Ambiente, AmbienteDTO, Am
 
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Ambiente toEntity(AmbienteDTO dto);
 
     @Override

@@ -16,8 +16,6 @@ import java.util.List;
 public interface EmpleadoMapper extends GenericoMapper<Empleado, EmpleadoDTO, EmpleadoResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Empleado toEntity(EmpleadoDTO dto);
 
     @Override

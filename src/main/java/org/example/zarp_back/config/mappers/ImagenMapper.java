@@ -13,7 +13,6 @@ import java.util.List;
 public interface ImagenMapper extends GenericoMapper<Imagen, ImagenDTO, ImagenResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
     Imagen toEntity(ImagenDTO dto);
 
     @Override

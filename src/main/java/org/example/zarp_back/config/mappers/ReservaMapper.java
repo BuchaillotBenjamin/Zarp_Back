@@ -15,8 +15,6 @@ import java.util.List;
 public interface ReservaMapper extends GenericoMapper<Reserva, ReservaDTO, ReservaResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         // El clienteId y propiedadId en DTO deben ser convertidos manualmente en el service a entidades Cliente y Propiedad
     Reserva toEntity(ReservaDTO dto);
 

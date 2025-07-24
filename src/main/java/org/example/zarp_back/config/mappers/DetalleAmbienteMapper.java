@@ -16,8 +16,6 @@ import java.util.List;
 public interface DetalleAmbienteMapper extends GenericoMapper<DetalleAmbiente, DetalleAmbienteDTO, DetalleAmbienteResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
         //TODO: Mapear campos de DetalleAmbienteDTO a DetalleAmbiente.
         // Como DetalleAmbienteDTO tiene propiedadId y ambienteId (Long),
         // y DetalleAmbiente tiene entidades Propiedad y Ambiente,

@@ -14,8 +14,6 @@ import java.util.List;
 public interface ConversacionMapper extends GenericoMapper<Conversacion, ConversacionDTO, ConversacionResponseDTO> {
 
     @Override
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "activo", ignore = true)
     Conversacion toEntity(ConversacionDTO dto);
 
     @Override
