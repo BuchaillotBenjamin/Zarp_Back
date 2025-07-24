@@ -1,4 +1,15 @@
 package org.example.zarp_back.service;
 
-public class ConversacionService {
+import org.example.zarp_back.config.mappers.ConversacionMapper;
+import org.example.zarp_back.model.dto.conversacion.ConversacionDTO;
+import org.example.zarp_back.model.dto.conversacion.ConversacionResponseDTO;
+import org.example.zarp_back.model.entity.Conversacion;
+import org.example.zarp_back.repository.ConversacionRepository;
+
+public class ConversacionService extends GenericoServiceImpl<Conversacion, ConversacionDTO, ConversacionResponseDTO, Long> {
+
+    public ConversacionService(ConversacionRepository conversacionRepository, ConversacionMapper conversacionMapper) {
+        super(conversacionRepository, conversacionMapper);
+    }
+
 }
