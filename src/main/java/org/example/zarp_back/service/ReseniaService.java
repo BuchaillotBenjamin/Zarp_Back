@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.reseña.ReseniaDTO;
 import org.example.zarp_back.model.dto.reseña.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Resenia;
 import org.example.zarp_back.repository.ReseniaRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, ReseniaResponseDTO, Long> {
 
     public ReseniaService(ReseniaRepository reseniaRepository, ReseniaMapper reseniaMapper) {

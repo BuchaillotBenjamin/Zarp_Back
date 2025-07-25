@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDT
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.repository.VerificacionClienteRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class VerificacionClienteService extends GenericoServiceImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long> {
 
     public VerificacionClienteService(VerificacionClienteRepository verificacionClienteRepository, VerificacionClienteMapper verificacionClienteMapper) {

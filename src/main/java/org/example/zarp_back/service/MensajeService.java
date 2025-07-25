@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.mensaje.MensajeDTO;
 import org.example.zarp_back.model.dto.mensaje.MensajeResponseDTO;
 import org.example.zarp_back.model.entity.Mensaje;
 import org.example.zarp_back.repository.MensajeRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MensajeService extends GenericoServiceImpl<Mensaje, MensajeDTO, MensajeResponseDTO, Long> {
 
     public MensajeService(MensajeRepository mensajeRepository, MensajeMapper mensajeMapper) {

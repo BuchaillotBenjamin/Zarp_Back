@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaResponseDTO;
 import org.example.zarp_back.model.entity.DetalleTipoPersona;
 import org.example.zarp_back.repository.DetalleTipoPersonaRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DetalleTipoPersonaService extends GenericoServiceImpl<DetalleTipoPersona, DetalleTipoPersonaDTO, DetalleTipoPersonaResponseDTO, Long> {
 
     public DetalleTipoPersonaService(DetalleTipoPersonaRepository detalleTipoPersonaRepository, DetalleTipoPersonaMapper detalleTipoPersonaMapper) {

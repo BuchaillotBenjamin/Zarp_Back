@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristi
 import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristicaResponseDTO;
 import org.example.zarp_back.model.entity.DetalleCaracteristica;
 import org.example.zarp_back.repository.DetalleCaracteristicaRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DetalleCaracteristicaService extends GenericoServiceImpl<DetalleCaracteristica, DetalleCaracteristicaDTO, DetalleCaracteristicaResponseDTO, Long> {
 
     public DetalleCaracteristicaService(DetalleCaracteristicaRepository detalleCaracteristicaRepository, DetalleCaracteristicaMapper detalleCaracteristicaMapper) {

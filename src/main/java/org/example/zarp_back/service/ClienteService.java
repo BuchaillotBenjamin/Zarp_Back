@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long> {
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {

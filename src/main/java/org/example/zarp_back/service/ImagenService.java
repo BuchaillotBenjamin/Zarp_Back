@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.imagen.ImagenDTO;
 import org.example.zarp_back.model.dto.imagen.ImagenResponseDTO;
 import org.example.zarp_back.model.entity.Imagen;
 import org.example.zarp_back.repository.ImagenRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ImagenService extends GenericoServiceImpl<Imagen, ImagenDTO, ImagenResponseDTO, Long> {
 
     public ImagenService(ImagenRepository imagenRepository, ImagenMapper imagenMapper) {

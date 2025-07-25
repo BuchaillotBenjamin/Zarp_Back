@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropi
 import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropiedadResponseDTO;
 import org.example.zarp_back.model.entity.DetalleImagenPropiedad;
 import org.example.zarp_back.repository.DetalleImagenPropiedadRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DetalleImagenPropiedadService extends GenericoServiceImpl<DetalleImagenPropiedad, DetalleImagenPropiedadDTO, DetalleImagenPropiedadResponseDTO, Long> {
 
     public DetalleImagenPropiedadService(DetalleImagenPropiedadRepository detalleImagenPropiedadRepository, DetalleImagenPropiedadMapper detalleImagenPropiedadMapper) {

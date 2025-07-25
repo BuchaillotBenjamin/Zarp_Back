@@ -5,7 +5,9 @@ import org.example.zarp_back.model.dto.empleado.EmpleadoDTO;
 import org.example.zarp_back.model.dto.empleado.EmpleadoResponseDTO;
 import org.example.zarp_back.model.entity.Empleado;
 import org.example.zarp_back.repository.EmpleadoRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, EmpleadoResponseDTO, Long> {
 
     public EmpleadoService(EmpleadoRepository empleadoRepository, EmpleadoMapper empleadoMapper) {
