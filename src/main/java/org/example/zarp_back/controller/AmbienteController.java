@@ -4,7 +4,6 @@ import org.example.zarp_back.model.dto.ambiente.AmbienteDTO;
 import org.example.zarp_back.model.dto.ambiente.AmbienteResponseDTO;
 import org.example.zarp_back.model.entity.Ambiente;
 import org.example.zarp_back.service.AmbienteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

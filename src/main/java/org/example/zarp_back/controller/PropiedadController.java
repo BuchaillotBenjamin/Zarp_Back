@@ -4,7 +4,11 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.service.PropiedadService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/api/propiedades")
 public class PropiedadController extends GenericoControllerImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long, PropiedadService> {
 
     public PropiedadController(PropiedadService servicio) {
