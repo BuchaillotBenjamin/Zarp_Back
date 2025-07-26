@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.conversacion;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.mensaje.MensajeDTO;
 import org.example.zarp_back.model.entity.Mensaje;
 
 import java.util.List;
@@ -12,6 +13,6 @@ import java.util.List;
 @Builder
 public class ConversacionDTO {
 
-    private List<Mensaje> mensajes;
+    private List<MensajeDTO> mensajes;
 
 }

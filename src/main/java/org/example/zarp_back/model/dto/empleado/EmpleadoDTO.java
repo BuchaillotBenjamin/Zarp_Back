@@ -2,6 +2,8 @@ package org.example.zarp_back.model.dto.empleado;
 
 
 import lombok.*;
+import org.example.zarp_back.model.dto.direccion.DireccionDTO;
+import org.example.zarp_back.model.dto.usuario.UsuarioDTO;
 import org.example.zarp_back.model.entity.Direccion;
 import org.example.zarp_back.model.entity.Usuario;
 import org.example.zarp_back.model.enums.Rol;
@@ -13,9 +15,9 @@ import org.example.zarp_back.model.enums.Rol;
 @Builder
 public class EmpleadoDTO {
 
-    private Usuario usuario;
+    private UsuarioDTO usuario;
     private Rol rol;
-    private Direccion direccion;
+    private DireccionDTO direccion;
     private String telefono;
 
 

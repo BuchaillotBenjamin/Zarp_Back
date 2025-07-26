@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.cliente;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.usuario.UsuarioDTO;
 import org.example.zarp_back.model.entity.Usuario;
 
 @Getter
@@ -10,7 +11,7 @@ import org.example.zarp_back.model.entity.Usuario;
 @Builder
 public class ClienteDTO {
 
-    private Usuario usuario;
+    private UsuarioDTO usuario;
     private String telefono;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;

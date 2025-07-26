@@ -1,9 +1,8 @@
-package org.example.zarp_back.model.dto.reseña;
+package org.example.zarp_back.model.dto.resenia;
 
 
 
 import lombok.*;
-import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.Propiedad;
 
 @Getter

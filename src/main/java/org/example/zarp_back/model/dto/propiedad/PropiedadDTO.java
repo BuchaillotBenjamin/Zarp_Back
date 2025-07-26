@@ -1,9 +1,11 @@
 package org.example.zarp_back.model.dto.propiedad;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.*;
+import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteDTO;
+import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristicaDTO;
+import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropiedadDTO;
+import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
+import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.entity.*;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 
@@ -19,13 +21,12 @@ public class PropiedadDTO {
     private String nombre;
     private String descripcion;
     private Double precioPorNoche;
-    private VerificacionPropiedad verificacionPropiedad;
     private Direccion direccion;
     private Long tipoPropiedadId;
-    private List<Resenia> resenias;
-    private List<DetalleTipoPersona> detalleTipoPersonas;
-    private List<DetalleCaracteristica> detalleCaracteristicas;
-    private List<DetalleImagenPropiedad> detalleImagenes;
-    private List<DetalleAmbiente> detalleAmbientes;
+    private List<ReseniaDTO> resenias;
+    private List<DetalleTipoPersonaDTO> detalleTipoPersonas;
+    private List<DetalleCaracteristicaDTO> detalleCaracteristicas;
+    private List<DetalleImagenPropiedadDTO> detalleImagenes;
+    private List<DetalleAmbienteDTO> detalleAmbientes;
 
 }

@@ -17,7 +17,7 @@ public class ReservaDTO {
 
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private double precioTotal;
+    private Double precioTotal;
     private Long clienteId;
     private Long propiedadId;
     private FormaPago formaPago;

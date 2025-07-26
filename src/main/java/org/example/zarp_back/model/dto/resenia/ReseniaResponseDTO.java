@@ -1,7 +1,8 @@
-package org.example.zarp_back.model.dto.reseña;
+package org.example.zarp_back.model.dto.resenia;
 
 
 import lombok.*;
+import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 
 
@@ -13,7 +14,7 @@ import org.example.zarp_back.model.entity.Cliente;
 public class ReseniaResponseDTO {
 
     private Long id;
-    private Cliente usuario;
+    private ClienteResponseDTO usuario;
     private String comentario;
     private Integer calificacion;
 

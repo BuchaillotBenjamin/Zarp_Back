@@ -4,15 +4,8 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
-import org.example.zarp_back.config.mappers.DireccionMapper;
-import org.example.zarp_back.config.mappers.TipoPropiedadMapper;
-import org.example.zarp_back.config.mappers.ReseniaMapper;
-import org.example.zarp_back.config.mappers.DetalleTipoPersonaMapper;
-import org.example.zarp_back.config.mappers.DetalleCaracteristicaMapper;
-import org.example.zarp_back.config.mappers.DetalleImagenPropiedadMapper;
-import org.example.zarp_back.config.mappers.DetalleAmbienteMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring",
@@ -28,6 +21,10 @@ import java.util.List;
 public interface PropiedadMapper extends GenericoMapper<Propiedad, PropiedadDTO, PropiedadResponseDTO> {
 
     @Override
+    @Mapping(target = "detalleTipoPersonas", ignore = true)
+    @Mapping(target = "detalleCaracteristicas", ignore = true)
+    @Mapping(target = "detalleImagenes", ignore = true)
+    @Mapping(target = "detalleAmbientes", ignore = true)
         // Convertir tipoPropiedadId (Long) a TipoPropiedad se debe hacer manualmente en el service
     Propiedad toEntity(PropiedadDTO dto);
 

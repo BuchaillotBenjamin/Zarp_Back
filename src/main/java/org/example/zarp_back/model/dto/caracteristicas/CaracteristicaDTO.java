@@ -2,6 +2,7 @@ package org.example.zarp_back.model.dto.caracteristicas;
 
 import lombok.*;
 
+import org.example.zarp_back.model.dto.imagen.ImagenDTO;
 import org.example.zarp_back.model.entity.Imagen;
 
 @Getter
@@ -13,6 +14,6 @@ public class CaracteristicaDTO {
 
     private String denominacion;
     private String descripcion;
-    private Imagen imagen;
+    private ImagenDTO imagen;
 
 }

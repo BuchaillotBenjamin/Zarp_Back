@@ -1,12 +1,10 @@
 package org.example.zarp_back.config.mappers;
 
-import org.example.zarp_back.model.dto.reseña.ReseniaDTO;
-import org.example.zarp_back.model.dto.reseña.ReseniaResponseDTO;
+import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
+import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Resenia;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
-import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 

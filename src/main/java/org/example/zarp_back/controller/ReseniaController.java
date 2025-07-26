@@ -1,7 +1,7 @@
 package org.example.zarp_back.controller;
 
-import org.example.zarp_back.model.dto.reseña.ReseniaDTO;
-import org.example.zarp_back.model.dto.reseña.ReseniaResponseDTO;
+import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
+import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Resenia;
 import org.example.zarp_back.service.ReseniaService;
 import org.springframework.web.bind.annotation.RequestMapping;

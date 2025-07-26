@@ -2,6 +2,7 @@ package org.example.zarp_back.model.dto.detalleTipoPersona;
 
 import lombok.*;
 
+import org.example.zarp_back.model.dto.tipoPersona.TipoPersonaResponseDTO;
 import org.example.zarp_back.model.entity.TipoPersona;
 
 @Getter
@@ -12,8 +13,8 @@ import org.example.zarp_back.model.entity.TipoPersona;
 public class DetalleTipoPersonaResponseDTO {
 
     private Long id;
-    private Integer Cantidad;
-    private TipoPersona tipoPersona;
+    private Integer cantidad;
+    private TipoPersonaResponseDTO tipoPersona;
 
 
 }

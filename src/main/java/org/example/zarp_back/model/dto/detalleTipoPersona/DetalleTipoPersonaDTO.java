@@ -11,7 +11,7 @@ import org.example.zarp_back.model.entity.TipoPersona;
 @Builder
 public class DetalleTipoPersonaDTO {
 
-    private Integer Cantidad;
+    private Integer cantidad;
     private Long tipoPersonaId;
     private Long propiedadId;
 }

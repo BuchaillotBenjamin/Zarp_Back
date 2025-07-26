@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.detalleCaracteristica;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.caracteristicas.CaracteristicaResponseDTO;
 import org.example.zarp_back.model.entity.Caracteristica;
 import org.example.zarp_back.model.entity.Propiedad;
 
@@ -13,6 +14,6 @@ public class DetalleCaracteristicaResponseDTO {
 
 
     private Long id;
-    private Caracteristica caracteristica;
+    private CaracteristicaResponseDTO caracteristica;
 
 }

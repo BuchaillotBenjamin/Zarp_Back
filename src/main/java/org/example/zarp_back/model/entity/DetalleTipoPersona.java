@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class DetalleTipoPersona extends Base{
 
-    private Integer Cantidad;
+    private Integer cantidad;
     @ManyToOne
     @JoinColumn(name = "tipo_persona_id")
     private TipoPersona tipoPersona;
