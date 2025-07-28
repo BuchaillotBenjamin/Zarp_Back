@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
 import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteDTO;
@@ -42,8 +43,6 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private static final Logger LOGGER = LoggerFactory.getLogger(PropiedadService.class);
 
 
-
-
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
         super(propiedadRepository, propiedadMapper);
         this.propiedadMapper = propiedadMapper;
@@ -57,72 +56,23 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         //detalle tipo personas
         propiedad.setDetalleTipoPersonas(new ArrayList<>());
+        agregarDetalleTipoPersonas(propiedad, propiedadDTO);
 
-        for (DetalleTipoPersonaDTO detalle: propiedadDTO.getDetalleTipoPersonas()) {
-
-            TipoPersona tipoPersona = tipoPersonaRepository.findById(detalle.getTipoPersonaId())
-                    .orElseThrow(() -> new RuntimeException("Tipo de persona no encontrado con ID: " + detalle.getTipoPersonaId()));
-
-            DetalleTipoPersona detalleTipoPersona = DetalleTipoPersona.builder()
-                    .cantidad(detalle.getCantidad())
-                    .tipoPersona(tipoPersona)
-                    .propiedad(propiedad)
-                    .build();
-
-            propiedad.getDetalleTipoPersonas().add(detalleTipoPersona);
-        }
         //detalle caracteristicas
         propiedad.setDetalleCaracteristicas(new ArrayList<>());
+        agregarDetalleCaracteristicas(propiedad, propiedadDTO);
 
-        for (DetalleCaracteristicaDTO detalle : propiedadDTO.getDetalleCaracteristicas()) {
-
-            Caracteristica caracteristica = caracteristicaRepository.findById(detalle.getCaracteristicaId())
-                    .orElseThrow(() -> new RuntimeException("Característica no encontrada con ID: " + detalle.getCaracteristicaId()));
-
-            DetalleCaracteristica detalleCaracteristica = DetalleCaracteristica.builder()
-                    .propiedad(propiedad)
-                    .caracteristica(caracteristica)
-                    .build();
-
-            propiedad.getDetalleCaracteristicas().add(detalleCaracteristica);
-
-        }
         //detalle imagenes
         propiedad.setDetalleImagenes(new ArrayList<>());
+        agregarDetalleImagenes(propiedad, propiedadDTO);
 
-        for(DetalleImagenPropiedadDTO detalle : propiedadDTO.getDetalleImagenes()) {
-
-            Imagen imagen = imagenMapper.toEntity(detalle.getImagen());
-
-            DetalleImagenPropiedad detalleImagenPropiedad = DetalleImagenPropiedad.builder()
-                    .propiedad(propiedad)
-                    .imgPrincipal(detalle.getImgPrincipal())
-                    .imagen(imagen)
-                    .build();
-
-            propiedad.getDetalleImagenes().add(detalleImagenPropiedad);
-
-        }
         //detalle ambientes
         propiedad.setDetalleAmbientes(new ArrayList<>());
-        for (DetalleAmbienteDTO detalle: propiedadDTO.getDetalleAmbientes()){
+        agregarDetalleAmbientes(propiedad, propiedadDTO);
 
-            Ambiente ambiente = ambienteRepository.findById(detalle.getAmbienteId())
-                    .orElseThrow(() -> new RuntimeException("Ambiente no encontrado con ID: " + detalle.getAmbienteId()));
-
-            DetalleAmbiente detalleAmbiente = DetalleAmbiente.builder()
-                    .propiedad(propiedad)
-                    .ambiente(ambiente)
-                    .cantidad(detalle.getCantidad())
-                    .build();
-
-            propiedad.getDetalleAmbientes().add(detalleAmbiente);
-
-        }
         //tipo Propiedad
-        TipoPropiedad tipoPropiedad = tipoPropiedadRepository.findById(propiedadDTO.getTipoPropiedadId())
-                .orElseThrow(() -> new RuntimeException("Tipo de propiedad no encontrado con ID: " + propiedadDTO.getTipoPropiedadId()));
-        propiedad.setTipoPropiedad(tipoPropiedad);
+        propiedad.setTipoPropiedad(new TipoPropiedad());
+        asignarTipoPropiedad(propiedad, propiedadDTO);
 
         //Verificacion pendiente
         propiedad.setVerificacionPropiedad(VerificacionPropiedad.PENDIENTE);
@@ -133,6 +83,107 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
     }
 
+    @Override
+    @Transactional
+    public PropiedadResponseDTO update(Long id, PropiedadDTO propiedadDTO) {
+    Propiedad propiedad = propiedadRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Propiedad no encontrada con ID: " + id));
 
-    // Aquí puedes agregar métodos específicos para el servicio de Propiedad si es necesario
+        if (!propiedad.getNombre().equals(propiedadDTO.getNombre())) {
+            propiedad.setNombre(propiedadDTO.getNombre());
+        }
+        if (!propiedad.getDescripcion().equals(propiedadDTO.getDescripcion())) {
+            propiedad.setDescripcion(propiedadDTO.getDescripcion());
+        }
+        if (!propiedad.getPrecioPorNoche().equals(propiedadDTO.getPrecioPorNoche())) {
+            propiedad.setPrecioPorNoche(propiedadDTO.getPrecioPorNoche());
+        }
+
+        //detalle tipo personas
+        agregarDetalleTipoPersonas(propiedad, propiedadDTO);
+
+        //detalle caracteristicas
+        agregarDetalleCaracteristicas(propiedad, propiedadDTO);
+
+        //detalle imagenes
+        agregarDetalleImagenes(propiedad, propiedadDTO);
+
+        //detalle ambientes
+        agregarDetalleAmbientes(propiedad, propiedadDTO);
+
+        //tipo Propiedad
+        asignarTipoPropiedad(propiedad, propiedadDTO);
+
+        propiedadRepository.save(propiedad);
+
+        return propiedadMapper.toResponseDTO(propiedad);
+    }
+
+
+
+    private void agregarDetalleTipoPersonas(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        propiedad.getDetalleTipoPersonas().clear();
+        for (DetalleTipoPersonaDTO detalle : propiedadDTO.getDetalleTipoPersonas()) {
+            TipoPersona tipoPersona = tipoPersonaRepository.findById(detalle.getTipoPersonaId())
+                    .orElseThrow(() -> new RuntimeException("Tipo de persona no encontrado con ID: " + detalle.getTipoPersonaId()));
+            DetalleTipoPersona detalleTipoPersona = DetalleTipoPersona.builder()
+                    .cantidad(detalle.getCantidad())
+                    .tipoPersona(tipoPersona)
+                    .propiedad(propiedad)
+                    .build();
+            propiedad.getDetalleTipoPersonas().add(detalleTipoPersona);
+        }
+    }
+
+    private void agregarDetalleCaracteristicas(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        propiedad.getDetalleCaracteristicas().clear();
+        for (DetalleCaracteristicaDTO detalle : propiedadDTO.getDetalleCaracteristicas()) {
+            Caracteristica caracteristica = caracteristicaRepository.findById(detalle.getCaracteristicaId())
+                    .orElseThrow(() -> new RuntimeException("Característica no encontrada con ID: " + detalle.getCaracteristicaId()));
+            DetalleCaracteristica detalleCaracteristica = DetalleCaracteristica.builder()
+                    .propiedad(propiedad)
+                    .caracteristica(caracteristica)
+                    .build();
+            propiedad.getDetalleCaracteristicas().add(detalleCaracteristica);
+        }
+    }
+
+    private void agregarDetalleImagenes(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        propiedad.getDetalleImagenes().clear();
+        for (DetalleImagenPropiedadDTO detalle : propiedadDTO.getDetalleImagenes()) {
+            Imagen imagen = imagenMapper.toEntity(detalle.getImagen());
+            DetalleImagenPropiedad detalleImagenPropiedad = DetalleImagenPropiedad.builder()
+                    .propiedad(propiedad)
+                    .imgPrincipal(detalle.getImgPrincipal())
+                    .imagen(imagen)
+                    .build();
+            propiedad.getDetalleImagenes().add(detalleImagenPropiedad);
+        }
+    }
+
+    private void agregarDetalleAmbientes(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        propiedad.getDetalleAmbientes().clear();
+        for (DetalleAmbienteDTO detalle : propiedadDTO.getDetalleAmbientes()) {
+            Ambiente ambiente = ambienteRepository.findById(detalle.getAmbienteId())
+                    .orElseThrow(() -> new RuntimeException("Ambiente no encontrado con ID: " + detalle.getAmbienteId()));
+            DetalleAmbiente detalleAmbiente = DetalleAmbiente.builder()
+                    .propiedad(propiedad)
+                    .ambiente(ambiente)
+                    .cantidad(detalle.getCantidad())
+                    .build();
+            propiedad.getDetalleAmbientes().add(detalleAmbiente);
+        }
+    }
+
+    private void asignarTipoPropiedad(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        TipoPropiedad tipoPropiedad = tipoPropiedadRepository.findById(propiedadDTO.getTipoPropiedadId())
+                .orElseThrow(() -> new RuntimeException("Tipo de propiedad no encontrado con ID: " + propiedadDTO.getTipoPropiedadId()));
+        propiedad.setTipoPropiedad(tipoPropiedad);
+    }
+
+
+
 }
+
+
+

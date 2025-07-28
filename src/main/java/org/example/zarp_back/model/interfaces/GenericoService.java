@@ -14,4 +14,6 @@ public interface GenericoService <T, D, R, ID> {
 
     List<R> findAll();
 
+    void toggleActivo(ID id);
+
 }

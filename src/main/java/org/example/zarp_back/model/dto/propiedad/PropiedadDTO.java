@@ -5,6 +5,7 @@ import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteDTO;
 import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristicaDTO;
 import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropiedadDTO;
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
+import org.example.zarp_back.model.dto.direccion.DireccionDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.entity.*;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
@@ -21,7 +22,7 @@ public class PropiedadDTO {
     private String nombre;
     private String descripcion;
     private Double precioPorNoche;
-    private Direccion direccion;
+    private DireccionDTO direccion;
     private Long tipoPropiedadId;
     private List<ReseniaDTO> resenias;
     private List<DetalleTipoPersonaDTO> detalleTipoPersonas;

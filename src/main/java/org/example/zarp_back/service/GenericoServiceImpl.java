@@ -58,4 +58,13 @@ public abstract class GenericoServiceImpl<T extends Base,D,R,ID extends Serializ
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public void toggleActivo(ID id) {
+        T entity = genericoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
+        entity.setActivo(!entity.getActivo());
+        genericoRepository.save(entity);
+    }
+
 }

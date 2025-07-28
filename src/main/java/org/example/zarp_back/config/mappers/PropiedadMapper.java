@@ -25,7 +25,7 @@ public interface PropiedadMapper extends GenericoMapper<Propiedad, PropiedadDTO,
     @Mapping(target = "detalleCaracteristicas", ignore = true)
     @Mapping(target = "detalleImagenes", ignore = true)
     @Mapping(target = "detalleAmbientes", ignore = true)
-        // Convertir tipoPropiedadId (Long) a TipoPropiedad se debe hacer manualmente en el service
+
     Propiedad toEntity(PropiedadDTO dto);
 
     @Override

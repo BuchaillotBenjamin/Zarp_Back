@@ -18,4 +18,6 @@ public interface GenericoController <E extends Base, D, R, ID extends Serializab
 
     ResponseEntity<List<R>> findAll();
 
+    ResponseEntity<String> toggleActivo(ID id);
+
 }
