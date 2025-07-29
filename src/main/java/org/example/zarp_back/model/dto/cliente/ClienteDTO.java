@@ -1,5 +1,8 @@
 package org.example.zarp_back.model.dto.cliente;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.example.zarp_back.model.dto.usuario.UsuarioDTO;
 import org.example.zarp_back.model.entity.Usuario;
@@ -11,9 +14,9 @@ import org.example.zarp_back.model.entity.Usuario;
 @Builder
 public class ClienteDTO {
 
+    @Valid
+    @NotNull(message = "El campo usuario no puede ser nulo")
     private UsuarioDTO usuario;
+    @NotBlank(message = "El campo nombre no puede estar vacio")
     private String telefono;
-    private Boolean correoVerificado;
-    private Boolean documentoVerificado;
-
 }

@@ -1,5 +1,8 @@
 package org.example.zarp_back.model.dto.mensaje;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.Conversacion;
@@ -12,9 +15,16 @@ import org.example.zarp_back.model.entity.Conversacion;
 @Builder
 public class MensajeDTO {
 
+    @NotBlank(message = "El campo contenido no puede estar vacio")
     private String contenido;
+    @NotNull(message = "El campo emisor no puede ser nulo")
+    @Positive(message = "El campo emisor debe ser un valor positivo")
     private Long emisorId;
+    @NotNull(message = "El campo receptor no puede ser nulo")
+    @Positive(message = "El campo receptor debe ser un valor positivo")
     private Long receptorId;
+    @NotNull(message = "El campo conversacionId no puede ser nulo")
+    @Positive(message = "El campo conversacionId debe ser un valor positivo")
     private Long conversacionId;
 
 }

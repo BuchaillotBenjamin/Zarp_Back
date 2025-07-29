@@ -116,6 +116,9 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         //tipo Propiedad
         asignarTipoPropiedad(propiedad, propiedadDTO);
 
+        //reseñas
+        propiedad.setResenias(new ArrayList<>());
+
         propiedadRepository.save(propiedad);
 
         return propiedadMapper.toResponseDTO(propiedad);

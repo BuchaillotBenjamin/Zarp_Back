@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.tipoPropiedad;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -10,5 +11,6 @@ import lombok.*;
 @Builder
 public class TipoPropiedadDTO {
 
+    @NotBlank(message = "El campo denominacion no puede estar vacio")
     private String denominacion;
 }
