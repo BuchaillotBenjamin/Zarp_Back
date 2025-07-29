@@ -28,6 +28,9 @@ public class Propiedad extends Base {
     @ManyToOne
     private TipoPropiedad tipoPropiedad;
 
+    /*@ManyToOne
+    private Cliente propietario;*/
+
     @OneToMany(mappedBy = "propiedad", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<Resenia> resenias;
 

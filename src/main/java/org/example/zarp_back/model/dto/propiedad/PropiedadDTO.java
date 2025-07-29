@@ -23,6 +23,7 @@ public class PropiedadDTO {
     private String descripcion;
     private Double precioPorNoche;
     private DireccionDTO direccion;
+    //private Long propietarioId;
     private Long tipoPropiedadId;
     private List<ReseniaDTO> resenias;
     private List<DetalleTipoPersonaDTO> detalleTipoPersonas;

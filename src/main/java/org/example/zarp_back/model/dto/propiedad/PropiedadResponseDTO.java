@@ -24,6 +24,7 @@ public class PropiedadResponseDTO {
     private Boolean activo;
     private String nombre;
     private String descripcion;
+    //private ClienteResponseDTO propietario;
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
     private DireccionResponseDTO direccion;

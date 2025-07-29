@@ -16,7 +16,8 @@ import java.util.List;
                 DetalleTipoPersonaMapper.class,
                 DetalleCaracteristicaMapper.class,
                 DetalleImagenPropiedadMapper.class,
-                DetalleAmbienteMapper.class
+                DetalleAmbienteMapper.class,
+                ClienteMapper.class
         })
 public interface PropiedadMapper extends GenericoMapper<Propiedad, PropiedadDTO, PropiedadResponseDTO> {
 
@@ -25,7 +26,7 @@ public interface PropiedadMapper extends GenericoMapper<Propiedad, PropiedadDTO,
     @Mapping(target = "detalleCaracteristicas", ignore = true)
     @Mapping(target = "detalleImagenes", ignore = true)
     @Mapping(target = "detalleAmbientes", ignore = true)
-
+    //@Mapping(target = "propietario", ignore = true)
     Propiedad toEntity(PropiedadDTO dto);
 
     @Override

@@ -77,6 +77,8 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         //Verificacion pendiente
         propiedad.setVerificacionPropiedad(VerificacionPropiedad.PENDIENTE);
 
+        //vincular cliente
+
 
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);
