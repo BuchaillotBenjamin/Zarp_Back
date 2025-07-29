@@ -1,5 +1,6 @@
 package org.example.zarp_back.controller;
 
+import jakarta.validation.Valid;
 import org.example.zarp_back.model.entity.Base;
 import org.example.zarp_back.model.interfaces.GenericoController;
 import org.example.zarp_back.model.interfaces.GenericoService;
@@ -20,14 +21,14 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
     @Override
     @PostMapping("/save")
-    public ResponseEntity<R> save(@RequestBody D dto) {
+    public ResponseEntity<R> save(@Valid @RequestBody D dto) {
         R response = s.save(dto);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @PutMapping("/update/{id}")
-    public ResponseEntity<R> update(@PathVariable ID id, @RequestBody D dto) {
+    public ResponseEntity<R> update(@PathVariable ID id,@Valid @RequestBody D dto) {
         R response = s.update(id, dto);
         return ResponseEntity.ok(response);
     }

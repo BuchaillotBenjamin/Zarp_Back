@@ -15,5 +15,6 @@ public class ReseniaController extends GenericoControllerImpl<Resenia, ReseniaDT
         super(servicio);
     }
 
+
     // Aquí puedes agregar métodos específicos para el controlador de Resenia si es necesario
 }

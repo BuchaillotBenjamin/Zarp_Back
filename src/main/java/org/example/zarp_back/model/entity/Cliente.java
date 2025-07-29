@@ -1,5 +1,6 @@
 package org.example.zarp_back.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class Cliente extends Base {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
     private String telefono;
     private Boolean correoVerificado;

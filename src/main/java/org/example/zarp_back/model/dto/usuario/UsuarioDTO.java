@@ -10,6 +10,8 @@ import lombok.*;
 @Builder
 public class UsuarioDTO {
 
+    @NotBlank(message = "El campo uId no puede estar vacio")
+    private String uId;
     @NotBlank(message = "El campo nombreCompleto no puede estar vacio")
     private String nombreCompleto;
     @NotBlank(message = "El campo correoElectronico no puede estar vacio")

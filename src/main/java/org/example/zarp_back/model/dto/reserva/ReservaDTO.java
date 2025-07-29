@@ -3,6 +3,7 @@ package org.example.zarp_back.model.dto.reserva;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
+import org.example.zarp_back.config.validation.RangoFechaValido;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.enums.Estado;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@RangoFechaValido
 public class ReservaDTO {
 
     @NotNull(message = "El fechaInicio estado no puede ser nulo")

@@ -18,7 +18,7 @@ import org.example.zarp_back.model.enums.Rol;
 @Entity
 public class Empleado extends Base {
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
     private Rol rol;
     @OneToOne(cascade= CascadeType.PERSIST)

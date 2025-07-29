@@ -23,6 +23,8 @@ public class EmpleadoDTO {
     private UsuarioDTO usuario;
     @NotNull(message = "El campo direccion no puede ser nulo")
     private DireccionDTO direccion;
+    @NotNull(message = "El campo rol no puede ser nulo")
+    private Rol rol;
     @NotBlank(message = "El campo telefono no puede estar vacío")
     private String telefono;
 
