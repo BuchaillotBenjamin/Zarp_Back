@@ -5,6 +5,7 @@ import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Resenia;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
 public interface ReseniaMapper extends GenericoMapper<Resenia, ReseniaDTO, ReseniaResponseDTO> {
 
     @Override
-        // El usuarioId del DTO debe ser convertido a Cliente en el service manualmente
+    @Mapping(target = "usuarioId", ignore = true)
+    @Mapping(target = "propiedadId", ignore = true)
     Resenia toEntity(ReseniaDTO dto);
 
     @Override

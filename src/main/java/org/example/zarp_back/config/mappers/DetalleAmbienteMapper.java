@@ -16,10 +16,6 @@ import java.util.List;
 public interface DetalleAmbienteMapper extends GenericoMapper<DetalleAmbiente, DetalleAmbienteDTO, DetalleAmbienteResponseDTO> {
 
     @Override
-        //TODO: Mapear campos de DetalleAmbienteDTO a DetalleAmbiente.
-        // Como DetalleAmbienteDTO tiene propiedadId y ambienteId (Long),
-        // y DetalleAmbiente tiene entidades Propiedad y Ambiente,
-        // si necesitás hacer la conversión explícita de IDs a entidades deberías manejarlo fuera o con mapeos personalizados.
     DetalleAmbiente toEntity(DetalleAmbienteDTO dto);
 
     @Override

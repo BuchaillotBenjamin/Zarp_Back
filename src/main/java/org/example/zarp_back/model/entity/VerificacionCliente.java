@@ -23,5 +23,7 @@ public class VerificacionCliente extends Base {
     private Imagen fotoDocumentoFrontal;
     @OneToOne(cascade = CascadeType.PERSIST)
     private Imagen fotoDocumentoTrasero;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private Cliente cliente;
 
 }

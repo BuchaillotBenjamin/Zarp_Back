@@ -9,10 +9,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {ImagenMapper.class})
+@Mapper(componentModel = "spring", uses = {ImagenMapper.class, ClienteMapper.class})
 public interface VerificacionClienteMapper extends GenericoMapper<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO> {
 
     @Override
+    @Mapping(target = "clienteId", ignore = true)
     VerificacionCliente toEntity(VerificacionClienteDTO dto);
 
     @Override

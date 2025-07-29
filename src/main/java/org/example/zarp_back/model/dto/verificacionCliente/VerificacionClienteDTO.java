@@ -13,5 +13,6 @@ public class VerificacionClienteDTO {
     private Imagen fotoFrontal;
     private Imagen fotoDocumentoFrontal;
     private Imagen fotoDocumentoTrasero;
+    private Long clienteId;
 
 }

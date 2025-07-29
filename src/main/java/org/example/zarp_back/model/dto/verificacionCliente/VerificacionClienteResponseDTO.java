@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.verificacionCliente;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Imagen;
 
 @Getter
@@ -15,5 +16,6 @@ public class VerificacionClienteResponseDTO {
     private Imagen fotoFrontal;
     private Imagen fotoDocumentoFrontal;
     private Imagen fotoDocumentoTrasero;
+    private ClienteResponseDTO cliente;
 
 }
