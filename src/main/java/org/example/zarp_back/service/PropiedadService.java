@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
 import org.example.zarp_back.config.mappers.PropiedadMapper;
@@ -89,7 +90,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     @Transactional
     public PropiedadResponseDTO update(Long id, PropiedadDTO propiedadDTO) {
     Propiedad propiedad = propiedadRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Propiedad no encontrada con ID: " + id));
+            .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con ID: " + id));
 
         if (!propiedad.getNombre().equals(propiedadDTO.getNombre())) {
             propiedad.setNombre(propiedadDTO.getNombre());
@@ -125,12 +126,11 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     }
 
 
-
     private void agregarDetalleTipoPersonas(Propiedad propiedad, PropiedadDTO propiedadDTO) {
         propiedad.getDetalleTipoPersonas().clear();
         for (DetalleTipoPersonaDTO detalle : propiedadDTO.getDetalleTipoPersonas()) {
             TipoPersona tipoPersona = tipoPersonaRepository.findById(detalle.getTipoPersonaId())
-                    .orElseThrow(() -> new RuntimeException("Tipo de persona no encontrado con ID: " + detalle.getTipoPersonaId()));
+                    .orElseThrow(() -> new NotFoundException("Tipo de persona no encontrado con ID: " + detalle.getTipoPersonaId()));
             DetalleTipoPersona detalleTipoPersona = DetalleTipoPersona.builder()
                     .cantidad(detalle.getCantidad())
                     .tipoPersona(tipoPersona)
@@ -144,7 +144,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         propiedad.getDetalleCaracteristicas().clear();
         for (DetalleCaracteristicaDTO detalle : propiedadDTO.getDetalleCaracteristicas()) {
             Caracteristica caracteristica = caracteristicaRepository.findById(detalle.getCaracteristicaId())
-                    .orElseThrow(() -> new RuntimeException("Característica no encontrada con ID: " + detalle.getCaracteristicaId()));
+                    .orElseThrow(() -> new NotFoundException("Característica no encontrada con ID: " + detalle.getCaracteristicaId()));
             DetalleCaracteristica detalleCaracteristica = DetalleCaracteristica.builder()
                     .propiedad(propiedad)
                     .caracteristica(caracteristica)
@@ -170,7 +170,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         propiedad.getDetalleAmbientes().clear();
         for (DetalleAmbienteDTO detalle : propiedadDTO.getDetalleAmbientes()) {
             Ambiente ambiente = ambienteRepository.findById(detalle.getAmbienteId())
-                    .orElseThrow(() -> new RuntimeException("Ambiente no encontrado con ID: " + detalle.getAmbienteId()));
+                    .orElseThrow(() -> new NotFoundException("Ambiente no encontrado con ID: " + detalle.getAmbienteId()));
             DetalleAmbiente detalleAmbiente = DetalleAmbiente.builder()
                     .propiedad(propiedad)
                     .ambiente(ambiente)
@@ -182,7 +182,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
     private void asignarTipoPropiedad(Propiedad propiedad, PropiedadDTO propiedadDTO) {
         TipoPropiedad tipoPropiedad = tipoPropiedadRepository.findById(propiedadDTO.getTipoPropiedadId())
-                .orElseThrow(() -> new RuntimeException("Tipo de propiedad no encontrado con ID: " + propiedadDTO.getTipoPropiedadId()));
+                .orElseThrow(() -> new NotFoundException("Tipo de propiedad no encontrado con ID: " + propiedadDTO.getTipoPropiedadId()));
         propiedad.setTipoPropiedad(tipoPropiedad);
     }
 

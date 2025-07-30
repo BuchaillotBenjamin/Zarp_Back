@@ -18,6 +18,6 @@ public class Usuario extends Base{
     private String uId;
     private String nombreCompleto;
     private String correoElectronico;
-    private String contrasena;
+    //private String contrasena;
 
 }

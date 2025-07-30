@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.EmpleadoMapper;
 import org.example.zarp_back.model.dto.empleado.EmpleadoDTO;
 import org.example.zarp_back.model.dto.empleado.EmpleadoResponseDTO;
@@ -25,7 +26,7 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
     @Transactional
     public EmpleadoResponseDTO update (Long id, EmpleadoDTO empleadoDTO) {
         Empleado empleado = empleadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empleado con el id " + id + " no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Empleado con el id " + id + " no encontrado"));
 
         boolean updated = false;
 

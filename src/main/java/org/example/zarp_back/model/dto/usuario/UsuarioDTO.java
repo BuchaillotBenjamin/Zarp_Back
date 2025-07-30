@@ -16,7 +16,7 @@ public class UsuarioDTO {
     private String nombreCompleto;
     @NotBlank(message = "El campo correoElectronico no puede estar vacio")
     private String correoElectronico;
-    @NotBlank(message = "El campo contrasena no puede estar vacio")
-    private String contrasena;
+    /*@NotBlank(message = "El campo contrasena no puede estar vacio")
+    private String contrasena;*/
 
 }

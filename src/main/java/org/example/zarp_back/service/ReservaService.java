@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReservaMapper;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
@@ -41,12 +42,12 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
 
         //propiedad
         Propiedad propiedad = propiedadRepository.findById(reservaDTO.getPropiedadId())
-                .orElseThrow(() -> new RuntimeException("Propiedad con el id " + reservaDTO.getPropiedadId() + " no encontrada"));
+                .orElseThrow(() -> new NotFoundException("Propiedad con el id " + reservaDTO.getPropiedadId() + " no encontrada"));
         reserva.setPropiedad(propiedad);
 
         //cliente
         Cliente cliente = clienteRepository.findById(reservaDTO.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente con el id " + reservaDTO.getClienteId() + " no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cliente con el id " + reservaDTO.getClienteId() + " no encontrado"));
         reserva.setCliente(cliente);
 
         //estado

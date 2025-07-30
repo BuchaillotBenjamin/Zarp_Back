@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.Rol;
 
 @Getter
 @Setter
@@ -19,6 +20,7 @@ public class Cliente extends Base {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
+    private Rol rol;
     private String telefono;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;

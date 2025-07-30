@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReseniaMapper;
 import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
@@ -32,7 +33,7 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
 
         Resenia resenia = reseniaMapper.toEntity(reseniaDTO);
         Propiedad propiedad = propiedadRepository.findById(reseniaDTO.getPropiedadId())
-                .orElseThrow(() -> new RuntimeException("Propiedad no encontrada con id: " + reseniaDTO.getPropiedadId()));
+                .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + reseniaDTO.getPropiedadId()));
 
 
         //TODO:verificar que tenga un reserva finalizada en la propiedad
