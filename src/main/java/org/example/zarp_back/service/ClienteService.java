@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long> {
 
@@ -42,8 +44,39 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
         clienteRepository.save(cliente);
 
+
+
         return clienteMapper.toResponseDTO(cliente);
     }
+
+    @Override
+    @Transactional
+    public ClienteResponseDTO update (Long id, ClienteDTO clienteDTO) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + id));
+
+        boolean updated = false;
+
+        if (!clienteDTO.getUsuario().getCorreoElectronico().equals(cliente.getUsuario().getCorreoElectronico())){
+            cliente.getUsuario().setCorreoElectronico(clienteDTO.getUsuario().getCorreoElectronico());
+            updated = true;
+        }
+        if (!clienteDTO.getUsuario().getNombreCompleto().equals(cliente.getUsuario().getNombreCompleto())){
+            cliente.getUsuario().setNombreCompleto(clienteDTO.getUsuario().getNombreCompleto());
+            updated = true;
+        }
+        if (!clienteDTO.getTelefono().equals(cliente.getTelefono())){
+            cliente.setTelefono(clienteDTO.getTelefono());
+            updated = true;
+        }
+
+        if (updated){
+            clienteRepository.save(cliente);
+        }
+
+        return clienteMapper.toResponseDTO(cliente);
+    }
+
 
     @Transactional
     public ClienteResponseDTO verificacionCorreo(Long id) {
@@ -53,17 +86,22 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         cliente.setCorreoVerificado(true);
         clienteRepository.save(cliente);
 
+        verificacionCompleta(id);
+
         return clienteMapper.toResponseDTO(cliente);
 
     }
 
     @Transactional
-    public ClienteResponseDTO verificacionDocumentacion(Long id, boolean verificado, Long verificacionClienteId) {
+    public ClienteResponseDTO verificacionDocumentacion(Long id, boolean verificado) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + id));
 
-        VerificacionCliente verificacionCliente = verificacionClienteRepository.findById(verificacionClienteId)
-                .orElseThrow(() -> new NotFoundException("Verificación de cliente no encontrada con id: " + verificacionClienteId));
+        List<VerificacionCliente> verificacionesActivas = verificacionClienteRepository.findVerificacionesActivasByClienteId(id);
+
+        VerificacionCliente verificacionCliente = verificacionesActivas.stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No hay verificación activa para el cliente con id: " + id));
 
         if (verificado) {
             cliente.setDocumentoVerificado(true);
@@ -73,11 +111,22 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         verificacionCliente.setActivo(false);
         verificacionClienteRepository.save(verificacionCliente);
 
+        verificacionCompleta(id);
+
         return clienteMapper.toResponseDTO(cliente);
 
     }
 
+    private void verificacionCompleta(long clienteId){
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
 
+        if (cliente.getCorreoVerificado() && cliente.getDocumentoVerificado()) {
+            cliente.setRol(Rol.PROPIETARIO);
+            clienteRepository.save(cliente);
+        }
+
+    }
 
     // Aquí puedes agregar métodos específicos para el servicio de Cliente si es necesario
 }

@@ -10,7 +10,7 @@ import lombok.*;
 public class UsuarioResponseDTO {
 
     private Long id;
-    private String uId;
+    private String uid;
     private Boolean activo;
     private String nombreCompleto;
     private String correoElectronico;

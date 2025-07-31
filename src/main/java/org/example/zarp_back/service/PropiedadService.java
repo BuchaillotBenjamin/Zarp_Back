@@ -40,6 +40,9 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private AmbienteRepository ambienteRepository;
     @Autowired
     private ImagenMapper imagenMapper;
+    @Autowired
+    ClienteRepository clienteRepository;
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropiedadService.class);
 
@@ -79,7 +82,9 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         propiedad.setVerificacionPropiedad(VerificacionPropiedad.PENDIENTE);
 
         //vincular cliente
-
+        Cliente propietario = clienteRepository.findById(propiedadDTO.getPropietarioId())
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + propiedadDTO.getPropietarioId()));
+        propiedad.setPropietario(propietario);
 
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);

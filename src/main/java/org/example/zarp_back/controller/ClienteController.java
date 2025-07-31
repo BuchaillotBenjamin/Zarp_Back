@@ -25,8 +25,8 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         return ResponseEntity.ok(response);
     }
     @PatchMapping("/verificacion-documento/{id}")
-    public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado, @RequestParam Long verificacionClienteId) {
-        ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado, verificacionClienteId);
+    public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
+        ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
         return ResponseEntity.ok(response);
     }
 

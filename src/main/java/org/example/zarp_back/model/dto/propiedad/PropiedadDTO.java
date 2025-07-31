@@ -34,9 +34,9 @@ public class PropiedadDTO {
     @Valid
     @NotNull(message = "El campo cantidadHuespedes no puede ser nulo")
     private DireccionDTO direccion;
-    //@NotNull(message = "El campo propietarioId no puede ser nulo")
-    //@Positive(message = "El campo propietarioId debe ser un valor positivo")
-    //private Long propietarioId;
+    @NotNull(message = "El campo propietarioId no puede ser nulo")
+    @Positive(message = "El campo propietarioId debe ser un valor positivo")
+    private Long propietarioId;
     @NotNull(message = "El campo tipoPropiedadId no puede ser nulo")
     @Positive(message = "El campo tipoPropiedadId debe ser un valor positivo")
     private Long tipoPropiedadId;

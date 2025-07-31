@@ -1,3 +1,4 @@
+/*
 package org.example.zarp_back.controller;
 
 import org.example.zarp_back.model.dto.usuario.UsuarioDTO;
@@ -17,3 +18,4 @@ public class UsuarioController extends GenericoControllerImpl<Usuario, UsuarioDT
 
     // Aquí puedes agregar métodos específicos para el controlador de Usuario si es necesario
 }
+*/
