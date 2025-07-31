@@ -16,9 +16,6 @@ import java.util.List;
 public interface MensajeMapper extends GenericoMapper<Mensaje, MensajeDTO, MensajeResponseDTO> {
 
     @Override
-    @Mapping(target = "emisorId", ignore = true)
-    @Mapping(target = "receptorId", ignore = true)
-    @Mapping(target = "conversacionId", ignore = true)
     Mensaje toEntity(MensajeDTO dto);
 
     @Override

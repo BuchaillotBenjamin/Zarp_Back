@@ -13,8 +13,6 @@ import java.util.List;
 public interface ReseniaMapper extends GenericoMapper<Resenia, ReseniaDTO, ReseniaResponseDTO> {
 
     @Override
-    @Mapping(target = "usuarioId", ignore = true)
-    @Mapping(target = "propiedadId", ignore = true)
     Resenia toEntity(ReseniaDTO dto);
 
     @Override
