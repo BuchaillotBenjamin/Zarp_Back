@@ -62,5 +62,13 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         return reservaMapper.toResponseDTO(reserva);
     }
 
+    public ReservaResponseDTO reservaFinalizada(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Reserva con el id " + id + " no encontrada"));
+        reserva.setEstado(Estado.FINALIZADA);
+        reservaRepository.save(reserva);
+        return reservaMapper.toResponseDTO(reserva);
+    }
+
     // Aquí puedes agregar métodos específicos para el servicio de Reserva si es necesario
 }
