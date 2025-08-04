@@ -21,7 +21,6 @@ public class Cliente extends Base {
     @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
     private Rol rol;
-    private String telefono;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;
 

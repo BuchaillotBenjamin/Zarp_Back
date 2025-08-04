@@ -15,7 +15,6 @@ public class ClienteResponseDTO {
     private Boolean activo;
     private UsuarioResponseDTO usuario;
     private String rol;
-    private String telefono;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;
 

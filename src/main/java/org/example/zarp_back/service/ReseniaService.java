@@ -6,9 +6,11 @@ import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.entity.Resenia;
+import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.repository.ReseniaRepository;
+import org.example.zarp_back.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,11 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
     private PropiedadRepository propiedadRepository;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private ReservaRepository reservaRepository;
+    @Autowired
+    private ReseniaRepository reseniaRepository;
+
 
     public ReseniaService(ReseniaRepository reseniaRepository, ReseniaMapper reseniaMapper) {
         super(reseniaRepository, reseniaMapper);
@@ -32,16 +39,29 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
     public ReseniaResponseDTO save(ReseniaDTO reseniaDTO) {
 
         Resenia resenia = reseniaMapper.toEntity(reseniaDTO);
+
+        //verificaciones de reserva finalizada y que no haya hecho reseña antes
+        boolean existeResenia = reseniaRepository.existsByPropiedadIdAndUsuarioId(
+                reseniaDTO.getPropiedadId(),
+                reseniaDTO.getUsuarioId()
+        );
+        if (existeResenia) {
+            throw new RuntimeException("El usuario ya ha dejado una reseña en esta propiedad.");
+        }
+
+        boolean tieneReservaFinalizada = reservaRepository.existsByClienteIdAndPropiedadIdAndEstado(
+                reseniaDTO.getPropiedadId(),
+                reseniaDTO.getUsuarioId(),
+                Estado.FINALIZADA
+        );
+        if (!tieneReservaFinalizada) {
+            throw new RuntimeException("El usuario no tiene una reserva finalizada en esta propiedad.");
+        }
+
+        //propiedad
         Propiedad propiedad = propiedadRepository.findById(reseniaDTO.getPropiedadId())
                 .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + reseniaDTO.getPropiedadId()));
 
-
-        //TODO:verificar que tenga un reserva finalizada en la propiedad
-        //metodobooleano de reservaRepo
-
-
-
-        //propiedad
         resenia.setPropiedad(propiedad);
 
 
@@ -54,6 +74,7 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
 
         return reseniaMapper.toResponseDTO(resenia);
     }
+
 
     // Aquí puedes agregar métodos específicos para el servicio de Resenia si es necesario
 }

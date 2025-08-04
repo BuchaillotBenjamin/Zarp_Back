@@ -11,9 +11,6 @@ import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristi
 import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropiedadDTO;
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
 import org.example.zarp_back.model.dto.direccion.DireccionDTO;
-import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
-import org.example.zarp_back.model.entity.*;
-import org.example.zarp_back.model.enums.VerificacionPropiedad;
 
 import java.util.List;
 

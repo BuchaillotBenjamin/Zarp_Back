@@ -17,6 +17,5 @@ public class ClienteDTO {
     @Valid
     @NotNull(message = "El campo usuario no puede ser nulo")
     private UsuarioDTO usuario;
-    @NotBlank(message = "El campo nombre no puede estar vacio")
-    private String telefono;
+
 }

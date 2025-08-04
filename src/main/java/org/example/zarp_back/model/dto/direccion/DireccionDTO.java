@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.direccion;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -22,9 +23,9 @@ public class DireccionDTO {
     private String codigoPostal;
     @NotBlank(message = "El campo localidad no puede estar vacío")
     private String localidad;
-    @NotBlank(message = "El campo latitud no puede estar vacío")
+    @NotNull(message = "El campo latitud no puede ser nulo")
     private Double latitud;
-    @NotBlank(message = "El campo longitud no puede estar vacío")
+    @NotNull(message = "El campo longitud no puede ser nulo")
     private Double longitud;
 
 }

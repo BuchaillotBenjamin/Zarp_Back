@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.propiedad;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteResponseDTO;
 import org.example.zarp_back.model.dto.detalleCaracteristica.DetalleCaracteristicaResponseDTO;
 import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropiedadResponseDTO;
@@ -24,7 +25,7 @@ public class PropiedadResponseDTO {
     private Boolean activo;
     private String nombre;
     private String descripcion;
-    //private ClienteResponseDTO propietario;
+    private ClienteResponseDTO propietario;
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
     private DireccionResponseDTO direccion;

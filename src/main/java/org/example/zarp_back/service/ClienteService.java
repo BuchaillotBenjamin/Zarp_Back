@@ -55,22 +55,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + id));
 
-        boolean updated = false;
 
-        if (!clienteDTO.getUsuario().getCorreoElectronico().equals(cliente.getUsuario().getCorreoElectronico())){
-            cliente.getUsuario().setCorreoElectronico(clienteDTO.getUsuario().getCorreoElectronico());
-            updated = true;
-        }
+
         if (!clienteDTO.getUsuario().getNombreCompleto().equals(cliente.getUsuario().getNombreCompleto())){
             cliente.getUsuario().setNombreCompleto(clienteDTO.getUsuario().getNombreCompleto());
-            updated = true;
-        }
-        if (!clienteDTO.getTelefono().equals(cliente.getTelefono())){
-            cliente.setTelefono(clienteDTO.getTelefono());
-            updated = true;
-        }
-
-        if (updated){
             clienteRepository.save(cliente);
         }
 

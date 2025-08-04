@@ -12,6 +12,7 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
+import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
 import org.slf4j.Logger;
@@ -58,6 +59,14 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         Propiedad propiedad = propiedadMapper.toEntity(propiedadDTO);
 
+        //vincular cliente y verificar su rol
+        Cliente propietario = clienteRepository.findById(propiedadDTO.getPropietarioId())
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + propiedadDTO.getPropietarioId()));
+        if (propietario.getRol()!= Rol.PROPIETARIO){
+            throw new RuntimeException("El cliente no esta verificado como propietario");
+        }
+        propiedad.setPropietario(propietario);
+
         //detalle tipo personas
         propiedad.setDetalleTipoPersonas(new ArrayList<>());
         agregarDetalleTipoPersonas(propiedad, propiedadDTO);
@@ -81,10 +90,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         //Verificacion pendiente
         propiedad.setVerificacionPropiedad(VerificacionPropiedad.PENDIENTE);
 
-        //vincular cliente
-        Cliente propietario = clienteRepository.findById(propiedadDTO.getPropietarioId())
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + propiedadDTO.getPropietarioId()));
-        propiedad.setPropietario(propietario);
+
 
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);

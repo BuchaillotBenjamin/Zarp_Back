@@ -1,12 +1,7 @@
 package org.example.zarp_back.model.dto.resenia;
 
-
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
-import org.example.zarp_back.model.entity.Propiedad;
 
 @Getter
 @Setter
@@ -23,7 +18,8 @@ public class ReseniaDTO {
     private Long usuarioId;
     @NotBlank(message = "El campo comentario no puede estar vacio")
     private String comentario;
-    @NotNull(message = "El campo calificacion no puede ser nulo")
-    @Positive(message = "El campo calificacion debe ser un valor positivo")
+    @Min(value = 1, message = "La calificación mínima permitida es 1")
+    @Max(value = 10, message = "La calificación máxima permitida es 10")
+    @NotNull(message = "El campo calificación no puede ser nulo")
     private Integer calificacion;
 }

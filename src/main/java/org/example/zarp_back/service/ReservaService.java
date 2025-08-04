@@ -8,6 +8,7 @@ import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.enums.Estado;
+import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.repository.ReservaRepository;
@@ -44,6 +45,9 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         Propiedad propiedad = propiedadRepository.findById(reservaDTO.getPropiedadId())
                 .orElseThrow(() -> new NotFoundException("Propiedad con el id " + reservaDTO.getPropiedadId() + " no encontrada"));
         reserva.setPropiedad(propiedad);
+        if (propiedad.getVerificacionPropiedad()!= VerificacionPropiedad.APROBADA){
+            throw new RuntimeException("La propiedad con el id " + reservaDTO.getPropiedadId() + " no está aprobada para reservas");
+        }
 
         //cliente
         Cliente cliente = clienteRepository.findById(reservaDTO.getClienteId())
