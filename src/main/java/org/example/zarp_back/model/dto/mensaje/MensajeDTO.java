@@ -20,11 +20,4 @@ public class MensajeDTO {
     @NotNull(message = "El campo emisor no puede ser nulo")
     @Positive(message = "El campo emisor debe ser un valor positivo")
     private Long emisorId;
-    @NotNull(message = "El campo receptor no puede ser nulo")
-    @Positive(message = "El campo receptor debe ser un valor positivo")
-    private Long receptorId;
-    @NotNull(message = "El campo conversacionId no puede ser nulo")
-    @Positive(message = "El campo conversacionId debe ser un valor positivo")
-    private Long conversacionId;
-
 }

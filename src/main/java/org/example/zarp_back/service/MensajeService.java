@@ -1,3 +1,4 @@
+/*
 package org.example.zarp_back.service;
 
 import org.example.zarp_back.config.mappers.MensajeMapper;
@@ -16,3 +17,4 @@ public class MensajeService extends GenericoServiceImpl<Mensaje, MensajeDTO, Men
 
     // Aquí puedes agregar métodos específicos para el servicio de Mensaje si es necesario
 }
+*/

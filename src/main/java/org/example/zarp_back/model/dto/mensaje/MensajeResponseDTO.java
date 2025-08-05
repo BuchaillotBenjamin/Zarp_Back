@@ -17,7 +17,6 @@ public class MensajeResponseDTO {
     private Long id;
     private String contenido;
     private ClienteResponseDTO emisor;
-    private ClienteResponseDTO receptor;
     private LocalDate fechaEnvio;
     private LocalTime horaEnvio;
 

@@ -10,10 +10,11 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {MensajeMapper.class})
+@Mapper(componentModel = "spring", uses = {MensajeMapper.class, ClienteMapper.class})
 public interface ConversacionMapper extends GenericoMapper<Conversacion, ConversacionDTO, ConversacionResponseDTO> {
 
     @Override
+    @Mapping(target = "mensajes", ignore = true)  // Mapeamos los mensajes usando MensajeMapper
     Conversacion toEntity(ConversacionDTO dto);
 
     @Override

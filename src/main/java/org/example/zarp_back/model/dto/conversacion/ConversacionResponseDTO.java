@@ -1,6 +1,7 @@
 package org.example.zarp_back.model.dto.conversacion;
 
 import lombok.*;
+import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.dto.mensaje.MensajeResponseDTO;
 import org.example.zarp_back.model.entity.Mensaje;
 
@@ -17,6 +18,8 @@ public class ConversacionResponseDTO {
     private Long id;
     private Boolean activo;
     private List<MensajeResponseDTO> mensajes;
+    private ClienteResponseDTO cliente1;
+    private ClienteResponseDTO cliente2;
     private LocalDate fechaCreacion;
 
 }

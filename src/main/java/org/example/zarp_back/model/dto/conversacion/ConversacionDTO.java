@@ -20,5 +20,9 @@ public class ConversacionDTO {
     @NotNull(message = "El campo mensajes no puede ser nulo")
     @Size(min = 1, message = "El campo mensajes debe contener al menos un mensaje")
     private List<MensajeDTO> mensajes;
+    @NotNull(message = "El campo cliente1 no puede ser nulo")
+    private Long cliente1Id;
+    @NotNull(message = "El campo cliente2 no puede ser nulo")
+    private Long cliente2Id;
 
 }

@@ -6,7 +6,6 @@ import org.example.zarp_back.model.entity.Mensaje;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.config.mappers.ConversacionMapper;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

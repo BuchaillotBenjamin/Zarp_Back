@@ -2,6 +2,7 @@ package org.example.zarp_back.model.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,12 @@ public class Conversacion extends Base{
 
     @OneToMany(mappedBy = "conversacion",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mensaje> mensajes;
+
+    @ManyToOne
+    private Cliente cliente1;
+
+    @ManyToOne
+    private Cliente cliente2;
 
     private LocalDate fechaCreacion;
 }

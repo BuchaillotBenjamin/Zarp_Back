@@ -1,3 +1,4 @@
+/*
 package org.example.zarp_back.controller;
 
 import org.example.zarp_back.model.dto.mensaje.MensajeDTO;
@@ -17,3 +18,4 @@ public class MensajeController extends GenericoControllerImpl<Mensaje, MensajeDT
 
     // Aquí puedes agregar métodos específicos para el controlador de Mensaje si es necesario
 }
+*/
