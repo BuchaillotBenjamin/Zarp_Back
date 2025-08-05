@@ -28,21 +28,9 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Empleado con el id " + id + " no encontrado"));
 
-        boolean updated = false;
 
-        if (!empleadoDTO.getUsuario().getCorreoElectronico().equals(empleado.getUsuario().getCorreoElectronico())){
-            empleado.getUsuario().setCorreoElectronico(empleadoDTO.getUsuario().getCorreoElectronico());
-            updated = true;
-        }
-        if (!empleadoDTO.getUsuario().getNombreCompleto().equals(empleado.getUsuario().getNombreCompleto())){
-            empleado.getUsuario().setNombreCompleto(empleadoDTO.getUsuario().getNombreCompleto());
-            updated = true;
-        }
-        if (!empleadoDTO.getTelefono().equals(empleado.getTelefono())){
-            empleado.setTelefono(empleadoDTO.getTelefono());
-            updated = true;
-        }
-        if (updated){
+        if (!empleadoDTO.getNombreCompleto().equals(empleado.getNombreCompleto())){
+            empleado.setNombreCompleto(empleadoDTO.getNombreCompleto());
             empleado = empleadoRepository.save(empleado);
         }
 

@@ -16,13 +16,9 @@ import org.example.zarp_back.model.enums.Rol;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Empleado extends Base {
+public class Empleado extends Usuario {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Usuario usuario;
+
     private Rol rol;
-    @OneToOne(cascade= CascadeType.PERSIST)
-    private Direccion direccion;
-    private String telefono;
 
 }

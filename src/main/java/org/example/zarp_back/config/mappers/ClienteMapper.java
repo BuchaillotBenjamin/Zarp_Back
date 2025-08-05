@@ -4,13 +4,11 @@ import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
-import org.example.zarp_back.config.mappers.UsuarioMapper;  // Importá el mapper de Usuario
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {UsuarioMapper.class})
+@Mapper(componentModel = "spring")
 public interface ClienteMapper extends GenericoMapper<Cliente, ClienteDTO, ClienteResponseDTO> {
 
     @Override

@@ -1,23 +1,21 @@
 package org.example.zarp_back.model.entity;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.MappedSuperclass;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+@MappedSuperclass
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@ToString
 @SuperBuilder
-@Entity
 public class Usuario extends Base{
 
     private String uid;
     private String nombreCompleto;
     private String correoElectronico;
-    //private String contrasena;
+
 
 }

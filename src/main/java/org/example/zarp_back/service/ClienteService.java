@@ -34,6 +34,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     @Transactional
     public ClienteResponseDTO save(ClienteDTO clienteDTO) {
 
+        if (clienteRepository.existsByUid(clienteDTO.getUid())) {
+            throw new IllegalArgumentException("El UID ya está en uso");
+        }
+
         Cliente cliente = clienteMapper.toEntity(clienteDTO);
 
         //verificaciones
@@ -49,6 +53,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         return clienteMapper.toResponseDTO(cliente);
     }
 
+    public boolean existsByUid(String uid) {
+        return clienteRepository.existsByUid(uid);
+    }
+
     @Override
     @Transactional
     public ClienteResponseDTO update (Long id, ClienteDTO clienteDTO) {
@@ -57,8 +65,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
 
 
-        if (!clienteDTO.getUsuario().getNombreCompleto().equals(cliente.getUsuario().getNombreCompleto())){
-            cliente.getUsuario().setNombreCompleto(clienteDTO.getUsuario().getNombreCompleto());
+        if (!clienteDTO.getNombreCompleto().equals(cliente.getNombreCompleto())){
+            cliente.setNombreCompleto(clienteDTO.getNombreCompleto());
             clienteRepository.save(cliente);
         }
 

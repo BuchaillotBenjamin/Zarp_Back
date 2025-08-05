@@ -16,11 +16,11 @@ import org.example.zarp_back.model.enums.Rol;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-public class Cliente extends Base {
+public class Cliente extends Usuario {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Usuario usuario;
     private Rol rol;
+    @OneToOne(cascade= CascadeType.ALL)
+    private Imagen fotoPerfil;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;
 
