@@ -12,6 +12,7 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
+import org.example.zarp_back.model.enums.Provincia;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long> {
@@ -135,6 +137,40 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         return propiedadMapper.toResponseDTO(propiedad);
     }
+
+    public List<List<PropiedadResponseDTO>> getPropiedadesByProvincia(){
+
+        List<List<PropiedadResponseDTO>> listasProvincias = new ArrayList<>();
+
+        for (Provincia provincia : Provincia.values()) {
+            List<Propiedad> propiedades = propiedadRepository.findByDireccionProvinciaAndActivoAndVerificacionPropiedad(
+                    provincia,
+                    true,
+                    VerificacionPropiedad.APROBADA);
+            if (!propiedades.isEmpty()) {
+                listasProvincias.add(propiedadMapper.toResponseDTOList(propiedades));
+            }
+        }
+
+        return listasProvincias;
+    }
+
+    public List<PropiedadResponseDTO> getPropiedadesByProvincia(Provincia provincia) {
+
+        List<Propiedad> propiedades = propiedadRepository.findByDireccionProvinciaAndActivoAndVerificacionPropiedad(
+                provincia,
+                true,
+                VerificacionPropiedad.APROBADA);
+        return propiedadMapper.toResponseDTOList(propiedades);
+    }
+
+    public List<PropiedadResponseDTO> getPropiedadesByCliente(Long idCliente) {
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + idCliente));
+        List<Propiedad> propiedades = propiedadRepository.findByClienteId(idCliente);
+        return propiedadMapper.toResponseDTOList(propiedades);
+    }
+
 
 
     private void agregarDetalleTipoPersonas(Propiedad propiedad, PropiedadDTO propiedadDTO) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.Provincia;
 
 @Getter
 @Setter
@@ -21,6 +22,7 @@ public class Direccion extends Base {
     private String departamento;
     private String codigoPostal;
     private String localidad;
+    private Provincia provincia;
     private Double latitud;
     private Double longitud;
 

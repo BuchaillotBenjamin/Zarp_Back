@@ -28,5 +28,6 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
         return ResponseEntity.ok(reservaResponseDTO);
     }
 
+
     // Aquí puedes agregar métodos específicos para el controlador de Reserva si es necesario
 }

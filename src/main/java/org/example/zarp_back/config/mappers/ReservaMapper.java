@@ -1,13 +1,11 @@
 package org.example.zarp_back.config.mappers;
 
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
+import org.example.zarp_back.model.dto.reserva.ReservaFechaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.interfaces.GenericoMapper;
-import org.example.zarp_back.config.mappers.ClienteMapper;
-import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -20,6 +18,10 @@ public interface ReservaMapper extends GenericoMapper<Reserva, ReservaDTO, Reser
 
     @Override
     List<Reserva> toEntityList(List<ReservaDTO> dtos);
+
+    ReservaFechaDTO toFechaDTO(Reserva reserva);
+
+    List<ReservaFechaDTO> toFechaDTOList(List<Reserva> reservas);
 
     @Override
     ReservaResponseDTO toResponseDTO(Reserva entity);

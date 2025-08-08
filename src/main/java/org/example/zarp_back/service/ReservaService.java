@@ -2,7 +2,9 @@ package org.example.zarp_back.service;
 
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReservaMapper;
+import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
+import org.example.zarp_back.model.dto.reserva.ReservaFechaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.Propiedad;
@@ -15,6 +17,8 @@ import org.example.zarp_back.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long> {
@@ -68,6 +72,17 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         reserva.setEstado(Estado.FINALIZADA);
         reservaRepository.save(reserva);
         return reservaMapper.toResponseDTO(reserva);
+    }
+
+    public List<ReservaFechaDTO> fechasReservadas(Long propiedadId){
+
+        if (!propiedadRepository.existsById(propiedadId)){
+            throw new NotFoundException("La propiedad con el id " + propiedadId+ " no existe");
+        }
+
+        List<Reserva> reservas = reservaRepository.findReservasActivasPorPropiedad(propiedadId);
+
+        return reservaMapper.toFechaDTOList(reservas);
     }
 
     // Aquí puedes agregar métodos específicos para el servicio de Reserva si es necesario
