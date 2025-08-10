@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class VerificacionClienteService extends GenericoServiceImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long> {
 
@@ -49,6 +51,12 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
         return verificacionClienteMapper.toResponseDTO(verificacionCliente);
     }
+
+    public List<VerificacionClienteResponseDTO> getVerificacionesActivas() {
+        List<VerificacionCliente> verificaciones = verificacionClienteRepository.findByActivo(true);
+        return verificacionClienteMapper.toResponseDTOList(verificaciones);
+    }
+
 
     // Aquí puedes agregar métodos específicos para el servicio de Verificación de Cliente si es necesario
 }

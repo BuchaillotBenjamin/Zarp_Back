@@ -167,7 +167,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     public List<PropiedadResponseDTO> getPropiedadesByCliente(Long idCliente) {
         Cliente cliente = clienteRepository.findById(idCliente)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + idCliente));
-        List<Propiedad> propiedades = propiedadRepository.findByClienteId(idCliente);
+        List<Propiedad> propiedades = propiedadRepository.findByPropietario_Id(idCliente);
         return propiedadMapper.toResponseDTOList(propiedades);
     }
 

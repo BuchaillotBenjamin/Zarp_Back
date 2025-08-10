@@ -80,7 +80,7 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
             throw new NotFoundException("La propiedad con el id " + propiedadId+ " no existe");
         }
 
-        List<Reserva> reservas = reservaRepository.findReservasActivasPorPropiedad(propiedadId);
+        List<Reserva> reservas = reservaRepository.findReservasActivasPorPropiedad(propiedadId, Estado.CANCELADA, Estado.FINALIZADA);
 
         return reservaMapper.toFechaDTOList(reservas);
     }

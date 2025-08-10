@@ -12,6 +12,6 @@ import java.util.List;
 public interface PropiedadRepository extends GenericoRepository<Propiedad, Long> {
 
     List<Propiedad> findByDireccionProvinciaAndActivoAndVerificacionPropiedad(Provincia provincia, boolean activo, VerificacionPropiedad verificacionPropiedad);
-    List<Propiedad> findByClienteId(Long idCliente);
+    List<Propiedad> findByPropietario_Id(Long idCliente);
 
 }

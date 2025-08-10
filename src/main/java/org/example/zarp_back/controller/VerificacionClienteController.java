@@ -4,15 +4,26 @@ import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDT
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.service.VerificacionClienteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/verificacionClientes")
 public class VerificacionClienteController extends GenericoControllerImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long, VerificacionClienteService> {
 
+    @Autowired
+    VerificacionClienteService verificacionClienteService;
+
+
     public VerificacionClienteController(VerificacionClienteService servicio) {
         super(servicio);
+    }
+
+    public List<VerificacionClienteResponseDTO> getVerificacionesActivas(Long clienteId) {
+        return verificacionClienteService.getVerificacionesActivas();
     }
 
     // Aquí puedes agregar métodos específicos para el controlador de VerificacionCliente si es necesario

@@ -25,6 +25,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     private ClienteMapper clienteMapper;
     @Autowired
     private VerificacionClienteRepository verificacionClienteRepository;
+    @Autowired
+    VerificacionClienteService verificacionClienteService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -73,7 +75,6 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         return clienteMapper.toResponseDTO(cliente);
     }
 
-
     @Transactional
     public ClienteResponseDTO verificacionCorreo(Long id) {
         Cliente cliente = clienteRepository.findById(id)
@@ -102,10 +103,11 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         if (verificado) {
             cliente.setDocumentoVerificado(true);
             clienteRepository.save(cliente);
-        }
+            verificacionClienteService.toggleActivo(verificacionCliente.getId());
 
-        verificacionCliente.setActivo(false);
-        verificacionClienteRepository.save(verificacionCliente);
+        }else{
+            verificacionClienteService.toggleActivo(verificacionCliente.getId());
+        }
 
         verificacionCompleta(id);
 
