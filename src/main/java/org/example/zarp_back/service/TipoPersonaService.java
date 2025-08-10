@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class TipoPersonaService extends GenericoServiceImpl<TipoPersona, TipoPersonaDTO, TipoPersonaResponseDTO, Long> {
 
@@ -45,6 +47,11 @@ public class TipoPersonaService extends GenericoServiceImpl<TipoPersona, TipoPer
         }
 
         return tipoPersonaMapper.toResponseDTO(tipoPersona);
+    }
+
+    public List<TipoPersonaResponseDTO> getActivos() {
+        List<TipoPersona> tipoPersonas = tipoPersonaRepository.findByActivo(true);
+        return tipoPersonaMapper.toResponseDTOList(tipoPersonas);
     }
 
     // Aquí puedes agregar métodos específicos para el servicio de TipoPersona si es necesario

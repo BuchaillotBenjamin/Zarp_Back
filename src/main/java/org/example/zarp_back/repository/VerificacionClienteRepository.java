@@ -14,6 +14,5 @@ public interface VerificacionClienteRepository extends GenericoRepository<Verifi
     @Query("SELECT vc FROM VerificacionCliente vc WHERE vc.cliente.id = :clienteId AND vc.cliente.documentoVerificado = true")
     List<VerificacionCliente> findVerificacionesActivasByClienteId(@Param("clienteId") Long clienteId);
 
-    List<VerificacionCliente>findByActivo(boolean activo);
 
 }

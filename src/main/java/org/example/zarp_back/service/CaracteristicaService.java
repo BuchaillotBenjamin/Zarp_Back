@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CaracteristicaService extends GenericoServiceImpl<Caracteristica, CaracteristicaDTO, CaracteristicaResponseDTO, Long> {
 
@@ -48,6 +50,10 @@ public class CaracteristicaService extends GenericoServiceImpl<Caracteristica, C
         return genericoMapper.toResponseDTO(caracteristicaExistente);
     }
 
+    public List<CaracteristicaResponseDTO> getActivos(Long propiedadId) {
+        List<Caracteristica> caracteristicas = caracteristicaRepository.findByActivo(true);
+        return caracteristicaMapper.toResponseDTOList(caracteristicas);
+    }
 
     // Aquí puedes agregar métodos específicos para el servicio de Característica si es necesario
 }

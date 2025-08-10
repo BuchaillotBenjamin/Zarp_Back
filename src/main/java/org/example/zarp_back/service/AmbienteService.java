@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AmbienteService extends GenericoServiceImpl<Ambiente, AmbienteDTO, AmbienteResponseDTO, Long> {
 
@@ -36,6 +38,14 @@ public class AmbienteService extends GenericoServiceImpl<Ambiente, AmbienteDTO, 
         }
 
         return genericoMapper.toResponseDTO(ambienteExistente);
+    }
+
+    public List<AmbienteResponseDTO> getActivos(){
+        List<Ambiente> ambientesActivos = ambienteRepository.findByActivo(true);
+        if (ambientesActivos.isEmpty()) {
+            throw new NotFoundException("No se encontraron ambientes activos");
+        }
+        return ambienteMapper.toResponseDTOList(ambientesActivos);
     }
 
 }
