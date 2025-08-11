@@ -31,14 +31,9 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     }
 
     @GetMapping("/existe-uid/{uid}")
-    public ResponseEntity<?> existsByUid(@PathVariable String uid) {
+    public ResponseEntity<Boolean> existsByUid(@PathVariable String uid) {
         boolean exists = clienteService.existsByUid(uid);
-        if (exists) {
-            return ResponseEntity.status(200).body("El UID está en uso");
-        }else{
-            return ResponseEntity.status(404).body("El UID está disponible");
-        }
-
+        return ResponseEntity.ok(exists);
     }
 
     // Aquí puedes agregar métodos específicos para el controlador de Cliente si es necesario
