@@ -21,7 +21,6 @@ public class ClienteDTO {
     private String nombreCompleto;
     @NotBlank(message = "El campo correoElectronico no puede estar vacio")
     private String correoElectronico;
-    @Valid
     @NotNull(message = "El campo fotoPerfil no puede ser nulo")
     private ImagenDTO fotoPerfil;
 
