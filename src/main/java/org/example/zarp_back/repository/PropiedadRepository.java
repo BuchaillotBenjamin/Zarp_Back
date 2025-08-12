@@ -13,5 +13,5 @@ public interface PropiedadRepository extends GenericoRepository<Propiedad, Long>
 
     List<Propiedad> findByDireccionProvinciaAndActivoAndVerificacionPropiedad(Provincia provincia, boolean activo, VerificacionPropiedad verificacionPropiedad);
     List<Propiedad> findByPropietario_Id(Long idCliente);
-
+    List<Propiedad> findByVerificacionPropiedad(VerificacionPropiedad verificacionPropiedad);
 }

@@ -10,6 +10,7 @@ import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropi
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
+import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
 import org.example.zarp_back.model.enums.Provincia;
@@ -171,7 +172,24 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         return propiedadMapper.toResponseDTOList(propiedades);
     }
 
+    public List<PropiedadResponseDTO> propiedadesVerificar() {
 
+        List<Propiedad> propiedades = propiedadRepository.findByVerificacionPropiedad(VerificacionPropiedad.PENDIENTE);
+        return propiedadMapper.toResponseDTOList(propiedades);
+
+    }
+
+    public PropiedadResponseDTO verificarPropiedad(Long id, boolean aprobado) {
+        Propiedad propiedad = propiedadRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con ID: " + id));
+        if (aprobado) {
+            propiedad.setVerificacionPropiedad(VerificacionPropiedad.APROBADA);
+        } else {
+            propiedad.setVerificacionPropiedad(VerificacionPropiedad.RECHAZADA);
+        }
+        propiedadRepository.save(propiedad);
+        return propiedadMapper.toResponseDTO(propiedad);
+    }
 
     private void agregarDetalleTipoPersonas(Propiedad propiedad, PropiedadDTO propiedadDTO) {
         propiedad.getDetalleTipoPersonas().clear();

@@ -5,6 +5,7 @@ import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteRe
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.service.VerificacionClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,8 +23,10 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
         super(servicio);
     }
 
-    public List<VerificacionClienteResponseDTO> getVerificacionesActivas(Long clienteId) {
-        return verificacionClienteService.getVerificacionesActivas();
+    public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas(Long clienteId) {
+
+        return ResponseEntity.ok(verificacionClienteService.getVerificacionesActivas());
+
     }
 
     // Aquí puedes agregar métodos específicos para el controlador de VerificacionCliente si es necesario

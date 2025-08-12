@@ -9,10 +9,7 @@ import org.example.zarp_back.service.PropiedadService;
 import org.example.zarp_back.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -55,6 +52,18 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     public ResponseEntity<List<?>> getReservasActivasPorPropiedad(@PathVariable Long propiedadId) {
         List<ReservaFechaDTO> reservas = reservaService.fechasReservadas(propiedadId);
         return ResponseEntity.ok(reservas);
+    }
+
+    @PutMapping("/activar/{id}")
+    public ResponseEntity<PropiedadResponseDTO> verificacionPropiedad(@PathVariable Long id, @RequestParam boolean activar) {
+        PropiedadResponseDTO propiedadActualizada = propiedadService.verificarPropiedad(id,activar);
+        return ResponseEntity.ok(propiedadActualizada);
+    }
+
+    @GetMapping("/aVerificar")
+    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesPorVerificar() {
+        List<PropiedadResponseDTO> propiedades = propiedadService.propiedadesVerificar();
+        return ResponseEntity.ok(propiedades);
     }
 
 
