@@ -17,11 +17,18 @@ public interface ReservaRepository extends GenericoRepository<Reserva, Long> {
     FROM Reserva r 
     WHERE r.propiedad.id = :propiedadId
       AND r.activo = true
-      AND r.estado NOT IN (:estado1, :estado2)
-""")
-    List<Reserva> findReservasActivasPorPropiedad(
-            @Param("propiedadId") Long propiedadId,
-            @Param("estado1") Estado estado1,
-            @Param("estado2") Estado estado2
-    );
+      AND r.estado NOT IN (org.example.zarp_back.model.enums.Estado.CANCELADA,
+                              org.example.zarp_back.model.enums.Estado.FINALIZADA)
+    """)
+    List<Reserva> findReservasActivasPorPropiedad(@Param("propiedadId") Long propiedadId);
+
+    @Query("""
+        SELECT r
+        FROM Reserva r
+        WHERE r.activo = true
+          AND r.estado NOT IN (org.example.zarp_back.model.enums.Estado.CANCELADA,
+                              org.example.zarp_back.model.enums.Estado.FINALIZADA)
+    """)
+    List<Reserva> findReservasActivas();
+
 }
