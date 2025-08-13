@@ -11,7 +11,10 @@ import java.util.List;
 @Repository
 public interface VerificacionClienteRepository extends GenericoRepository<VerificacionCliente, Long> {
 
-    @Query("SELECT vc FROM VerificacionCliente vc WHERE vc.cliente.id = :clienteId AND vc.cliente.documentoVerificado = true")
+    @Query("SELECT vc " +
+            "FROM VerificacionCliente vc " +
+            "WHERE vc.cliente.id = :clienteId " +
+            "AND vc.cliente.documentoVerificado = false")
     List<VerificacionCliente> findVerificacionesActivasByClienteId(@Param("clienteId") Long clienteId);
 
 
