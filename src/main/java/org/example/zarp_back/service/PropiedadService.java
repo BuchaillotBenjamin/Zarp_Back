@@ -25,7 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long> {
@@ -117,19 +120,29 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         }
 
         //detalle tipo personas
-        agregarDetalleTipoPersonas(propiedad, propiedadDTO);
+        if (!sonIgualesPorIdTipoPersona(propiedad.getDetalleTipoPersonas(), propiedadDTO.getDetalleTipoPersonas())) {
+            agregarDetalleTipoPersonas(propiedad, propiedadDTO);
+        }
 
         //detalle caracteristicas
-        agregarDetalleCaracteristicas(propiedad, propiedadDTO);
+        if (!sonIgualesPorIdDetalleCaracteristica(propiedad.getDetalleCaracteristicas(), propiedadDTO.getDetalleCaracteristicas())) {
+            agregarDetalleCaracteristicas(propiedad, propiedadDTO);
+        }
 
         //detalle imagenes
-        agregarDetalleImagenes(propiedad, propiedadDTO);
+        if (!sonIgualesPorUrlDetalleImagen(propiedad.getDetalleImagenes(), propiedadDTO.getDetalleImagenes())) {
+            agregarDetalleImagenes(propiedad, propiedadDTO);
+        }
 
         //detalle ambientes
-        agregarDetalleAmbientes(propiedad, propiedadDTO);
+        if (!sonIgualesPorIdDetalleAmbiente(propiedad.getDetalleAmbientes(), propiedadDTO.getDetalleAmbientes())) {
+            agregarDetalleAmbientes(propiedad, propiedadDTO);
+        }
 
         //tipo Propiedad
-        asignarTipoPropiedad(propiedad, propiedadDTO);
+        if (!propiedadDTO.getTipoPropiedadId().equals(propiedad.getTipoPropiedad().getId())) {
+            asignarTipoPropiedad(propiedad, propiedadDTO);
+        }
 
         //reseñas
         propiedad.setResenias(new ArrayList<>());
@@ -191,6 +204,9 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         return propiedadMapper.toResponseDTO(propiedad);
     }
 
+
+    //metodos privadps
+
     private void agregarDetalleTipoPersonas(Propiedad propiedad, PropiedadDTO propiedadDTO) {
         propiedad.getDetalleTipoPersonas().clear();
         for (DetalleTipoPersonaDTO detalle : propiedadDTO.getDetalleTipoPersonas()) {
@@ -251,7 +267,61 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         propiedad.setTipoPropiedad(tipoPropiedad);
     }
 
+    private boolean sonIgualesPorIdTipoPersona(List<DetalleTipoPersona> listaEntidad, List<DetalleTipoPersonaDTO> listaDto) {
+        if (listaEntidad.size() != listaDto.size()) return false;
 
+        Set<Long> idsEntidad = listaEntidad.stream()
+                .map(detalle -> detalle.getTipoPersona().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> idsDto = listaDto.stream()
+                .map(DetalleTipoPersonaDTO::getTipoPersonaId)
+                .collect(Collectors.toSet());
+
+        return idsEntidad.equals(idsDto);
+    }
+
+    private boolean sonIgualesPorIdDetalleCaracteristica(List<DetalleCaracteristica> listaEntidad, List<DetalleCaracteristicaDTO> listaDto) {
+        if (listaEntidad.size() != listaDto.size()) return false;
+
+        Set<Long> idsEntidad = listaEntidad.stream()
+                .map(detalle -> detalle.getCaracteristica().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> idsDto = listaDto.stream()
+                .map(DetalleCaracteristicaDTO::getCaracteristicaId)
+                .collect(Collectors.toSet());
+
+        return idsEntidad.equals(idsDto);
+    }
+
+    private boolean sonIgualesPorUrlDetalleImagen(List<DetalleImagenPropiedad> listaEntidad, List<DetalleImagenPropiedadDTO> listaDto) {
+        if (listaEntidad.size() != listaDto.size()) return false;
+
+        Set<String> urlsEntidad = listaEntidad.stream()
+                .map(detalle -> detalle.getImagen().getUrlImagen())
+                .collect(Collectors.toSet());
+
+        Set<String> urlsDto = listaDto.stream()
+                .map(detalle -> detalle.getImagen().getUrlImagen())
+                .collect(Collectors.toSet());
+
+        return urlsEntidad.equals(urlsDto);
+    }
+
+    private boolean sonIgualesPorIdDetalleAmbiente(List<DetalleAmbiente> listaEntidad, List<DetalleAmbienteDTO> listaDto) {
+        if (listaEntidad.size() != listaDto.size()) return false;
+
+        Set<Long> idsEntidad = listaEntidad.stream()
+                .map(detalle -> detalle.getAmbiente().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> idsDto = listaDto.stream()
+                .map(DetalleAmbienteDTO::getAmbienteId)
+                .collect(Collectors.toSet());
+
+        return idsEntidad.equals(idsDto);
+    }
 
 }
 
