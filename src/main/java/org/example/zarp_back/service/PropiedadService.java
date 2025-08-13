@@ -49,7 +49,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private ImagenMapper imagenMapper;
     @Autowired
     ClienteRepository clienteRepository;
-    
+
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
         super(propiedadRepository, propiedadMapper);
         this.propiedadMapper = propiedadMapper;

@@ -42,8 +42,11 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
             throw new RuntimeException("El usuario ya ha dejado una reseña en esta propiedad.");
         }
 
-        if (reservaRepository.existsByClienteIdAndPropiedadIdAndEstado(reseniaDTO.getPropiedadId(), reseniaDTO.getUsuarioId(), Estado.FINALIZADA)) {
-            throw new RuntimeException("El usuario no tiene una reserva finalizada en esta propiedad.");
+        boolean tieneFinalizada = reservaRepository.existsByClienteIdAndPropiedadIdAndEstado(reseniaDTO.getUsuarioId(), reseniaDTO.getPropiedadId(), Estado.FINALIZADA);
+        boolean tieneActiva = reservaRepository.existsByClienteIdAndPropiedadIdAndEstado(reseniaDTO.getUsuarioId(), reseniaDTO.getPropiedadId(), Estado.ACTIVA);
+
+        if (!(tieneFinalizada || tieneActiva)) {
+            throw new RuntimeException("El usuario no tiene una reserva finalizada o activa en esta propiedad.");
         }
 
         Resenia resenia = reseniaMapper.toEntity(reseniaDTO);
