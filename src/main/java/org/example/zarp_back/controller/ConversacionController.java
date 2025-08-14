@@ -17,6 +17,11 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
     @Autowired
     ConversacionService conversacionService;
 
+    @Override
+    protected String entidadNombre() {
+        return "conversaciones";
+    }
+
     public ConversacionController(ConversacionService servicio) {
         super(servicio);
     }

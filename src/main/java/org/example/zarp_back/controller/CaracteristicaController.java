@@ -19,6 +19,11 @@ public class CaracteristicaController extends GenericoControllerImpl<Caracterist
     @Autowired
     private CaracteristicaService servicio;
 
+    @Override
+    protected String entidadNombre() {
+        return "caracteristicas";
+    }
+
     public CaracteristicaController(CaracteristicaService servicio) {
         super(servicio);
     }

@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/empleados")
 public class EmpleadoController extends GenericoControllerImpl<Empleado, EmpleadoDTO, EmpleadoResponseDTO, Long, EmpleadoService> {
 
+    @Override
+    protected String entidadNombre() {
+        return "empleados";
+    }
+
     public EmpleadoController(EmpleadoService servicio) {
         super(servicio);
     }

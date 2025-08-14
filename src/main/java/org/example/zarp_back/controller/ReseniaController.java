@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/resenias")
 public class ReseniaController extends GenericoControllerImpl<Resenia, ReseniaDTO, ReseniaResponseDTO, Long, ReseniaService> {
 
+    @Override
+    protected String entidadNombre() {
+        return "resenias";
+    }
+
     public ReseniaController(ReseniaService servicio) {
         super(servicio);
     }

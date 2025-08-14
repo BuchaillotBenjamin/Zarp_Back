@@ -18,6 +18,11 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
     @Autowired
     ReservaService reservaService;
 
+    @Override
+    protected String entidadNombre() {
+        return "reservas";
+    }
+
     public ReservaController(ReservaService servicio) {
         super(servicio);
     }

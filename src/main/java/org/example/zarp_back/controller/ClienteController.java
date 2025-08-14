@@ -6,6 +6,7 @@ import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +15,13 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @Override
+    protected String entidadNombre() {
+        return "clientes";
+    }
 
     public ClienteController(ClienteService servicio) {
         super(servicio);
@@ -22,11 +30,13 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     @PatchMapping("/verificacion-correo/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionCorreo(@PathVariable Long id) {
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
+        messagingTemplate.convertAndSend("/topic/clientes", response);
         return ResponseEntity.ok(response);
     }
     @PatchMapping("/verificacion-documento/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
+        messagingTemplate.convertAndSend("/topic/clientes", response);
         return ResponseEntity.ok(response);
     }
 

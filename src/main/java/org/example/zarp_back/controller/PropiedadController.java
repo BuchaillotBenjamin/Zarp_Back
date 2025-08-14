@@ -9,6 +9,7 @@ import org.example.zarp_back.service.PropiedadService;
 import org.example.zarp_back.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,13 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     PropiedadService propiedadService;
     @Autowired
     ReservaService reservaService;
+    @Autowired
+    SimpMessagingTemplate messagingTemplate;
+
+    @Override
+    protected String entidadNombre() {
+        return "propiedades";
+    }
 
     public PropiedadController(PropiedadService servicio) {
         super(servicio);
@@ -54,9 +62,10 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
         return ResponseEntity.ok(reservas);
     }
 
-    @PutMapping("/activar/{id}")
+    @PutMapping("/verificacion/{id}")
     public ResponseEntity<PropiedadResponseDTO> verificacionPropiedad(@PathVariable Long id, @RequestParam boolean activar) {
         PropiedadResponseDTO propiedadActualizada = propiedadService.verificarPropiedad(id,activar);
+        messagingTemplate.convertAndSend("/topic/propiedades", propiedadActualizada);
         return ResponseEntity.ok(propiedadActualizada);
     }
 
