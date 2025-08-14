@@ -12,12 +12,12 @@ public interface GenericoController <E extends Base, D, R, ID extends Serializab
 
     ResponseEntity<R> update(ID id, D dto);
 
-    ResponseEntity<?> delete(ID id);
+    ResponseEntity<R> delete(ID id);
 
     ResponseEntity<R> findById(ID id);
 
     ResponseEntity<List<R>> findAll();
 
-    ResponseEntity<String> toggleActivo(ID id);
+    ResponseEntity<R> toggleActivo(ID id);
 
 }
