@@ -28,7 +28,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PostMapping("/save")
     public ResponseEntity<R> save(@Valid @RequestBody D dto) {
         R response = s.save(dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre(), response);
+        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/save", response);
         return ResponseEntity.ok(response);
     }
 
@@ -36,7 +36,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PutMapping("/update/{id}")
     public ResponseEntity<R> update(@PathVariable ID id,@Valid @RequestBody D dto) {
         R response = s.update(id, dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre(), response);
+        messagingTemplate.convertAndSend("/topic/" + entidadNombre() +"/update", response);
         return ResponseEntity.ok(response);
     }
 
@@ -44,7 +44,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<R> delete(@PathVariable ID id) {
         R response = s.delete(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre(), response);
+        messagingTemplate.convertAndSend("/topic/" + entidadNombre()+"/delete", response);
         return ResponseEntity.ok(response);
     }
 
@@ -65,7 +65,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PatchMapping("/toggleActivo/{id}")
     public ResponseEntity<R> toggleActivo(@PathVariable ID id) {
         R response= s.toggleActivo(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre(), response);
+        messagingTemplate.convertAndSend("/topic/" + entidadNombre()+"/update", response);
         return ResponseEntity.ok(response);
     }
 

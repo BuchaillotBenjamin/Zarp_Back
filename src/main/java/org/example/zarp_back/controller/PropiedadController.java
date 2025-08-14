@@ -65,7 +65,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     @PutMapping("/verificacion/{id}")
     public ResponseEntity<PropiedadResponseDTO> verificacionPropiedad(@PathVariable Long id, @RequestParam boolean activar) {
         PropiedadResponseDTO propiedadActualizada = propiedadService.verificarPropiedad(id,activar);
-        messagingTemplate.convertAndSend("/topic/propiedades", propiedadActualizada);
+        messagingTemplate.convertAndSend("/topic/propiedades/update", propiedadActualizada);
         return ResponseEntity.ok(propiedadActualizada);
     }
 

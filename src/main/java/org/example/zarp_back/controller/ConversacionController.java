@@ -8,6 +8,7 @@ import org.example.zarp_back.model.entity.Conversacion;
 import org.example.zarp_back.service.ConversacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class ConversacionController extends GenericoControllerImpl<Conversacion, ConversacionDTO, ConversacionResponseDTO, Long, ConversacionService> {
 
     @Autowired
-    ConversacionService conversacionService;
+    private ConversacionService conversacionService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Override
     protected String entidadNombre() {
@@ -29,7 +32,9 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
     @PutMapping("/agregar-mensaje/{idConversacion}")
     public ResponseEntity<ConversacionResponseDTO> agregarMensaje(@Valid @RequestBody MensajeDTO mensajeDTO, @PathVariable Long idConversacion) {
 
-        return ResponseEntity.ok(conversacionService.agregarMensajes(idConversacion, mensajeDTO));
+        ConversacionResponseDTO response = conversacionService.agregarMensajes(idConversacion, mensajeDTO);
+        messagingTemplate.convertAndSend("/topic/conversaciones/update", response);
+        return ResponseEntity.ok(response);
 
     }
 

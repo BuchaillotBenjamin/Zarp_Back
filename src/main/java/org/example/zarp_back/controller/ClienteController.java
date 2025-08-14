@@ -30,13 +30,13 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     @PatchMapping("/verificacion-correo/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionCorreo(@PathVariable Long id) {
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
-        messagingTemplate.convertAndSend("/topic/clientes", response);
+        messagingTemplate.convertAndSend("/topic/clientes/update", response);
         return ResponseEntity.ok(response);
     }
     @PatchMapping("/verificacion-documento/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
-        messagingTemplate.convertAndSend("/topic/clientes", response);
+        messagingTemplate.convertAndSend("/topic/clientes/update", response);
         return ResponseEntity.ok(response);
     }
 
