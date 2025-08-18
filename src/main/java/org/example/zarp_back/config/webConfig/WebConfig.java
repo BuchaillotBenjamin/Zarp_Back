@@ -14,10 +14,13 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Permite todos los endpoints
-                        .allowedOrigins("http://localhost:5173") // Solo tu frontend
+                        .allowedOrigins(
+                                "http://127.0.0.1:5500",          // tu front local
+                                "https://b5796001ff36.ngrok-free.app" // front en ngrok cambiar cada vez que se ejecuta el ngrok
+                        )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true); // Si usás cookies/sesiones
+                        .allowCredentials(true); // si usás cookies/sesiones
             }
         };
     }
