@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface EmpleadoRepository extends GenericoRepository<Empleado, Long> {
 
     Optional<Empleado> findByUid(String uid);
+    boolean existsByUid(String uid);
 
 }

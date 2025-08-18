@@ -125,7 +125,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     }
 
     public ClienteResponseDTO getByUid(String uid) {
-        Cliente cliente = clienteRepository.findByUid(uid);
+        Cliente cliente = clienteRepository.findByUid(uid)
+                .orElseThrow(() -> new NotFoundException("Cliente con el UID " + uid + " no encontrado"));
 
         return clienteMapper.toResponseDTO(cliente);
     }

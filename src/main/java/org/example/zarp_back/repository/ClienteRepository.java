@@ -11,6 +11,6 @@ public interface ClienteRepository extends GenericoRepository<Cliente, Long> {
 
     boolean existsByUid(String uid);
 
-    Cliente findByUid(String uid);
+    Optional<Cliente> findByUid(String uid);
 
 }

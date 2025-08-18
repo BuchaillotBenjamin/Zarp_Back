@@ -40,13 +40,10 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     }
 
     @GetMapping("/getByUid/{uid}")
-    public ResponseEntity<?> getByUid(@PathVariable String uid) {
+    public ResponseEntity<ClienteResponseDTO> getByUid(@PathVariable String uid) {
+
         ClienteResponseDTO cliente = clienteService.getByUid(uid);
-        if (cliente == null) {
-            EmpleadoResponseDTO empleado = empleadoService.getByUid(uid);
-            return ResponseEntity.ok(empleado);
-        }
-        
+
         return ResponseEntity.ok(cliente);
 
     }

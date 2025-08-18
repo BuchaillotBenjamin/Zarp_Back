@@ -37,12 +37,17 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
         return empleadoMapper.toResponseDTO(empleado);
     }
 
+    public Boolean existsByUid(String uid) {
+        return empleadoRepository.existsByUid(uid);
+    }
+
     public EmpleadoResponseDTO getByUid(String uid) {
         Empleado empleado = empleadoRepository.findByUid(uid)
                 .orElseThrow(() -> new NotFoundException("Empleado con el UID " + uid + " no encontrado"));
 
         return empleadoMapper.toResponseDTO(empleado);
     }
+
 
 
     // Aquí puedes agregar métodos específicos para el servicio de Empleado si es necesario
