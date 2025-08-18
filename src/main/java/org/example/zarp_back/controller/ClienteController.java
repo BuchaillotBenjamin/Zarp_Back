@@ -2,8 +2,10 @@ package org.example.zarp_back.controller;
 
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
+import org.example.zarp_back.model.dto.empleado.EmpleadoResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.service.ClienteService;
+import org.example.zarp_back.service.EmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
     @Autowired
     private ClienteService clienteService;
+    private EmpleadoService empleadoService;
 
     public ClienteController(ClienteService servicio) {
         super(servicio);
@@ -34,6 +37,18 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     public ResponseEntity<Boolean> existsByUid(@PathVariable String uid) {
         boolean exists = clienteService.existsByUid(uid);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/getByUid/{uid}")
+    public ResponseEntity<?> getByUid(@PathVariable String uid) {
+        ClienteResponseDTO cliente = clienteService.getByUid(uid);
+        if (cliente == null) {
+            EmpleadoResponseDTO empleado = empleadoService.getByUid(uid);
+            return ResponseEntity.ok(empleado);
+        }
+        
+        return ResponseEntity.ok(cliente);
+
     }
 
     // Aquí puedes agregar métodos específicos para el controlador de Cliente si es necesario
