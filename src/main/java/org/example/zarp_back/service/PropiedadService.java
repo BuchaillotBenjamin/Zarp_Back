@@ -200,6 +200,13 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         return propiedadMapper.toResponseDTO(propiedad);
     }
 
+    public List<PropiedadResponseDTO> getActivasVerificadas(){
+
+        List<Propiedad>propiedades=propiedadRepository.findByVerificacionPropiedadAndActivo(VerificacionPropiedad.APROBADA, true);
+
+        return propiedadMapper.toResponseDTOList(propiedades);
+    }
+
 
     //metodos privadps
 
