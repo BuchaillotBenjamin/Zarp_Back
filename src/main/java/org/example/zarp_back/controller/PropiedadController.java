@@ -18,9 +18,9 @@ import java.util.List;
 public class PropiedadController extends GenericoControllerImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long, PropiedadService> {
 
     @Autowired
-    PropiedadService propiedadService;
+    private PropiedadService propiedadService;
     @Autowired
-    ReservaService reservaService;
+    private ReservaService reservaService;
 
     public PropiedadController(PropiedadService servicio) {
         super(servicio);

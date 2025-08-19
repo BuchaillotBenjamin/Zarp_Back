@@ -9,6 +9,7 @@ import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.example.zarp_back.repository.EmpleadoRepository;
 import org.example.zarp_back.repository.VerificacionClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,9 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     @Autowired
     private VerificacionClienteRepository verificacionClienteRepository;
     @Autowired
-    VerificacionClienteService verificacionClienteService;
+    private EmpleadoRepository empleadoRepository;
+    @Autowired
+    private VerificacionClienteService verificacionClienteService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -36,7 +39,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     @Transactional
     public ClienteResponseDTO save(ClienteDTO clienteDTO) {
 
-        if (clienteRepository.existsByUid(clienteDTO.getUid())) {
+        if (clienteRepository.existsByUid(clienteDTO.getUid())|| empleadoRepository.existsByUid(clienteDTO.getUid())) {
             throw new IllegalArgumentException("El UID ya está en uso");
         }
 

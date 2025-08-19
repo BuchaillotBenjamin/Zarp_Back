@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long, ReservaService> {
 
     @Autowired
-    ReservaService reservaService;
+    private ReservaService reservaService;
 
     public ReservaController(ReservaService servicio) {
         super(servicio);

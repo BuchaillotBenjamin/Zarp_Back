@@ -1,8 +1,8 @@
 package org.example.zarp_back.controller;
 
+import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
-import org.example.zarp_back.model.dto.empleado.EmpleadoResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.service.ClienteService;
 import org.example.zarp_back.service.EmpleadoService;
@@ -16,6 +16,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
     @Autowired
     private ClienteService clienteService;
+    @Autowired
     private EmpleadoService empleadoService;
 
     public ClienteController(ClienteService servicio) {
@@ -27,6 +28,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
         return ResponseEntity.ok(response);
     }
+
     @PatchMapping("/verificacion-documento/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
@@ -35,7 +37,22 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
     @GetMapping("/existe-uid/{uid}")
     public ResponseEntity<Boolean> existsByUid(@PathVariable String uid) {
-        boolean exists = clienteService.existsByUid(uid);
+
+        Boolean exists = clienteService.existsByUid(uid);
+
+        return ResponseEntity.ok(exists);
+
+    }
+
+    @GetMapping("/existe-uidLogin/{uid}")
+    public ResponseEntity<Boolean> existsByUidLogin(@PathVariable String uid) {
+
+        Boolean exists = clienteService.existsByUid(uid);
+
+        if (!exists) {
+            exists = empleadoService.existsByUid(uid);
+        }
+
         return ResponseEntity.ok(exists);
     }
 
@@ -45,7 +62,23 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         ClienteResponseDTO cliente = clienteService.getByUid(uid);
 
         return ResponseEntity.ok(cliente);
+    }
 
+    @GetMapping("/getByUidLogin/{uid}")
+    public ResponseEntity<ClienteResponseDTO> getByUidLogin(@PathVariable String uid) {
+
+        ClienteResponseDTO cliente = null;
+        try {
+           cliente = clienteService.getByUid(uid);
+           return ResponseEntity.ok(cliente);
+        }catch (NotFoundException e) {
+            try{
+                cliente = empleadoService.getByUidLogin(uid);
+                return ResponseEntity.ok(cliente);
+            }catch (NotFoundException ex){
+                throw new NotFoundException("No se encontró un cliente o empleado con el UID: " + uid);
+            }
+        }
     }
 
     // Aquí puedes agregar métodos específicos para el controlador de Cliente si es necesario

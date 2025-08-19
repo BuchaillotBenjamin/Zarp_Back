@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ConversacionController extends GenericoControllerImpl<Conversacion, ConversacionDTO, ConversacionResponseDTO, Long, ConversacionService> {
 
     @Autowired
-    ConversacionService conversacionService;
+    private ConversacionService conversacionService;
 
     public ConversacionController(ConversacionService servicio) {
         super(servicio);

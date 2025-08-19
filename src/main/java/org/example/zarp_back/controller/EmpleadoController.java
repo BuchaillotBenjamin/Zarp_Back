@@ -37,5 +37,4 @@ public class EmpleadoController extends GenericoControllerImpl<Empleado, Emplead
 
     }
 
-    // Aquí puedes agregar métodos específicos para el controlador de Empleado si es necesario
 }

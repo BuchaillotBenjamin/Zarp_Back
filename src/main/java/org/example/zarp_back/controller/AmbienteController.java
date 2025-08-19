@@ -17,7 +17,7 @@ import java.util.List;
 public class AmbienteController extends GenericoControllerImpl<Ambiente, AmbienteDTO, AmbienteResponseDTO, Long, AmbienteService> {
 
     @Autowired
-    AmbienteService ambienteServicio;
+    private AmbienteService ambienteServicio;
 
     public AmbienteController(AmbienteService servicio) {
         super(servicio);
