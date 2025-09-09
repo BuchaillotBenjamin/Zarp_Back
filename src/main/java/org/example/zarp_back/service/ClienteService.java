@@ -122,6 +122,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         }
 
         verificacionCompleta(id);
+        verificacionClienteRepository.save(verificacionCliente);
 
         return clienteMapper.toResponseDTO(cliente);
 
