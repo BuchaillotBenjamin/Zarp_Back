@@ -195,6 +195,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.APROBADA);
         } else {
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.RECHAZADA);
+            propiedad.setActivo(false);
         }
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);

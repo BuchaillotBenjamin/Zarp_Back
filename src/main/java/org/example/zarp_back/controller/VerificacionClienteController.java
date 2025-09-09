@@ -23,7 +23,7 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
         super(servicio);
     }
 
-    public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas(Long clienteId) {
+    public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas() {
 
         return ResponseEntity.ok(verificacionClienteService.getVerificacionesActivas());
 
