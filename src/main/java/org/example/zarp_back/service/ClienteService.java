@@ -113,13 +113,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
             cliente.setDocumentoVerificado(true);
             clienteRepository.save(cliente);
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
-
+            verificacionCompleta(id);
         }else{
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
         }
-
-        verificacionCompleta(id);
-        verificacionClienteRepository.save(verificacionCliente);
 
         return clienteMapper.toResponseDTO(cliente);
 
