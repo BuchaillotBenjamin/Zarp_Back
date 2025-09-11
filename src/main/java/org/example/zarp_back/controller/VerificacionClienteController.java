@@ -6,6 +6,7 @@ import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.service.VerificacionClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,7 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
         super(servicio);
     }
 
+    @GetMapping("/activas")
     public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas() {
 
         return ResponseEntity.ok(verificacionClienteService.getVerificacionesActivas());

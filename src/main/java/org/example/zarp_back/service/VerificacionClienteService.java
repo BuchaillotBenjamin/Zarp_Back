@@ -36,7 +36,7 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
         Cliente cliente = clienteRepository.findById(verificacionClienteDTO.getClienteId())
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + verificacionClienteDTO.getClienteId()));
 
-        if(verificacionClienteRepository.findVerificacionesActivasByClienteId(verificacionClienteDTO.getClienteId()).size() > 0) {
+        if(verificacionClienteRepository.existsVerificacionActivaByClienteId(verificacionClienteDTO.getClienteId())) {
             throw new RuntimeException("El cliente ya tiene una verificación activa.");
         }else if(cliente.getDocumentoVerificado()){
             throw new RuntimeException("El cliente ya esta verificado.");

@@ -106,10 +106,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + id));
 
-        List<VerificacionCliente> verificacionesActivas = verificacionClienteRepository.findVerificacionesActivasByClienteId(id);
-
-        VerificacionCliente verificacionCliente = verificacionesActivas.stream()
-                .findFirst()
+        VerificacionCliente verificacionCliente = verificacionClienteRepository.findVerificacionActivaByClienteId(id)
                 .orElseThrow(() -> new NotFoundException("No hay verificación activa para el cliente con id: " + id));
 
         if (verificado) {
