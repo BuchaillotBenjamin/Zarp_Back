@@ -126,4 +126,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({com.mercadopago.exceptions.MPException.class, com.mercadopago.exceptions.MPApiException.class})
+    public ResponseEntity<ErrorResponse> handleMercadoPagoException(Exception ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .mensaje("Error al comunicarse con Mercado Pago: " + ex.getMessage())
+                .codigo("MP_ERROR")
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_GATEWAY); // 502 porque es error de servicio externo
+    }
+
+
 }
