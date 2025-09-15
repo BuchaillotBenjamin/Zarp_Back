@@ -1,12 +1,13 @@
 package org.example.zarp_back.service;
 
 import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.merchantorder.MerchantOrderClient;
 import com.mercadopago.client.payment.PaymentClient;
-import com.mercadopago.client.payment.PaymentCreateRequest;
-import com.mercadopago.client.payment.PaymentPayerRequest;
 import com.mercadopago.client.preference.*;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.merchantorder.MerchantOrder;
+import com.mercadopago.resources.merchantorder.MerchantOrderPayment;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 import jakarta.annotation.PostConstruct;
@@ -14,11 +15,8 @@ import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
-import org.example.zarp_back.model.entity.Propiedad;
-import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
-import org.example.zarp_back.repository.PropiedadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -80,8 +78,8 @@ public class MercadoPagoService {
                 .items(items)
                 .payer(
                         PreferencePayerRequest.builder()
-                                .email(cliente.getCorreoElectronico())
-                                .name(cliente.getNombreCompleto())
+                                .email("")
+                                .name("")
                                 .build()
                 )
                 .backUrls(
@@ -102,40 +100,49 @@ public class MercadoPagoService {
 
     public boolean handlePayment(Map<String, Object> body) throws MPException, MPApiException {
 
+        System.out.println("Webhook body: " + body);
+
+        Long paymentId;
         String type = String.valueOf(body.get("type"));
         Map<String, Object> data = (Map<String, Object>) body.get("data");
 
-        if (!"payment".equals(type) || data == null || data.get("id") == null) {
+        if (type.equals("payment") && (data != null && data.get("id") != null)) {
+            paymentId = Long.valueOf((String) data.get("id"));
+            System.out.println("Procesando paymentId: " + paymentId);
+        } else {
             return false;
         }
-
-        Long paymentId = Long.valueOf(String.valueOf(data.get("id")));
 
         PaymentClient paymentClient = new PaymentClient();
         Payment payment = paymentClient.get(paymentId);
 
+        return procesarPago(payment);
+    }
+
+    // Procesamiento de los pagos
+    private boolean procesarPago(Payment payment) throws MPException, MPApiException {
         String status = payment.getStatus();
         String externalReference = payment.getExternalReference();
+        System.out.println("Procesando pago con status: " + status + " y externalReference: " + externalReference);
 
         if ("approved".equals(status)) {
             // Recuperar la reserva temporal
             ReservaDTO reserva = reservasTemporales.remove(externalReference);
-
             if (reserva == null) return false;
 
+            System.out.println("Procesando reserva: " + reserva);
             ReservaResponseDTO reservaEntity = reservaService.save(reserva);
             reservaService.cambiarEstado(reservaEntity.getId(), Estado.RESERVADA);
-
+            return true;
 
         } else if ("rejected".equals(status)) {
+            System.out.println("Pago rechazado para externalReference: " + externalReference);
             // Si el pago fue rechazado, eliminar la reserva temporal
             reservasTemporales.remove(externalReference);
+            return true;
         }
 
-        return true;
+        return false;
     }
-
-
-
 
 }

@@ -61,6 +61,9 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         if (!cliente.getRol().equals(Rol.PROPIETARIO)) {
             throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no tiene las verificaciones necesarias");
         }
+        if (propiedad.getPropietario().getId().equals(cliente.getId())) {
+            throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no puede reservar su propia propiedad");
+        }
 
         //estado
         reserva.setEstado(Estado.PENDIENTE);
