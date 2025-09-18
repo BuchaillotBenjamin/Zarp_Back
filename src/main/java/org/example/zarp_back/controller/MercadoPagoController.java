@@ -8,10 +8,7 @@ import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.service.MercadoPagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -37,6 +34,18 @@ public class MercadoPagoController {
 
         return ResponseEntity.status(200).body("Webhook de Mercado Pago recibido correctamente");
 
+    }
+
+    @PostMapping("/createAuthClient/{clienteId}")
+    public ResponseEntity<String> createAuthClient(@PathVariable Long clienteId) throws MPException, MPApiException  {
+        String authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
+        return ResponseEntity.ok(authUrl);
+    }
+
+    @GetMapping("/webhook/getAuthClient")
+    public ResponseEntity<Boolean> getAuthUrl(@RequestParam String code, @RequestParam String state) throws MPException, MPApiException {
+        Boolean authUrl = mercadoPagoService.getAuthorizationClient(code, state);
+        return ResponseEntity.ok(authUrl);
     }
 
 }

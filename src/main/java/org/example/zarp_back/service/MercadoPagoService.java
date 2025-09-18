@@ -1,13 +1,11 @@
 package org.example.zarp_back.service;
 
 import com.mercadopago.MercadoPagoConfig;
-import com.mercadopago.client.merchantorder.MerchantOrderClient;
+import com.mercadopago.client.oauth.OauthClient;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.*;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.mercadopago.resources.merchantorder.MerchantOrder;
-import com.mercadopago.resources.merchantorder.MerchantOrderPayment;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 import jakarta.annotation.PostConstruct;
@@ -19,13 +17,12 @@ import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -46,10 +43,17 @@ public class MercadoPagoService {
     private String mpFailureBackUrl;
     @Value("${api.url}")
     private String publicUrl;
+    @Value("${mercadopago.client_id}")
+    private String mpClientId;
+    @Value("${mercadopago.client_secret}")
+    private String mpClientSecret;
+
+    private String mpAuthUrl = "";
 
 
     // Mapa temporal
     private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
+    private static final Map<String, Cliente> clientesTemporales = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void initMPConfig() {
@@ -57,8 +61,6 @@ public class MercadoPagoService {
     }
 
     public Preference createPreference(ReservaDTO reserva)throws MPException, MPApiException {
-        Cliente cliente = clienteRepository.findById(reserva.getClienteId())
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
 
         // Generar un ID temporal único
         String tempId = UUID.randomUUID().toString();
@@ -119,7 +121,55 @@ public class MercadoPagoService {
         return procesarPago(payment);
     }
 
-    // Procesamiento de los pagos
+    public String createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
+        Cliente cliente = clienteRepository.findById(ClienteId)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
+        String tempId = UUID.randomUUID().toString();
+        clientesTemporales.put(tempId, cliente);
+
+            return buildAuthUrl(tempId);
+    }
+
+    public boolean getAuthorizationClient(String code, String state) throws MPException, MPApiException {
+
+        String url = "https://api.mercadopago.com/oauth/token";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Body de la request
+        Map<String, String> body = new HashMap<>();
+        body.put("client_id", mpClientId);
+        body.put("client_secret", mpClientSecret);
+        body.put("grant_type", "authorization_code");
+        body.put("code", code);
+        body.put("redirect_uri", publicUrl + "/api/mercadoPago/webhook/getAuthClient");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, body, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            String accessToken = (String) response.getBody().get("access_token");
+            String refreshToken = (String) response.getBody().get("refresh_token");
+            Long userId = Long.valueOf(response.getBody().get("user_id").toString());
+
+            Cliente cliente = clientesTemporales.remove(state);
+            if (cliente == null) return false;
+
+
+            // Acá guardás el accessToken, refreshToken y userId en tu DB
+            System.out.println("ACCESS TOKEN: " + accessToken);
+            System.out.println("REFRESH TOKEN: " + refreshToken);
+            System.out.println("USER ID: " + userId);
+            System.out.println("Cliente ID: " + state);
+            System.out.println("Cliente asociado: " + cliente);
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    //Procesar el pago basado en su estado
     private boolean procesarPago(Payment payment) throws MPException, MPApiException {
         String status = payment.getStatus();
         String externalReference = payment.getExternalReference();
@@ -143,6 +193,13 @@ public class MercadoPagoService {
         }
 
         return false;
+    }
+
+    private String buildAuthUrl(String tempId) throws MPException, MPApiException {
+        String oauthClient = new OauthClient().getAuthorizationURL(mpClientId,
+                publicUrl + "/api/mercadoPago/webhook/getAuthClient");
+        oauthClient += "&state=" + tempId;
+        return oauthClient;
     }
 
 }
