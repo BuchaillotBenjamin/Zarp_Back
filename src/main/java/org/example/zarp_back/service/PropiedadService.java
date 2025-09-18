@@ -49,6 +49,8 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private ImagenMapper imagenMapper;
     @Autowired
     ClienteRepository clienteRepository;
+    @Autowired
+    DetalleImagenPropiedadRepository detalleImagenRepository;
 
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
         super(propiedadRepository, propiedadMapper);
@@ -221,6 +223,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     }
 
     private void agregarDetalleImagenes(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        detalleImagenRepository.deleteAll(propiedad.getDetalleImagenes());
         propiedad.getDetalleImagenes().clear();
         for (DetalleImagenPropiedadDTO detalle : propiedadDTO.getDetalleImagenes()) {
             Imagen imagen = imagenMapper.toEntity(detalle.getImagen());
