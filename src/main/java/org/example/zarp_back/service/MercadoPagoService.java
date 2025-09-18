@@ -140,7 +140,6 @@ public class MercadoPagoService {
         return preference;
     }
 
-
     public boolean handlePayment(Map<String, Object> body) throws MPException, MPApiException {
 
         System.out.println("Webhook body: " + body);
@@ -172,23 +171,9 @@ public class MercadoPagoService {
         Reserva reserva = reservaRepository.findById(Long.valueOf(externalReference))
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada para external_reference: " + externalReference));
 
-        Cliente vendedor = reserva.getPropiedad().getPropietario();
-        String tokenVendedor;
-        try {
-            tokenVendedor = cryptoUtils.decrypt(vendedor.getCredencialesMP().getAccessToken());
-        } catch (Exception e) {
-            throw new RuntimeException("Error al desencriptar las credenciales");
-        }
-
-        // Si necesitás hacer acciones con el token del vendedor, lo tenés disponible
-        MPRequestOptions requestOptionsVendedor = MPRequestOptions.builder()
-                .accessToken(tokenVendedor)
-                .build();
-
         // Procesar el pago
         return procesarPago(payment, reserva);
     }
-
 
     public String createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
         Cliente cliente = clienteRepository.findById(ClienteId)
@@ -251,7 +236,6 @@ public class MercadoPagoService {
 
         return false;
     }
-
 
     //Procesar el pago basado en su estado
     private boolean procesarPago(Payment payment, Reserva reserva) throws MPException, MPApiException {
