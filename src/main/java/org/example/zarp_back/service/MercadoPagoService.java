@@ -16,10 +16,12 @@ import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.CredencialesMP;
 import org.example.zarp_back.model.entity.Propiedad;
+import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
+import org.example.zarp_back.repository.ReservaRepository;
 import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,8 @@ public class MercadoPagoService {
     private ClienteService clienteService;
     @Autowired
     PropiedadRepository propiedadRepository;
+    @Autowired
+    ReservaRepository ReservaRepository;
     @Value("${mercadopago.access_token}")
     private String mpAccess;
     @Value("${mercadopago.back_url.success}")
@@ -59,12 +63,15 @@ public class MercadoPagoService {
     private String mpClientSecret;
     private final CryptoUtils cryptoUtils;
     @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
     public MercadoPagoService(CryptoUtils cryptoUtils) {
         this.cryptoUtils = cryptoUtils;
     }
 
     // Mapa temporal
-    private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
+    private static final Map<String, ReservaResponseDTO> reservasTemporales = new ConcurrentHashMap<>();
     private static final Map<String, Cliente> clientesTemporales = new ConcurrentHashMap<>();
 
     /*@PostConstruct
@@ -72,44 +79,41 @@ public class MercadoPagoService {
         MercadoPagoConfig.setAccessToken(mpAccess);
     }*/
 
-    public Preference createPreference(ReservaDTO reserva)throws MPException, MPApiException {
+    public Preference createPreference(ReservaDTO reserva) throws MPException, MPApiException {
 
         Propiedad propiedad = propiedadRepository.findById(reserva.getPropiedadId())
                 .orElseThrow(() -> new NotFoundException("Propiedad no encontrada"));
         Cliente vendedor = propiedad.getPropietario();
 
-        if(vendedor.getCredencialesMP()==null){
+        if (vendedor.getCredencialesMP() == null) {
             throw new RuntimeException("El vendedor no tiene credenciales de Mercado Pago");
         }
 
         String tokenVendedor;
+        ReservaResponseDTO reservaEntidad = reservaService.save(reserva);
 
         try {
             tokenVendedor = cryptoUtils.decrypt(vendedor.getCredencialesMP().getAccessToken());
-        }catch (Exception e){
-            throw new RuntimeException("Error al desencriptar las credenciales" );
+        } catch (Exception e) {
+            throw new RuntimeException("Error al desencriptar las credenciales");
         }
 
-        // Generar un ID temporal único
-        String tempId = UUID.randomUUID().toString();
-        reservasTemporales.put(tempId, reserva);
-
-        // Crear items para la preferencia
         List<PreferenceItemRequest> items = new ArrayList<>();
         PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
-                .title("Reserva #" + tempId)
+                .title("Reserva temporal Zarp")
                 .quantity(1)
                 .unitPrice(new BigDecimal(reserva.getPrecioTotal()))
                 .build();
         items.add(itemRequest);
 
-        Double fee = reserva.getPrecioTotal() * 0.10; // 10% de fee
+        Double fee = reserva.getPrecioTotal() * 0.10;
         Cliente comprador = clienteRepository.findById(reserva.getClienteId())
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
-        // Construir la preferencia
+
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
                 .marketplaceFee(new BigDecimal(fee))
+                .externalReference(String.valueOf(reservaEntidad.getId())) // 🔑 clave para vincular el pago
                 .payer(
                         PreferencePayerRequest.builder()
                                 .email(comprador.getCorreoElectronico())
@@ -123,12 +127,8 @@ public class MercadoPagoService {
                                 .failure(mpFailureBackUrl)
                                 .build()
                 )
-                .externalReference(tempId)
                 .notificationUrl(publicUrl + "/api/mercadoPago/webhook/notification")
                 .build();
-
-
-        // Crear la preferencia
 
         MPRequestOptions requestOptions = MPRequestOptions.builder()
                 .accessToken(tokenVendedor)
@@ -140,6 +140,7 @@ public class MercadoPagoService {
         return preference;
     }
 
+
     public boolean handlePayment(Map<String, Object> body) throws MPException, MPApiException {
 
         System.out.println("Webhook body: " + body);
@@ -148,18 +149,46 @@ public class MercadoPagoService {
         String type = String.valueOf(body.get("type"));
         Map<String, Object> data = (Map<String, Object>) body.get("data");
 
-        if (type.equals("payment") && (data != null && data.get("id") != null)) {
-            paymentId = Long.valueOf((String) data.get("id"));
-            System.out.println("Procesando paymentId: " + paymentId);
-        } else {
+        if (!"payment".equals(type) || data == null || data.get("id") == null) {
             return false;
         }
 
-        PaymentClient paymentClient = new PaymentClient();
-        Payment payment = paymentClient.get(paymentId);
+        paymentId = Long.valueOf((String) data.get("id"));
+        System.out.println("Procesando paymentId: " + paymentId);
 
-        return procesarPago(payment);
+        // 🔐 Usamos el token del app owner para obtener el Payment
+        MPRequestOptions requestOptionsAppOwner = MPRequestOptions.builder()
+                .accessToken(mpAccess) // tu token como owner
+                .build();
+
+        PaymentClient paymentClient = new PaymentClient();
+        Payment payment = paymentClient.get(paymentId, requestOptionsAppOwner);
+
+        String externalReference = payment.getExternalReference();
+        if (externalReference == null) {
+            throw new RuntimeException("El payment no tiene external_reference");
+        }
+
+        Reserva reserva = reservaRepository.findById(Long.valueOf(externalReference))
+                .orElseThrow(() -> new NotFoundException("Reserva no encontrada para external_reference: " + externalReference));
+
+        Cliente vendedor = reserva.getPropiedad().getPropietario();
+        String tokenVendedor;
+        try {
+            tokenVendedor = cryptoUtils.decrypt(vendedor.getCredencialesMP().getAccessToken());
+        } catch (Exception e) {
+            throw new RuntimeException("Error al desencriptar las credenciales");
+        }
+
+        // Si necesitás hacer acciones con el token del vendedor, lo tenés disponible
+        MPRequestOptions requestOptionsVendedor = MPRequestOptions.builder()
+                .accessToken(tokenVendedor)
+                .build();
+
+        // Procesar el pago
+        return procesarPago(payment, reserva);
     }
+
 
     public String createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
         Cliente cliente = clienteRepository.findById(ClienteId)
@@ -225,25 +254,17 @@ public class MercadoPagoService {
 
 
     //Procesar el pago basado en su estado
-    private boolean procesarPago(Payment payment) throws MPException, MPApiException {
+    private boolean procesarPago(Payment payment, Reserva reserva) throws MPException, MPApiException {
         String status = payment.getStatus();
-        String externalReference = payment.getExternalReference();
-        System.out.println("Procesando pago con status: " + status + " y externalReference: " + externalReference);
 
         if ("approved".equals(status)) {
-            // Recuperar la reserva temporal
-            ReservaDTO reserva = reservasTemporales.remove(externalReference);
-            if (reserva == null) return false;
 
             System.out.println("Procesando reserva: " + reserva);
-            ReservaResponseDTO reservaEntity = reservaService.save(reserva);
-            reservaService.cambiarEstado(reservaEntity.getId(), Estado.RESERVADA);
+            reservaService.cambiarEstado(reserva.getId(), Estado.RESERVADA);
             return true;
 
         } else if ("rejected".equals(status)) {
-            System.out.println("Pago rechazado para externalReference: " + externalReference);
-            // Si el pago fue rechazado, eliminar la reserva temporal
-            reservasTemporales.remove(externalReference);
+            reservaService.cambiarEstado(reserva.getId(), Estado.CANCELADA);
             return true;
         }
 
