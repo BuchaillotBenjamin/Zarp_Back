@@ -7,6 +7,7 @@ import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.EmpleadoRepository;
@@ -50,6 +51,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         cliente.setDocumentoVerificado(false);
         // Asignar rol por defecto
         cliente.setRol(Rol.CLIENTE);
+        //credenciales
+        cliente.setCredencialesMP(null);
+        //autorizaciones
+        cliente.setAutorizaciones(AutorizacionesCliente.NINGUNA);
 
         clienteRepository.save(cliente);
 
