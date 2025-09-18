@@ -4,6 +4,7 @@ import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.oauth.OauthClient;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.*;
+import com.mercadopago.core.MPRequestOptions;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
@@ -14,9 +15,11 @@ import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.CredencialesMP;
+import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +41,8 @@ public class MercadoPagoService {
     private ReservaService reservaService;
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    PropiedadRepository propiedadRepository;
     @Value("${mercadopago.access_token}")
     private String mpAccess;
     @Value("${mercadopago.back_url.success}")
@@ -62,12 +67,28 @@ public class MercadoPagoService {
     private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
     private static final Map<String, Cliente> clientesTemporales = new ConcurrentHashMap<>();
 
-    @PostConstruct
+    /*@PostConstruct
     public void initMPConfig() {
         MercadoPagoConfig.setAccessToken(mpAccess);
-    }
+    }*/
 
     public Preference createPreference(ReservaDTO reserva)throws MPException, MPApiException {
+
+        Propiedad propiedad = propiedadRepository.findById(reserva.getPropiedadId())
+                .orElseThrow(() -> new NotFoundException("Propiedad no encontrada"));
+        Cliente vendedor = propiedad.getPropietario();
+
+        if(vendedor.getCredencialesMP()==null){
+            throw new RuntimeException("El vendedor no tiene credenciales de Mercado Pago");
+        }
+
+        String tokenVendedor;
+
+        try {
+            tokenVendedor = cryptoUtils.decrypt(vendedor.getCredencialesMP().getAccessToken());
+        }catch (Exception e){
+            throw new RuntimeException("Error al desencriptar las credenciales" );
+        }
 
         // Generar un ID temporal único
         String tempId = UUID.randomUUID().toString();
@@ -82,13 +103,17 @@ public class MercadoPagoService {
                 .build();
         items.add(itemRequest);
 
+        Double fee = reserva.getPrecioTotal() * 0.10; // 10% de fee
+        Cliente comprador = clienteRepository.findById(reserva.getClienteId())
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
         // Construir la preferencia
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
+                .marketplaceFee(new BigDecimal(fee))
                 .payer(
                         PreferencePayerRequest.builder()
-                                .email("")
-                                .name("")
+                                .email(comprador.getCorreoElectronico())
+                                .name(comprador.getNombreCompleto())
                                 .build()
                 )
                 .backUrls(
@@ -102,9 +127,17 @@ public class MercadoPagoService {
                 .notificationUrl(publicUrl + "/api/mercadoPago/webhook/notification")
                 .build();
 
+
         // Crear la preferencia
+
+        MPRequestOptions requestOptions = MPRequestOptions.builder()
+                .accessToken(tokenVendedor)
+                .build();
+
         PreferenceClient client = new PreferenceClient();
-        return client.create(preferenceRequest);
+        Preference preference = client.create(preferenceRequest, requestOptions);
+
+        return preference;
     }
 
     public boolean handlePayment(Map<String, Object> body) throws MPException, MPApiException {
