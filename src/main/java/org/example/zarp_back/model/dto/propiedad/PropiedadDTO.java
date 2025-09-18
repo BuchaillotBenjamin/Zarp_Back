@@ -43,7 +43,6 @@ public class PropiedadDTO {
     private List<DetalleTipoPersonaDTO> detalleTipoPersonas;
     @Valid
     @NotNull(message = "El campo detalleCaracteristicas no puede ser nulo")
-    @Size(min = 1, message = "El campo detalleCaracteristicas debe contener por lo menos 1 elemento")
     private List<DetalleCaracteristicaDTO> detalleCaracteristicas;
     @Valid
     @NotNull(message = "El campo detalleImagenes no puede ser nulo")

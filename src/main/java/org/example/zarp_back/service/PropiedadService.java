@@ -115,11 +115,6 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
             propiedad.setPrecioPorNoche(propiedadDTO.getPrecioPorNoche());
         }
 
-        //detalle tipo personas
-        if (!sonIgualesPorIdTipoPersona(propiedad.getDetalleTipoPersonas(), propiedadDTO.getDetalleTipoPersonas())) {
-            agregarDetalleTipoPersonas(propiedad, propiedadDTO);
-        }
-
         //detalle caracteristicas
         if (!sonIgualesPorIdDetalleCaracteristica(propiedad.getDetalleCaracteristicas(), propiedadDTO.getDetalleCaracteristicas())) {
             agregarDetalleCaracteristicas(propiedad, propiedadDTO);
@@ -129,19 +124,6 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         if (!sonIgualesPorUrlDetalleImagen(propiedad.getDetalleImagenes(), propiedadDTO.getDetalleImagenes())) {
             agregarDetalleImagenes(propiedad, propiedadDTO);
         }
-
-        //detalle ambientes
-        if (!sonIgualesPorIdDetalleAmbiente(propiedad.getDetalleAmbientes(), propiedadDTO.getDetalleAmbientes())) {
-            agregarDetalleAmbientes(propiedad, propiedadDTO);
-        }
-
-        //tipo Propiedad
-        if (!propiedadDTO.getTipoPropiedadId().equals(propiedad.getTipoPropiedad().getId())) {
-            asignarTipoPropiedad(propiedad, propiedadDTO);
-        }
-
-        //reseñas
-        propiedad.setResenias(new ArrayList<>());
 
         propiedadRepository.save(propiedad);
 
@@ -300,6 +282,10 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     }
 
     private boolean sonIgualesPorUrlDetalleImagen(List<DetalleImagenPropiedad> listaEntidad, List<DetalleImagenPropiedadDTO> listaDto) {
+
+        if (listaEntidad.isEmpty() && listaDto.isEmpty()) return true;
+        if (listaEntidad.isEmpty() || listaDto.isEmpty()) return false;
+        
         if (listaEntidad.size() != listaDto.size()) return false;
 
         Set<String> urlsEntidad = listaEntidad.stream()
@@ -312,6 +298,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         return urlsEntidad.equals(urlsDto);
     }
+
 
     private boolean sonIgualesPorIdDetalleAmbiente(List<DetalleAmbiente> listaEntidad, List<DetalleAmbienteDTO> listaDto) {
         if (listaEntidad.size() != listaDto.size()) return false;

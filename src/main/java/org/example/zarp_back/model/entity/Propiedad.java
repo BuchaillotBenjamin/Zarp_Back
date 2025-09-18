@@ -22,7 +22,7 @@ public class Propiedad extends Base {
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Direccion direccion;
 
     @ManyToOne
