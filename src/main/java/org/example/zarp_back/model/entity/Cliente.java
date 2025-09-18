@@ -27,7 +27,7 @@ public class Cliente extends Usuario {
     private Boolean correoVerificado;
     private Boolean documentoVerificado;
     private AutorizacionesCliente autorizaciones;
-    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToOne( cascade = CascadeType.ALL)
     private CredencialesMP credencialesMP;
 
 

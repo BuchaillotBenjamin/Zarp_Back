@@ -13,8 +13,11 @@ import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
+import org.example.zarp_back.model.entity.CredencialesMP;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +36,8 @@ public class MercadoPagoService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ReservaService reservaService;
-
+    @Autowired
+    private ClienteService clienteService;
     @Value("${mercadopago.access_token}")
     private String mpAccess;
     @Value("${mercadopago.back_url.success}")
@@ -47,9 +52,11 @@ public class MercadoPagoService {
     private String mpClientId;
     @Value("${mercadopago.client_secret}")
     private String mpClientSecret;
-
-    private String mpAuthUrl = "";
-
+    private final CryptoUtils cryptoUtils;
+    @Autowired
+    public MercadoPagoService(CryptoUtils cryptoUtils) {
+        this.cryptoUtils = cryptoUtils;
+    }
 
     // Mapa temporal
     private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
@@ -127,6 +134,10 @@ public class MercadoPagoService {
         String tempId = UUID.randomUUID().toString();
         clientesTemporales.put(tempId, cliente);
 
+        if(cliente.getAutorizaciones()==AutorizacionesCliente.MERCADO_PAGO||cliente.getAutorizaciones()==AutorizacionesCliente.AMBAS){
+            throw new RuntimeException("El cliente ya tiene autorizaciones de Mercado Pago");
+        }
+
             return buildAuthUrl(tempId);
     }
 
@@ -151,16 +162,27 @@ public class MercadoPagoService {
             String refreshToken = (String) response.getBody().get("refresh_token");
             Long userId = Long.valueOf(response.getBody().get("user_id").toString());
 
+            Integer expiresIn = (Integer) response.getBody().get("expires_in");
+            LocalDateTime tokenExpiration = LocalDateTime.now().plusSeconds(expiresIn);
+
             Cliente cliente = clientesTemporales.remove(state);
             if (cliente == null) return false;
 
-
-            // Acá guardás el accessToken, refreshToken y userId en tu DB
-            System.out.println("ACCESS TOKEN: " + accessToken);
-            System.out.println("REFRESH TOKEN: " + refreshToken);
-            System.out.println("USER ID: " + userId);
-            System.out.println("Cliente ID: " + state);
-            System.out.println("Cliente asociado: " + cliente);
+            try {
+                CredencialesMP credenciales = CredencialesMP.builder()
+                        .accessToken(cryptoUtils.encrypt(accessToken))
+                        .refreshToken(cryptoUtils.encrypt(refreshToken))
+                        .userIdMp(userId)
+                        .tokenExpiration(tokenExpiration)
+                        .build();
+                cliente.setCredencialesMP(credenciales);
+                clienteRepository.save(cliente);
+                clienteService.actualizarAutorizaciones(cliente.getId());
+            }catch (Exception e){
+                throw new RuntimeException("Error al encriptar las credenciales" );
+            }
+            
+            System.out.println(cliente);
 
             return true;
         }
