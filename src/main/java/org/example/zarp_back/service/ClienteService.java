@@ -7,6 +7,7 @@ import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.EmpleadoRepository;
@@ -50,6 +51,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         cliente.setDocumentoVerificado(false);
         // Asignar rol por defecto
         cliente.setRol(Rol.CLIENTE);
+        //credenciales
+        cliente.setCredencialesMP(null);
+        //autorizaciones
+        cliente.setAutorizaciones(AutorizacionesCliente.NINGUNA);
 
         clienteRepository.save(cliente);
 
@@ -129,6 +134,26 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         return clienteMapper.toResponseDTO(cliente);
     }
 
+    public void actualizarAutorizaciones(Long clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
+        Boolean updated = false;
+
+        if (cliente.getAutorizaciones() == AutorizacionesCliente.AMBAS) {
+            return; // Ya tiene la autorización, no hacer nada
+        }
+        if(cliente.getAutorizaciones() == AutorizacionesCliente.NINGUNA){
+
+            if(cliente.getCredencialesMP()!=null){
+                cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
+                updated = true;
+            }
+
+        }
+        if (updated){clienteRepository.save(cliente);}
+
+    }
+
     private void verificacionCompleta(long clienteId){
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
@@ -139,6 +164,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         }
 
     }
+
 
     // Aquí puedes agregar métodos específicos para el servicio de Cliente si es necesario
 }

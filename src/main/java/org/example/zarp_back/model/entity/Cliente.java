@@ -8,7 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Rol;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,5 +26,10 @@ public class Cliente extends Usuario {
     private Imagen fotoPerfil;
     private Boolean correoVerificado;
     private Boolean documentoVerificado;
+    private AutorizacionesCliente autorizaciones;
+    @OneToOne( cascade = CascadeType.ALL)
+    private CredencialesMP credencialesMP;
+
+
 
 }

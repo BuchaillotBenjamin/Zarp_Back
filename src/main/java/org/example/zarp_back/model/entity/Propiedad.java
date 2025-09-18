@@ -46,4 +46,6 @@ public class Propiedad extends Base {
     @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleAmbiente> detalleAmbientes;
 
+    private String collectorId; // ID del collector en MercadoPago
+
 }
