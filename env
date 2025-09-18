@@ -1,0 +1,14 @@
+MP_ACCESS_TOKEN=APP_USR-3770347774470840-091719-cf64b288a496dc2b0367980e665b5a7e-2694005493
+MP_BACK_URL_SUCCESS=https://www.facebook.com/?locale=es_LA
+MP_BACK_URL_PENDING=https://www.facebook.com/?locale=es_LA
+MP_BACK_URL_FAILURE=https://www.youtube.com/watch?v=QKy_th4I7NE&list=RDQKy_th4I7NE&start_radio=1&ab_channel=joaquinsabinaVEVO
+MP_WEBHOOK_SECRET=8a10ce74cd34e1de1bda453e215ac00a4e4c517af2f057d083dd8a4a14d1a167
+MP_CLIENT_ID=3770347774470840
+MP_CLIENT_SECRET=9vIXalfotyOKQW2uBxFCQceeEBqjPrj4
+PUBLIC_KEY=APP_USR-3cf792a8-b746-4c9a-a552-b487ba5eed22
+
+
+
+API_URL=https://da248a7a9b10.ngrok-free.app
+
+ENCRYPTION_KEY=LiOnelMeSsi10cRa
