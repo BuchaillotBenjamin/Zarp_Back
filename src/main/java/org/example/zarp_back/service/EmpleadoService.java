@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.EmpleadoMapper;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.logging.Logger;
 
 @Service
+@Slf4j
 public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, EmpleadoResponseDTO, Long> {
 
     @Autowired
@@ -33,13 +35,14 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
     public EmpleadoResponseDTO save(EmpleadoDTO empleadoDTO) {
 
         if (clienteRepository.existsByUid(empleadoDTO.getUid())|| empleadoRepository.existsByUid(empleadoDTO.getUid())) {
+            log.error("El UID ya está en uso: {}", empleadoDTO.getUid());
             throw new IllegalArgumentException("El UID ya está en uso");
         }
 
         Empleado empleado = empleadoMapper.toEntity(empleadoDTO);
 
         empleadoRepository.save(empleado);
-
+        log.info("Empleado guardado con éxito: {}", empleado.getId());
         return empleadoMapper.toResponseDTO(empleado);
     }
 
@@ -53,6 +56,7 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
         if (!empleadoDTO.getNombreCompleto().equals(empleado.getNombreCompleto())){
             empleado.setNombreCompleto(empleadoDTO.getNombreCompleto());
             empleado = empleadoRepository.save(empleado);
+            log.info("Empleado actualizado con éxito: {}", empleado.getId());
         }
 
         return empleadoMapper.toResponseDTO(empleado);
@@ -68,7 +72,6 @@ public class EmpleadoService extends GenericoServiceImpl<Empleado, EmpleadoDTO, 
 
         return empleadoMapper.toResponseDTO(empleado);
     }
-
 
     public ClienteResponseDTO getByUidLogin(String uid){
 

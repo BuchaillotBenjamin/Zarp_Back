@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
@@ -13,6 +14,7 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Provincia;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
@@ -31,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long> {
 
     @Autowired
@@ -67,8 +70,14 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         Cliente propietario = clienteRepository.findById(propiedadDTO.getPropietarioId())
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + propiedadDTO.getPropietarioId()));
         if (propietario.getRol()!= Rol.PROPIETARIO){
+            log.error("El cliente con ID {} no esta verificado como propietario", propietario.getId());
             throw new RuntimeException("El cliente no esta verificado como propietario");
         }
+        if (propietario.getAutorizaciones()== AutorizacionesCliente.NINGUNA){
+            log.error("El cliente con ID {} no tiene ningun metodo de cobro asociado", propietario.getId());
+            throw new RuntimeException("El cliente no tiene ningun metodo de cobro asociado");
+        }
+
         propiedad.setPropietario(propietario);
 
         //detalle tipo personas
@@ -97,6 +106,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
 
         propiedadRepository.save(propiedad);
+        log.info("Propiedad guardada con exito: {}", propiedad.getId());
         return propiedadMapper.toResponseDTO(propiedad);
 
     }
@@ -129,6 +139,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         propiedadRepository.save(propiedad);
 
+        log.info("Propiedad actualizada con exito: {}", propiedad.getId());
         return propiedadMapper.toResponseDTO(propiedad);
     }
 
@@ -301,7 +312,6 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
         return urlsEntidad.equals(urlsDto);
     }
-
 
     private boolean sonIgualesPorIdDetalleAmbiente(List<DetalleAmbiente> listaEntidad, List<DetalleAmbienteDTO> listaDto) {
         if (listaEntidad.size() != listaDto.size()) return false;

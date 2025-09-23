@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReservaMapper;
 import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long> {
 
     @Autowired
@@ -51,6 +53,7 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
                 .orElseThrow(() -> new NotFoundException("Propiedad con el id " + reservaDTO.getPropiedadId() + " no encontrada"));
         reserva.setPropiedad(propiedad);
         if (propiedad.getVerificacionPropiedad()!= VerificacionPropiedad.APROBADA){
+            log.error("La propiedad con el id {} no está aprobada para reservas", reservaDTO.getPropiedadId());
             throw new RuntimeException("La propiedad con el id " + reservaDTO.getPropiedadId() + " no está aprobada para reservas");
         }
 
@@ -59,9 +62,11 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
                 .orElseThrow(() -> new NotFoundException("Cliente con el id " + reservaDTO.getClienteId() + " no encontrado"));
         reserva.setCliente(cliente);
         if (!cliente.getRol().equals(Rol.PROPIETARIO)) {
+            log.error("El cliente con el id {} no tiene las verificaciones necesarias", reservaDTO.getClienteId());
             throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no tiene las verificaciones necesarias");
         }
         if (propiedad.getPropietario().getId().equals(cliente.getId())) {
+            log.error("El cliente con el id {} no puede reservar su propia propiedad", reservaDTO.getClienteId());
             throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no puede reservar su propia propiedad");
         }
 
@@ -70,6 +75,7 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
 
         reservaRepository.save(reserva);
 
+        log.info("Reserva con el id {} creada exitosamente", reserva.getId());
         return reservaMapper.toResponseDTO(reserva);
     }
 

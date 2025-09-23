@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long> {
 
     @Autowired
@@ -41,6 +43,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     public ClienteResponseDTO save(ClienteDTO clienteDTO) {
 
         if (clienteRepository.existsByUid(clienteDTO.getUid())|| empleadoRepository.existsByUid(clienteDTO.getUid())) {
+            log.error("El UID ya está en uso: {}", clienteDTO.getUid());
             throw new IllegalArgumentException("El UID ya está en uso");
         }
 
@@ -60,6 +63,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
 
 
+        log.info("Cliente guardado con éxito: {}", cliente.getId());
         return clienteMapper.toResponseDTO(cliente);
     }
 
@@ -87,6 +91,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
         if (updated){
             clienteRepository.save(cliente);
+            log.info("Cliente actualizado con éxito: {}", cliente.getId());
         }
         
         return clienteMapper.toResponseDTO(cliente);
@@ -99,6 +104,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
         cliente.setCorreoVerificado(true);
         clienteRepository.save(cliente);
+        log.info("Correo del cliente con id {} verificado", id);
 
         verificacionCompleta(id);
 
@@ -118,9 +124,11 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
             cliente.setDocumentoVerificado(true);
             clienteRepository.save(cliente);
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
+            log.info("Documentación del cliente con id {} verificada", id);
             verificacionCompleta(id);
         }else{
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
+            log.warn("Documentación del cliente con id {} no verificada, verificación desactivada", id);
         }
 
         return clienteMapper.toResponseDTO(cliente);
@@ -150,7 +158,10 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
             }
 
         }
-        if (updated){clienteRepository.save(cliente);}
+        if (updated){
+            clienteRepository.save(cliente);
+            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
+        }
 
     }
 
@@ -161,6 +172,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         if (cliente.getCorreoVerificado() && cliente.getDocumentoVerificado()) {
             cliente.setRol(Rol.PROPIETARIO);
             clienteRepository.save(cliente);
+            log.info("Cliente con id {} verificado completamente y rol actualizado a PROPIETARIO", clienteId);
         }
 
     }
