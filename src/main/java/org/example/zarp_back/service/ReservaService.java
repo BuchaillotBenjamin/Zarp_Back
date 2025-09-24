@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReservaMapper;
@@ -16,6 +17,7 @@ import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.repository.ReservaRepository;
+import org.example.zarp_back.service.utils.NotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,8 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
     private PropiedadRepository propiedadRepository;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private NotificacionService notificacionService;
 
 
     public ReservaService(ReservaRepository reservaRepository, ReservaMapper reservaMapper) {
@@ -102,6 +106,17 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Reserva con el id " + id + " no encontrada"));
         reserva.setEstado(estado);
+        if(estado==Estado.RESERVADA){
+
+            try {
+                notificacionService.notificarReservaPropietario(reserva);
+                notificacionService.notificarReservaCliente(reserva);
+            } catch (MessagingException e) {
+                log.error("Error al enviar notificaciones para la reserva con id {}: {}", id, e.getMessage());
+            }
+
+        }
+
         reservaRepository.save(reserva);
         return null;
     }
