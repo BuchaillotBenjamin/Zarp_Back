@@ -18,6 +18,7 @@ import java.util.List;
 public class Propiedad extends Base {
 
     private String nombre;
+    @Column(length = 1000)
     private String descripcion;
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
