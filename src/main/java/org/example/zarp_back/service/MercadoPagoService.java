@@ -25,11 +25,16 @@ import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +67,8 @@ public class MercadoPagoService {
     private String mpClientId;
     @Value("${mercadopago.client_secret}")
     private String mpClientSecret;
+    @Value("${mercadopago.secret_key_webhook}")
+    private String mpSecretKeyWebhook;
 
     private final CryptoUtils cryptoUtils;
     private final OauthClient oauthClient;
@@ -75,6 +82,7 @@ public class MercadoPagoService {
     // Mapa temporal
     private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
     private static final Map<String, Cliente> clientesTemporales = new ConcurrentHashMap<>();
+
 
     public Preference createPreference(ReservaDTO reserva) throws MPException, MPApiException {
 
@@ -143,7 +151,6 @@ public class MercadoPagoService {
 
     public boolean handlePayment(Map<String, Object> body) throws MPException, MPApiException {
 
-        Long paymentId;
         String type = String.valueOf(body.get("type"));
         Map<String, Object> data = (Map<String, Object>) body.get("data");
 
@@ -152,10 +159,10 @@ public class MercadoPagoService {
             return false;
         }
 
-        paymentId = Long.valueOf((String) data.get("id"));
+        Long paymentId = Long.valueOf((String) data.get("id"));
 
         MPRequestOptions requestOptionsAppOwner = MPRequestOptions.builder()
-                .accessToken(mpAccess) // tu token como owner
+                .accessToken(mpAccess)
                 .build();
 
         PaymentClient paymentClient = new PaymentClient();
@@ -169,9 +176,21 @@ public class MercadoPagoService {
 
         ReservaDTO reserva = reservasTemporales.remove(externalReference);
 
-        // Procesar el pago
+        if (reserva == null) {
+            log.info("Reserva ya procesada o no encontrada para externalReference: {}. Ignorando pago ID {}", externalReference, paymentId);
+            return true;
+        }
+
         log.info("Procesando pago ID: {} con estado: {}", paymentId, payment.getStatus());
-        return procesarPago(payment, reserva);
+
+        boolean exito = procesarPago(payment, reserva);
+        if (exito) {
+            log.info("Pago ID {} procesado exitosamente", paymentId);
+        } else {
+            log.warn("El pago ID {} no fue aprobado ni rechazado. Estado: {}", paymentId, payment.getStatus());
+        }
+
+        return exito;
     }
 
     public String createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
@@ -266,18 +285,61 @@ public class MercadoPagoService {
         }
     }
 
+    public boolean isValidWebhookSignature(String signatureHeader, String requestId, String dataId) {
+        try {
+            if (signatureHeader == null || mpSecretKeyWebhook == null) {
+                log.warn("Faltan headers o clave secreta");
+                return false;
+            }
+
+            // Extraer ts y v1
+            String ts = null;
+            String v1 = null;
+            for (String part : signatureHeader.split(",")) {
+                String[] kv = part.split("=");
+                if (kv.length == 2) {
+                    String key = kv[0].trim();
+                    String value = kv[1].trim();
+                    if ("ts".equals(key)) ts = value;
+                    else if ("v1".equals(key)) v1 = value;
+                }
+            }
+
+            if (ts == null || v1 == null) {
+                log.warn("No se encontró ts o v1 en x-signature");
+                return false;
+            }
+
+            // Construir manifest
+            StringBuilder manifest = new StringBuilder();
+            if (dataId != null) manifest.append("id:").append(dataId.toLowerCase()).append(";");
+            if (requestId != null) manifest.append("request-id:").append(requestId).append(";");
+            manifest.append("ts:").append(ts).append(";");
+
+            // Calcular HMAC-SHA256 en hexadecimal
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(mpSecretKeyWebhook.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            mac.init(secretKey);
+            byte[] hmacBytes = mac.doFinal(manifest.toString().getBytes(StandardCharsets.UTF_8));
+            String expectedSignature = bytesToHex(hmacBytes);
+
+            return MessageDigest.isEqual(expectedSignature.getBytes(), v1.getBytes());
+
+        } catch (Exception e) {
+            log.error("Error al validar firma del webhook: {}", e.getMessage());
+            return false;
+        }
+    }
+
     private boolean procesarPago(Payment payment, ReservaDTO reserva) throws MPException, MPApiException {
         String status = payment.getStatus();
 
         if ("approved".equals(status)) {
-
             ReservaResponseDTO reservaResponse = reservaService.save(reserva);
             reservaService.cambiarEstado(reservaResponse.getId(), Estado.RESERVADA);
             log.info("Pago aprobado y reserva creada con ID: {}", reservaResponse.getId());
             return true;
-
         } else if ("rejected".equals(status)) {
-
             ReservaResponseDTO reservaResponse = reservaService.save(reserva);
             reservaService.cambiarEstado(reservaResponse.getId(), Estado.CANCELADA);
             log.warn("Pago rechazado y reserva cancelada con ID: {}", reservaResponse.getId());
@@ -293,4 +355,13 @@ public class MercadoPagoService {
         return url;
     }
 
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 }
