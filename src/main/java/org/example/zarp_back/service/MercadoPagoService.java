@@ -350,9 +350,13 @@ public class MercadoPagoService {
     }
 
     private String buildAuthUrl(String tempId) throws MPException, MPApiException {
-        String url = oauthClient.getAuthorizationURL(mpClientId, publicUrl + "/api/mercadoPago/webhook/getAuthClient");
+        try {String url = oauthClient.getAuthorizationURL(mpClientId, publicUrl + "/api/mercadoPago/webhook/getAuthClient");
         url += "&state=" + tempId;
-        return url;
+        return url;}
+        catch (MPApiException e){
+            log.error("MercadoPago API error: {}", e.getApiResponse().getContent());
+            throw new RuntimeException("Error al construir la URL de autorización: " + e.getApiResponse().getContent());
+        }
     }
 
     private String bytesToHex(byte[] bytes) {
