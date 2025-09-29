@@ -6,8 +6,12 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.mail.MessagingException;
+import org.example.zarp_back.config.exception.NotFoundException;
+import org.example.zarp_back.model.entity.Cliente;
+import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.example.zarp_back.repository.PropiedadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +25,8 @@ public class NotificacionService {
     private EmailService emailService;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private PropiedadRepository propiedadRepository;
 
     //TODO: AGREGAR NOTIFICACIONES PARA VERIFICACION DOCUMENTO Y PARA ACTIVACION DE PROPIEDADES
 
@@ -42,6 +48,7 @@ public class NotificacionService {
         byte[] pdf = generarPdfReservaPropietario(reserva);
         emailService.enviarMailConAdjunto(para, asunto, cuerpo, pdf, nombrePdf);
     }
+
     private byte[] generarPdfReservaCliente(Reserva reserva) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document();
@@ -72,6 +79,7 @@ public class NotificacionService {
             throw new RuntimeException("Error al generar PDF de reserva para cliente", e);
         }
     }
+
     private byte[] generarPdfReservaPropietario(Reserva reserva) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document();
@@ -103,6 +111,75 @@ public class NotificacionService {
         } catch (Exception e) {
             throw new RuntimeException("Error al generar PDF de reserva para propietario", e);
         }
+    }
+
+    public void notifcarVerificacionDocumento(Long idCliente){
+
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(()-> new NotFoundException("Cliente no encontrado con id: " + idCliente));
+
+        String para = cliente.getCorreoElectronico();
+        String asunto = "Verificacion de Documento Exitosa";
+        String cuerpo="Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
+                "Nos complace informarte que la verificación de tu documento ha sido completada exitosamente.\n\n" +
+                "Tu información ha sido validada y ahora podés continuar utilizando nuestros servicios.\n\n" +
+                "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
+                "Saludos cordiales,\n" +
+                "Zarp Team";
+
+        emailService.enviarMail(para, asunto, cuerpo);
+
+    }
+
+    public void notificarVerificacionPropiedad(Long idPropiedad){
+        Propiedad propiedad = propiedadRepository.findById(idPropiedad)
+                .orElseThrow(()-> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
+
+        String para = propiedad.getPropietario().getCorreoElectronico();
+        String asunto = "Verificacion de Propiedad Exitosa";
+        String cuerpo="Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
+                "Nos complace informarte que la verificación de tu propiedad ha sido completada exitosamente.\n\n" +
+                "La información ha sido validada y ya se encuentra disponible para ser rentada.\n\n" +
+                "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
+                "Saludos cordiales,\n" +
+                "Zarp Team";
+
+        emailService.enviarMail(para, asunto, cuerpo);
+
+    }
+
+    public void notificarRechazoDocumento(Long idCliente) {
+
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + idCliente));
+
+        String para = cliente.getCorreoElectronico();
+        String asunto = "Verificación de Documento Rechazada";
+        String cuerpo = "Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
+                "Lamentamos informarte que la verificación de tu documento no ha sido aprobada.\n\n" +
+                "Por favor, revisá que la información y la calidad del documento sean correctas y volvé a intentarlo desde tu panel de usuario.\n\n" +
+                "Si necesitás ayuda para completar el proceso, no dudes en contactarnos.\n\n" +
+                "Saludos cordiales,\n" +
+                "Zarp Team";
+
+        emailService.enviarMail(para, asunto, cuerpo);
+    }
+
+    public void notificarRechazoPropiedad(Long idPropiedad) {
+
+        Propiedad propiedad = propiedadRepository.findById(idPropiedad)
+                .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
+
+        String para = propiedad.getPropietario().getCorreoElectronico();
+        String asunto = "Verificación de Propiedad Rechazada";
+        String cuerpo = "Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
+                "Lamentamos informarte que la verificación de tu propiedad no ha sido aprobada.\n\n" +
+                "Para poder publicar tu propiedad, deberás registrarla nuevamente y esperar a que sea verificada por nuestro equipo.\n\n" +
+                "Si necesitás asistencia para completar el proceso, estamos disponibles para ayudarte.\n\n" +
+                "Saludos cordiales,\n" +
+                "Zarp Team";
+
+        emailService.enviarMail(para, asunto, cuerpo);
     }
 
 

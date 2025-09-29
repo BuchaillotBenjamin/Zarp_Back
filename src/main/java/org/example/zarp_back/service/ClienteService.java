@@ -13,6 +13,7 @@ import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.EmpleadoRepository;
 import org.example.zarp_back.repository.VerificacionClienteRepository;
+import org.example.zarp_back.service.utils.NotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     private EmpleadoRepository empleadoRepository;
     @Autowired
     private VerificacionClienteService verificacionClienteService;
+    @Autowired
+    private NotificacionService notificacionService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -125,10 +128,16 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
             clienteRepository.save(cliente);
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
             log.info("Documentación del cliente con id {} verificada", id);
+            if(cliente.getCorreoVerificado()){
+                notificacionService.notifcarVerificacionDocumento(cliente.getId());
+            }
             verificacionCompleta(id);
         }else{
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
             log.warn("Documentación del cliente con id {} no verificada, verificación desactivada", id);
+            if (cliente.getCorreoVerificado()){
+                notificacionService.notificarRechazoDocumento(cliente.getId());
+            }
         }
 
         return clienteMapper.toResponseDTO(cliente);

@@ -19,6 +19,7 @@ import org.example.zarp_back.model.enums.Provincia;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
+import org.example.zarp_back.service.utils.NotificacionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +52,12 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     @Autowired
     private ImagenMapper imagenMapper;
     @Autowired
-    ClienteRepository clienteRepository;
+    private ClienteRepository clienteRepository;
     @Autowired
-    DetalleImagenPropiedadRepository detalleImagenRepository;
+    private DetalleImagenPropiedadRepository detalleImagenRepository;
+    @Autowired
+    private NotificacionService notificacionService;
+
 
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
         super(propiedadRepository, propiedadMapper);
@@ -188,9 +192,11 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
                 .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con ID: " + id));
         if (aprobado) {
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.APROBADA);
+            notificacionService.notificarVerificacionPropiedad(propiedad.getId());
         } else {
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.RECHAZADA);
             propiedad.setActivo(false);
+            notificacionService.notificarRechazoPropiedad(propiedad.getId());
         }
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);
