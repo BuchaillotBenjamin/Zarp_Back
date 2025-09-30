@@ -49,8 +49,17 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
     public ReservaResponseDTO save(ReservaDTO reservaDTO) {
 
         Reserva reserva = reservaMapper.toEntity(reservaDTO);
+        
+        List<Reserva> reservasSolapadas = reservaRepository.findReservasSolapadas(
+                reservaDTO.getPropiedadId(),
+                reservaDTO.getFechaInicio(),
+                reservaDTO.getFechaFin()
+        );
 
-        //TODO:validar que la propiedad no tenga reservas en las fechas indicadas
+        if (!reservasSolapadas.isEmpty()) {
+            log.error("La propiedad con el id {} ya tiene reservas en las fechas indicadas", reservaDTO.getPropiedadId());
+            throw new RuntimeException("La propiedad ya tiene reservas activas en las fechas seleccionadas.");
+        }
 
         //propiedad
         Propiedad propiedad = propiedadRepository.findById(reservaDTO.getPropiedadId())

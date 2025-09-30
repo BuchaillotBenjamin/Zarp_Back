@@ -28,8 +28,6 @@ public class NotificacionService {
     @Autowired
     private PropiedadRepository propiedadRepository;
 
-    //TODO: AGREGAR NOTIFICACIONES PARA VERIFICACION DOCUMENTO Y PARA ACTIVACION DE PROPIEDADES
-
     public void notificarReservaCliente(Reserva reserva) throws MessagingException {
         String para = reserva.getCliente().getCorreoElectronico();
         String asunto = "Confirmación de Reserva";

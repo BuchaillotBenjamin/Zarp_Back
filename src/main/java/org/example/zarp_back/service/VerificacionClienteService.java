@@ -115,5 +115,5 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
         return responseDTO;
     }
-    
+
 }
