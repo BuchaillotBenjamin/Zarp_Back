@@ -33,7 +33,8 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
     public ResponseEntity<ConversacionResponseDTO> agregarMensaje(@Valid @RequestBody MensajeDTO mensajeDTO, @PathVariable Long idConversacion) {
 
         ConversacionResponseDTO response = conversacionService.agregarMensajes(idConversacion, mensajeDTO);
-        messagingTemplate.convertAndSend("/topic/conversaciones/update", response);
+        messagingTemplate.convertAndSend("/topic/conversaciones/update/"+response.getCliente2().getId(), response);
+        messagingTemplate.convertAndSend("/topic/conversaciones/update/"+response.getCliente1().getId(), response);
         return ResponseEntity.ok(response);
 
     }

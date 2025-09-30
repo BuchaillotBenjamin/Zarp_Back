@@ -16,7 +16,7 @@ public class WebConfig {
                 registry.addMapping("/**") // Permite todos los endpoints
                         .allowedOrigins(
                                 "http://127.0.0.1:5500",          // tu front local
-                                "https://b5796001ff36.ngrok-free.app" // front en ngrok cambiar cada vez que se ejecuta el ngrok
+                                "https://1480d5bc9d93.ngrok-free.app" // front en ngrok cambiar cada vez que se ejecuta el ngrok
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

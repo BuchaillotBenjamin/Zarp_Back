@@ -15,10 +15,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins(
-                        "https://b5796001ff36.ngrok-free.app", // tu front en ngrok, cambiar cada vez que se ejecuta el ngrok
-                        "http://127.0.0.1:5500"               // si pruebas local
-                )
-                .withSockJS();
+                        "https://1480d5bc9d93.ngrok-free.app",
+                        "http://127.0.0.1:5500"
+                );
+
     }
 
     @Override
