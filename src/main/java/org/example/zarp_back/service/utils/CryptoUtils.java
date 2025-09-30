@@ -34,4 +34,22 @@ public class CryptoUtils {
         byte[] decrypted = cipher.doFinal(decoded);
         return new String(decrypted);
     }
+
+    public String encryptUrl(String url) throws Exception {
+        SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encrypted = cipher.doFinal(url.getBytes());
+        return Base64.getUrlEncoder().encodeToString(encrypted); // URL-safe
+    }
+
+    public String decryptUrl(String encryptedUrl) throws Exception {
+        SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decoded = Base64.getUrlDecoder().decode(encryptedUrl); // URL-safe
+        byte[] decrypted = cipher.doFinal(decoded);
+        return new String(decrypted);
+    }
+
 }

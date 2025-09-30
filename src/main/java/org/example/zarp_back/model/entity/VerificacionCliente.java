@@ -18,11 +18,11 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class VerificacionCliente extends Base {
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private Imagen fotoFrontal;
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private Imagen fotoDocumentoFrontal;
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     private Imagen fotoDocumentoTrasero;
     @ManyToOne
     private Cliente cliente;
