@@ -29,6 +29,8 @@ public class Cliente extends Usuario {
     private AutorizacionesCliente autorizaciones;
     @OneToOne( cascade = CascadeType.ALL)
     private CredencialesMP credencialesMP;
+    @OneToOne( cascade = CascadeType.ALL)
+    private CredencialesPP credencialesPP;
 
 
 

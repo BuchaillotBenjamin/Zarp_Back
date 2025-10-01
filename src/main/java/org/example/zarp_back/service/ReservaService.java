@@ -4,7 +4,6 @@ import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ReservaMapper;
-import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaFechaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -49,39 +49,21 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
     public ReservaResponseDTO save(ReservaDTO reservaDTO) {
 
         Reserva reserva = reservaMapper.toEntity(reservaDTO);
-        
-        List<Reserva> reservasSolapadas = reservaRepository.findReservasSolapadas(
-                reservaDTO.getPropiedadId(),
-                reservaDTO.getFechaInicio(),
-                reservaDTO.getFechaFin()
-        );
 
-        if (!reservasSolapadas.isEmpty()) {
-            log.error("La propiedad con el id {} ya tiene reservas en las fechas indicadas", reservaDTO.getPropiedadId());
-            throw new RuntimeException("La propiedad ya tiene reservas activas en las fechas seleccionadas.");
+        if(!esReservaValida(reservaDTO)){
+            log.error("La reserva no es válida por incumplimiento de alguna regla de negocio");
+            throw new IllegalArgumentException("La reserva no es válida por incumplimiento de alguna regla de negocio");
         }
 
         //propiedad
         Propiedad propiedad = propiedadRepository.findById(reservaDTO.getPropiedadId())
                 .orElseThrow(() -> new NotFoundException("Propiedad con el id " + reservaDTO.getPropiedadId() + " no encontrada"));
         reserva.setPropiedad(propiedad);
-        if (propiedad.getVerificacionPropiedad()!= VerificacionPropiedad.APROBADA){
-            log.error("La propiedad con el id {} no está aprobada para reservas", reservaDTO.getPropiedadId());
-            throw new RuntimeException("La propiedad con el id " + reservaDTO.getPropiedadId() + " no está aprobada para reservas");
-        }
 
         //cliente
         Cliente cliente = clienteRepository.findById(reservaDTO.getClienteId())
                 .orElseThrow(() -> new NotFoundException("Cliente con el id " + reservaDTO.getClienteId() + " no encontrado"));
         reserva.setCliente(cliente);
-        if (!cliente.getRol().equals(Rol.PROPIETARIO)) {
-            log.error("El cliente con el id {} no tiene las verificaciones necesarias", reservaDTO.getClienteId());
-            throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no tiene las verificaciones necesarias");
-        }
-        if (propiedad.getPropietario().getId().equals(cliente.getId())) {
-            log.error("El cliente con el id {} no puede reservar su propia propiedad", reservaDTO.getClienteId());
-            throw new RuntimeException("El cliente con el id " + reservaDTO.getClienteId() + " no puede reservar su propia propiedad");
-        }
 
         //estado
         reserva.setEstado(Estado.PENDIENTE);
@@ -129,6 +111,53 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         reservaRepository.save(reserva);
         return null;
     }
+
+    public boolean esReservaValida(ReservaDTO reservaDTO) {
+        // Verificar solapamiento de fechas
+        List<Reserva> reservasSolapadas = reservaRepository.findReservasSolapadas(
+                reservaDTO.getPropiedadId(),
+                reservaDTO.getFechaInicio(),
+                reservaDTO.getFechaFin()
+        );
+        if (!reservasSolapadas.isEmpty()) {
+            log.warn("Reserva inválida: solapamiento con otras reservas para propiedad {}", reservaDTO.getPropiedadId());
+            return false;
+        }
+
+        // Verificar propiedad
+        Optional<Propiedad> propiedadOpt = propiedadRepository.findById(reservaDTO.getPropiedadId());
+        if (propiedadOpt.isEmpty()) {
+            log.warn("Reserva inválida: propiedad {} no encontrada", reservaDTO.getPropiedadId());
+            return false;
+        }
+
+        Propiedad propiedad = propiedadOpt.get();
+        if (propiedad.getVerificacionPropiedad() != VerificacionPropiedad.APROBADA) {
+            log.warn("Reserva inválida: propiedad {} no está aprobada", reservaDTO.getPropiedadId());
+            return false;
+        }
+
+        // Verificar cliente
+        Optional<Cliente> clienteOpt = clienteRepository.findById(reservaDTO.getClienteId());
+        if (clienteOpt.isEmpty()) {
+            log.warn("Reserva inválida: cliente {} no encontrado", reservaDTO.getClienteId());
+            return false;
+        }
+
+        Cliente cliente = clienteOpt.get();
+        if (!cliente.getRol().equals(Rol.PROPIETARIO)) {
+            log.warn("Reserva inválida: cliente {} no tiene rol PROPIETARIO", reservaDTO.getClienteId());
+            return false;
+        }
+
+        if (propiedad.getPropietario().getId().equals(cliente.getId())) {
+            log.warn("Reserva inválida: cliente {} intenta reservar su propia propiedad", reservaDTO.getClienteId());
+            return false;
+        }
+
+        return true;
+    }
+
 
     // Aquí puedes agregar métodos específicos para el servicio de Reserva si es necesario
 }
