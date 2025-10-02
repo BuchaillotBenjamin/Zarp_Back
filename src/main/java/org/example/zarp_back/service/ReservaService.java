@@ -136,5 +136,24 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         return reservaMapper.toResponseDTOList(reservas);
     }
 
+    public List<ReservaResponseDTO> obtenerReservasPorPropiedad(Long propiedadId){
+        List<Reserva> reservas = reservaRepository.findByPropiedadId(propiedadId);
+        return reservaMapper.toResponseDTOList(reservas);
+    }
+
+    public List<List<ReservaResponseDTO>> obeterReservasDePropietario(Long propietarioId){
+
+        Cliente propietario = clienteRepository.findById(propietarioId)
+                .orElseThrow(() -> new NotFoundException("Cliente con el id " + propietarioId + " no encontrado"));
+
+        List<Propiedad> propiedades = propiedadRepository.findByPropietario_Id(propietarioId);
+
+        List<List<ReservaResponseDTO>> reservasDePropiedades = propiedades.stream()
+                .map(propiedad -> reservaMapper.toResponseDTOList(reservaRepository.findByPropiedadId(propiedad.getId())))
+                .toList();
+
+        return reservasDePropiedades;
+    }
+
     // Aquí puedes agregar métodos específicos para el servicio de Reserva si es necesario
 }

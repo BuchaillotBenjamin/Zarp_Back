@@ -53,6 +53,19 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
         return ResponseEntity.ok(reservas);
     }
 
+    @GetMapping("/propiedad/{propiedadId}")
+    public ResponseEntity<List<ReservaResponseDTO>> getReservasByPropiedadId(@PathVariable Long propiedadId) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorPropiedad(propiedadId);
+        return ResponseEntity.ok(reservas);
+    }
+
+    @GetMapping("/propietario/{propietarioId}")
+    public ResponseEntity<List<List<ReservaResponseDTO>>> getReservasByPropietarioId(@PathVariable Long propietarioId) {
+        List<List<ReservaResponseDTO>> reservas = reservaService.obeterReservasDePropietario(propietarioId);
+        return ResponseEntity.ok(reservas);
+    }
+
+
 
     // Aquí puedes agregar métodos específicos para el controlador de Reserva si es necesario
 }
