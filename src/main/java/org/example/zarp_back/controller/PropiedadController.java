@@ -22,9 +22,8 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     private PropiedadService propiedadService;
     @Autowired
     private ReservaService reservaService;
-    ReservaService reservaService;
     @Autowired
-    SimpMessagingTemplate messagingTemplate;
+    private SimpMessagingTemplate messagingTemplate;
 
     @Override
     protected String entidadNombre() {

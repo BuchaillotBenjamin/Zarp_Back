@@ -17,7 +17,6 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
 
     @Autowired
     private ConversacionService conversacionService;
-    private ConversacionService conversacionService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
