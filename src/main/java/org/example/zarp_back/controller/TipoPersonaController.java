@@ -18,7 +18,7 @@ import java.util.List;
 public class TipoPersonaController extends GenericoControllerImpl<TipoPersona, TipoPersonaDTO, TipoPersonaResponseDTO, Long, TipoPersonaService> {
 
     @Autowired
-    TipoPersonaService servicio;
+    private TipoPersonaService servicio;
 
     @Override
     protected String entidadNombre() {

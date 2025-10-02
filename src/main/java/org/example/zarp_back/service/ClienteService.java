@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
@@ -7,9 +8,12 @@ import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
+import org.example.zarp_back.repository.EmpleadoRepository;
 import org.example.zarp_back.repository.VerificacionClienteRepository;
+import org.example.zarp_back.service.utils.NotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long> {
 
     @Autowired
@@ -26,7 +31,11 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     @Autowired
     private VerificacionClienteRepository verificacionClienteRepository;
     @Autowired
-    VerificacionClienteService verificacionClienteService;
+    private EmpleadoRepository empleadoRepository;
+    @Autowired
+    private VerificacionClienteService verificacionClienteService;
+    @Autowired
+    private NotificacionService notificacionService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -36,7 +45,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     @Transactional
     public ClienteResponseDTO save(ClienteDTO clienteDTO) {
 
-        if (clienteRepository.existsByUid(clienteDTO.getUid())) {
+        if (clienteRepository.existsByUid(clienteDTO.getUid())|| empleadoRepository.existsByUid(clienteDTO.getUid())) {
+            log.error("El UID ya está en uso: {}", clienteDTO.getUid());
             throw new IllegalArgumentException("El UID ya está en uso");
         }
 
@@ -47,11 +57,16 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         cliente.setDocumentoVerificado(false);
         // Asignar rol por defecto
         cliente.setRol(Rol.CLIENTE);
+        //credenciales
+        cliente.setCredencialesMP(null);
+        //autorizaciones
+        cliente.setAutorizaciones(AutorizacionesCliente.NINGUNA);
 
         clienteRepository.save(cliente);
 
 
 
+        log.info("Cliente guardado con éxito: {}", cliente.getId());
         return clienteMapper.toResponseDTO(cliente);
     }
 
@@ -79,6 +94,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
         if (updated){
             clienteRepository.save(cliente);
+            log.info("Cliente actualizado con éxito: {}", cliente.getId());
         }
         
         return clienteMapper.toResponseDTO(cliente);
@@ -91,6 +107,7 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
 
         cliente.setCorreoVerificado(true);
         clienteRepository.save(cliente);
+        log.info("Correo del cliente con id {} verificado", id);
 
         verificacionCompleta(id);
 
@@ -103,24 +120,57 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + id));
 
-        List<VerificacionCliente> verificacionesActivas = verificacionClienteRepository.findVerificacionesActivasByClienteId(id);
-
-        VerificacionCliente verificacionCliente = verificacionesActivas.stream()
-                .findFirst()
+        VerificacionCliente verificacionCliente = verificacionClienteRepository.findVerificacionActivaByClienteId(id)
                 .orElseThrow(() -> new NotFoundException("No hay verificación activa para el cliente con id: " + id));
 
         if (verificado) {
             cliente.setDocumentoVerificado(true);
             clienteRepository.save(cliente);
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
-
+            log.info("Documentación del cliente con id {} verificada", id);
+            if(cliente.getCorreoVerificado()){
+                notificacionService.notifcarVerificacionDocumento(cliente.getId());
+            }
+            verificacionCompleta(id);
         }else{
             verificacionClienteService.toggleActivo(verificacionCliente.getId());
+            log.warn("Documentación del cliente con id {} no verificada, verificación desactivada", id);
+            if (cliente.getCorreoVerificado()){
+                notificacionService.notificarRechazoDocumento(cliente.getId());
+            }
         }
 
-        verificacionCompleta(id);
+        return clienteMapper.toResponseDTO(cliente);
+
+    }
+
+    public ClienteResponseDTO getByUid(String uid) {
+        Cliente cliente = clienteRepository.findByUid(uid)
+                .orElseThrow(() -> new NotFoundException("Cliente con el UID " + uid + " no encontrado"));
 
         return clienteMapper.toResponseDTO(cliente);
+    }
+
+    public void actualizarAutorizaciones(Long clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
+        Boolean updated = false;
+
+        if (cliente.getAutorizaciones() == AutorizacionesCliente.AMBAS) {
+            return; // Ya tiene la autorización, no hacer nada
+        }
+        if(cliente.getAutorizaciones() == AutorizacionesCliente.NINGUNA){
+
+            if(cliente.getCredencialesMP()!=null){
+                cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
+                updated = true;
+            }
+
+        }
+        if (updated){
+            clienteRepository.save(cliente);
+            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
+        }
 
     }
 
@@ -131,9 +181,11 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         if (cliente.getCorreoVerificado() && cliente.getDocumentoVerificado()) {
             cliente.setRol(Rol.PROPIETARIO);
             clienteRepository.save(cliente);
+            log.info("Cliente con id {} verificado completamente y rol actualizado a PROPIETARIO", clienteId);
         }
 
     }
+
 
     // Aquí puedes agregar métodos específicos para el servicio de Cliente si es necesario
 }

@@ -18,11 +18,12 @@ import java.util.List;
 public class Propiedad extends Base {
 
     private String nombre;
+    @Column(length = 1000)
     private String descripcion;
     private Double precioPorNoche;
     private VerificacionPropiedad verificacionPropiedad;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Direccion direccion;
 
     @ManyToOne
@@ -45,5 +46,4 @@ public class Propiedad extends Base {
 
     @OneToMany(mappedBy = "propiedad", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleAmbiente> detalleAmbientes;
-
 }

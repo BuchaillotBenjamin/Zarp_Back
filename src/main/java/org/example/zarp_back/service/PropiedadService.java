@@ -1,5 +1,6 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
@@ -13,10 +14,12 @@ import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
+import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Provincia;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
+import org.example.zarp_back.service.utils.NotificacionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long> {
 
     @Autowired
@@ -48,7 +52,12 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     @Autowired
     private ImagenMapper imagenMapper;
     @Autowired
-    ClienteRepository clienteRepository;
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private DetalleImagenPropiedadRepository detalleImagenRepository;
+    @Autowired
+    private NotificacionService notificacionService;
+
 
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
         super(propiedadRepository, propiedadMapper);
@@ -65,8 +74,14 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         Cliente propietario = clienteRepository.findById(propiedadDTO.getPropietarioId())
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con ID: " + propiedadDTO.getPropietarioId()));
         if (propietario.getRol()!= Rol.PROPIETARIO){
+            log.error("El cliente con ID {} no esta verificado como propietario", propietario.getId());
             throw new RuntimeException("El cliente no esta verificado como propietario");
         }
+        if (propietario.getAutorizaciones()== AutorizacionesCliente.NINGUNA){
+            log.error("El cliente con ID {} no tiene ningun metodo de cobro asociado", propietario.getId());
+            throw new RuntimeException("El cliente no tiene ningun metodo de cobro asociado");
+        }
+
         propiedad.setPropietario(propietario);
 
         //detalle tipo personas
@@ -95,6 +110,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
 
 
         propiedadRepository.save(propiedad);
+        log.info("Propiedad guardada con exito: {}", propiedad.getId());
         return propiedadMapper.toResponseDTO(propiedad);
 
     }
@@ -115,11 +131,6 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
             propiedad.setPrecioPorNoche(propiedadDTO.getPrecioPorNoche());
         }
 
-        //detalle tipo personas
-        if (!sonIgualesPorIdTipoPersona(propiedad.getDetalleTipoPersonas(), propiedadDTO.getDetalleTipoPersonas())) {
-            agregarDetalleTipoPersonas(propiedad, propiedadDTO);
-        }
-
         //detalle caracteristicas
         if (!sonIgualesPorIdDetalleCaracteristica(propiedad.getDetalleCaracteristicas(), propiedadDTO.getDetalleCaracteristicas())) {
             agregarDetalleCaracteristicas(propiedad, propiedadDTO);
@@ -130,21 +141,9 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
             agregarDetalleImagenes(propiedad, propiedadDTO);
         }
 
-        //detalle ambientes
-        if (!sonIgualesPorIdDetalleAmbiente(propiedad.getDetalleAmbientes(), propiedadDTO.getDetalleAmbientes())) {
-            agregarDetalleAmbientes(propiedad, propiedadDTO);
-        }
-
-        //tipo Propiedad
-        if (!propiedadDTO.getTipoPropiedadId().equals(propiedad.getTipoPropiedad().getId())) {
-            asignarTipoPropiedad(propiedad, propiedadDTO);
-        }
-
-        //reseñas
-        propiedad.setResenias(new ArrayList<>());
-
         propiedadRepository.save(propiedad);
 
+        log.info("Propiedad actualizada con exito: {}", propiedad.getId());
         return propiedadMapper.toResponseDTO(propiedad);
     }
 
@@ -193,11 +192,21 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
                 .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con ID: " + id));
         if (aprobado) {
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.APROBADA);
+            notificacionService.notificarVerificacionPropiedad(propiedad.getId());
         } else {
             propiedad.setVerificacionPropiedad(VerificacionPropiedad.RECHAZADA);
+            propiedad.setActivo(false);
+            notificacionService.notificarRechazoPropiedad(propiedad.getId());
         }
         propiedadRepository.save(propiedad);
         return propiedadMapper.toResponseDTO(propiedad);
+    }
+
+    public List<PropiedadResponseDTO> getActivasVerificadas(){
+
+        List<Propiedad>propiedades=propiedadRepository.findByVerificacionPropiedadAndActivo(VerificacionPropiedad.APROBADA, true);
+
+        return propiedadMapper.toResponseDTOList(propiedades);
     }
 
 
@@ -231,6 +240,7 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     }
 
     private void agregarDetalleImagenes(Propiedad propiedad, PropiedadDTO propiedadDTO) {
+        detalleImagenRepository.deleteAll(propiedad.getDetalleImagenes());
         propiedad.getDetalleImagenes().clear();
         for (DetalleImagenPropiedadDTO detalle : propiedadDTO.getDetalleImagenes()) {
             Imagen imagen = imagenMapper.toEntity(detalle.getImagen());
@@ -292,6 +302,10 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     }
 
     private boolean sonIgualesPorUrlDetalleImagen(List<DetalleImagenPropiedad> listaEntidad, List<DetalleImagenPropiedadDTO> listaDto) {
+
+        if (listaEntidad.isEmpty() && listaDto.isEmpty()) return true;
+        if (listaEntidad.isEmpty() || listaDto.isEmpty()) return false;
+        
         if (listaEntidad.size() != listaDto.size()) return false;
 
         Set<String> urlsEntidad = listaEntidad.stream()

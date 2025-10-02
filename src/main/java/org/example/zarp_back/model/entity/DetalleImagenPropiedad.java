@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 public class DetalleImagenPropiedad extends Base{
 
     private Boolean imgPrincipal;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "imagen_id")
     private Imagen imagen;
     @ManyToOne

@@ -8,7 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class ReservaScheduler {
@@ -23,23 +25,27 @@ public class ReservaScheduler {
 
         LocalDate now = LocalDate.now();
 
+        Set<Estado> estadosProcesables = EnumSet.of(Estado.RESERVADA, Estado.ACTIVA);
+
         for(Reserva reserva : reservas) {
             boolean update = false;
-            if ((now.isEqual(reserva.getFechaInicio()) || now.isAfter(reserva.getFechaInicio()))
-                    && (now.isBefore(reserva.getFechaFin()) || now.isEqual(reserva.getFechaFin()))) {
-                // La reserva está en periodo activo
-                reserva.setEstado(Estado.ACTIVA);
-                update = true;
-            }  else if (now.isAfter(reserva.getFechaFin())) {
-                reserva.setEstado(Estado.FINALIZADA);
-                reserva.setActivo(false);
-                update = true;
-            }
-            if(update){
-                try{
-                    reservaRepository.save(reserva);
-                }catch (Exception exception){
-                    System.out.println("Error al actualizar la reserva con id: " + reserva.getId());
+            if (estadosProcesables.contains(reserva.getEstado())) {
+                if ((now.isEqual(reserva.getFechaInicio()) || now.isAfter(reserva.getFechaInicio()))
+                        && (now.isBefore(reserva.getFechaFin()) || now.isEqual(reserva.getFechaFin()))) {
+                    // La reserva está en periodo activo
+                    reserva.setEstado(Estado.ACTIVA);
+                    update = true;
+                } else if (now.isAfter(reserva.getFechaFin())) {
+                    reserva.setEstado(Estado.FINALIZADA);
+                    reserva.setActivo(false);
+                    update = true;
+                }
+                if (update) {
+                    try {
+                        reservaRepository.save(reserva);
+                    } catch (Exception exception) {
+                        System.out.println("Error al actualizar la reserva con id: " + reserva.getId());
+                    }
                 }
             }
 

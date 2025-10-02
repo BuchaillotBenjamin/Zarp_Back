@@ -1,7 +1,10 @@
 package org.example.zarp_back.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
+import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.example.zarp_back.config.mappers.ReseniaMapper;
+import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Propiedad;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, ReseniaResponseDTO, Long> {
 
     @Autowired
@@ -28,6 +32,8 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
     private ReservaRepository reservaRepository;
     @Autowired
     private ReseniaRepository reseniaRepository;
+    @Autowired
+    private PropiedadMapper propiedadMapper;
 
 
     public ReseniaService(ReseniaRepository reseniaRepository, ReseniaMapper reseniaMapper) {
@@ -39,6 +45,7 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
     public ReseniaResponseDTO save(ReseniaDTO reseniaDTO) {
 
         if (reseniaRepository.existsByPropiedadIdAndUsuarioId(reseniaDTO.getPropiedadId(),reseniaDTO.getUsuarioId())) {
+            log.error("El usuario ya ha dejado una reseña en esta propiedad.");
             throw new RuntimeException("El usuario ya ha dejado una reseña en esta propiedad.");
         }
 
@@ -46,6 +53,7 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
         boolean tieneActiva = reservaRepository.existsByClienteIdAndPropiedadIdAndEstado(reseniaDTO.getUsuarioId(), reseniaDTO.getPropiedadId(), Estado.ACTIVA);
 
         if (!(tieneFinalizada || tieneActiva)) {
+            log.error("El usuario no tiene una reserva finalizada o activa en esta propiedad.");
             throw new RuntimeException("El usuario no tiene una reserva finalizada o activa en esta propiedad.");
         }
 
@@ -64,8 +72,17 @@ public class ReseniaService extends GenericoServiceImpl<Resenia, ReseniaDTO, Res
 
         propiedad.getResenias().add(resenia);
         propiedadRepository.save(propiedad);
+        log.info("Reseña guardada correctamente: {}", resenia);
 
-        return reseniaMapper.toResponseDTO(resenia);
+        if (reseniaRepository.existsByPropiedadIdAndUsuarioId(reseniaDTO.getPropiedadId(),reseniaDTO.getUsuarioId())) {
+            Resenia reseniaGuardada = reseniaRepository.findByPropiedadIdAndUsuarioId(resenia.getPropiedad().getId(), resenia.getUsuario().getId())
+                    .orElseThrow(() -> new RuntimeException("Error al guardar la reseña."));
+            return reseniaMapper.toResponseDTO(reseniaGuardada);
+        }else {
+            throw new RuntimeException("Error al guardar la reseña.");
+        }
+
+
     }
 
 

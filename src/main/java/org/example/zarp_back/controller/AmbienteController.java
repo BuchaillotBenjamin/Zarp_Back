@@ -18,7 +18,7 @@ public class AmbienteController extends GenericoControllerImpl<Ambiente, Ambient
 
 
     @Autowired
-    AmbienteService ambienteServicio;
+    private AmbienteService ambienteServicio;
 
     @Override
     protected String entidadNombre() {

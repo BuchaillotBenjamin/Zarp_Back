@@ -4,9 +4,17 @@ import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.interfaces.GenericoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ClienteRepository extends GenericoRepository<Cliente, Long> {
 
     boolean existsByUid(String uid);
+
+    Optional<Cliente> findByUid(String uid);
+
+    List<Cliente> findByCredencialesMP_TokenExpirationBefore(LocalDateTime fecha);
 
 }

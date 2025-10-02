@@ -24,6 +24,7 @@ public class PropiedadDTO {
     @NotBlank(message = "El campo nombre no puede estar vacio")
     private String nombre;
     @NotBlank(message = "El campo descripcion no puede estar vacio")
+    @Size(max = 1000, message = "La descripción no puede superar los 1000 caracteres")
     private String descripcion;
     @NotNull(message = "El campo precioPorNoche no puede ser nulo")
     @Positive(message = "El campo precioPorNoche debe ser un valor positivo")
@@ -43,7 +44,6 @@ public class PropiedadDTO {
     private List<DetalleTipoPersonaDTO> detalleTipoPersonas;
     @Valid
     @NotNull(message = "El campo detalleCaracteristicas no puede ser nulo")
-    @Size(min = 1, message = "El campo detalleCaracteristicas debe contener por lo menos 1 elemento")
     private List<DetalleCaracteristicaDTO> detalleCaracteristicas;
     @Valid
     @NotNull(message = "El campo detalleImagenes no puede ser nulo")

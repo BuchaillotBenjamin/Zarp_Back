@@ -17,7 +17,7 @@ import java.util.List;
 public class VerificacionClienteController extends GenericoControllerImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long, VerificacionClienteService> {
 
     @Autowired
-    VerificacionClienteService verificacionClienteService;
+    private VerificacionClienteService verificacionClienteService;
 
     @Override
     protected String entidadNombre() {

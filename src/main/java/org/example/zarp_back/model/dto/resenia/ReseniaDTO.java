@@ -19,7 +19,7 @@ public class ReseniaDTO {
     @NotBlank(message = "El campo comentario no puede estar vacio")
     private String comentario;
     @Min(value = 1, message = "La calificación mínima permitida es 1")
-    @Max(value = 10, message = "La calificación máxima permitida es 10")
+    @Max(value = 5, message = "La calificación máxima permitida es 10")
     @NotNull(message = "El campo calificación no puede ser nulo")
     private Integer calificacion;
 }

@@ -19,8 +19,9 @@ import java.util.List;
 public class PropiedadController extends GenericoControllerImpl<Propiedad, PropiedadDTO, PropiedadResponseDTO, Long, PropiedadService> {
 
     @Autowired
-    PropiedadService propiedadService;
+    private PropiedadService propiedadService;
     @Autowired
+    private ReservaService reservaService;
     ReservaService reservaService;
     @Autowired
     SimpMessagingTemplate messagingTemplate;
@@ -57,7 +58,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     }
 
     @GetMapping("/reservas/{propiedadId}")
-    public ResponseEntity<List<?>> getReservasActivasPorPropiedad(@PathVariable Long propiedadId) {
+    public ResponseEntity<List<ReservaFechaDTO>> getReservasActivasPorPropiedad(@PathVariable Long propiedadId) {
         List<ReservaFechaDTO> reservas = reservaService.fechasReservadas(propiedadId);
         return ResponseEntity.ok(reservas);
     }
@@ -74,6 +75,13 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
         List<PropiedadResponseDTO> propiedades = propiedadService.propiedadesVerificar();
         return ResponseEntity.ok(propiedades);
     }
+
+    @GetMapping("/activas")
+    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesActivas() {
+        List<PropiedadResponseDTO> propiedades = propiedadService.getActivasVerificadas();
+        return ResponseEntity.ok(propiedades);
+    }
+
 
 
     // Aquí puedes agregar métodos específicos para el controlador de Propiedad si es necesario
