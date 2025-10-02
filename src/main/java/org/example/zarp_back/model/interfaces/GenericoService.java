@@ -8,12 +8,12 @@ public interface GenericoService <T, D, R, ID> {
 
     R update(ID id, D dto);
 
-    void delete(ID id);
+    R delete(ID id);
 
     R findById(ID id);
 
     List<R> findAll();
 
-    void toggleActivo(ID id);
+    R toggleActivo(ID id);
 
 }

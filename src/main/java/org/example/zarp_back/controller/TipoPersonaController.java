@@ -20,6 +20,11 @@ public class TipoPersonaController extends GenericoControllerImpl<TipoPersona, T
     @Autowired
     private TipoPersonaService servicio;
 
+    @Override
+    protected String entidadNombre() {
+        return "tipoPersonas";
+    }
+
     public TipoPersonaController(TipoPersonaService servicio) {
         super(servicio);
     }

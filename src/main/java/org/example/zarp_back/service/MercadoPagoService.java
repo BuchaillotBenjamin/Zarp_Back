@@ -50,9 +50,9 @@ public class MercadoPagoService {
     @Autowired
     private ClienteService clienteService;
     @Autowired
-    PropiedadRepository propiedadRepository;
+    private PropiedadRepository propiedadRepository;
     @Autowired
-    ReservaRepository ReservaRepository;
+    private ReservaRepository ReservaRepository;
     @Value("${mercadopago.access_token}")
     private String mpAccess;
     @Value("${mercadopago.back_url.success}")
@@ -72,6 +72,8 @@ public class MercadoPagoService {
 
     private final CryptoUtils cryptoUtils;
     private final OauthClient oauthClient;
+    @Autowired
+    private ReservaRepository reservaRepository;
 
     @Autowired
     public MercadoPagoService(CryptoUtils cryptoUtils, OauthClient oauthClient) {
@@ -88,6 +90,12 @@ public class MercadoPagoService {
 
         Propiedad propiedad = propiedadRepository.findById(reserva.getPropiedadId())
                 .orElseThrow(() -> new NotFoundException("Propiedad no encontrada"));
+
+        if (reservaRepository.findReservasSolapadas(reserva.getPropiedadId(), reserva.getFechaInicio(), reserva.getFechaFin()).size() > 0) {
+            log.error("No se puede crear preferencia: la propiedad ID {} ya tiene reservas en las fechas {} - {}",
+                    reserva.getPropiedadId(), reserva.getFechaInicio(), reserva.getFechaFin());
+            throw new RuntimeException("No se puede crear preferencia: la propiedad ya tiene reservas solapadas en las fechas indicadas");
+        }
 
         Cliente vendedor = propiedad.getPropietario();
         if (vendedor.getCredencialesMP() == null) {
@@ -207,6 +215,7 @@ public class MercadoPagoService {
             return buildAuthUrl(tempId);
     }
 
+    @Transactional
     public boolean getAuthorizationClient(String code, String state) throws MPException, MPApiException {
 
         String url = "https://api.mercadopago.com/oauth/token";

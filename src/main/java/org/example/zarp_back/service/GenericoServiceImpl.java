@@ -30,19 +30,11 @@ public abstract class GenericoServiceImpl<T extends Base,D,R,ID extends Serializ
 
     @Override
     @Transactional
-    public R update(ID id, D dto) {
-        return null;
-    }
+    public R update(ID id, D dto) { return null;}
 
     @Override
     @Transactional
-    public void delete(ID id) {
-        if (!genericoRepository.existsById(id)) {
-            throw new NotFoundException("Entidad con el id " + id + " no encontrada");
-        }
-        genericoRepository.deleteById(id);
-
-    }
+    public R delete(ID id) { return null; }
 
     @Override
     public R findById(ID id) {
@@ -60,11 +52,12 @@ public abstract class GenericoServiceImpl<T extends Base,D,R,ID extends Serializ
 
     @Override
     @Transactional
-    public void toggleActivo(ID id) {
+    public R toggleActivo(ID id) {
         T entity = genericoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
         entity.setActivo(!entity.getActivo());
         genericoRepository.save(entity);
+        return genericoMapper.toResponseDTO(entity);
     }
 
 }

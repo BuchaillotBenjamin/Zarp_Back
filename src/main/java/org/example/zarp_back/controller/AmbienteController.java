@@ -16,8 +16,14 @@ import java.util.List;
 @RequestMapping("/api/ambientes")
 public class AmbienteController extends GenericoControllerImpl<Ambiente, AmbienteDTO, AmbienteResponseDTO, Long, AmbienteService> {
 
+
     @Autowired
     private AmbienteService ambienteServicio;
+
+    @Override
+    protected String entidadNombre() {
+        return "ambientes";
+    }
 
     public AmbienteController(AmbienteService servicio) {
         super(servicio);

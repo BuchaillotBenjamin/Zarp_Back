@@ -52,4 +52,16 @@ public interface ReservaRepository extends GenericoRepository<Reserva, Long> {
             @Param("fin") LocalDate fin
     );
 
+    List<Reserva> findByClienteId(Long clienteId);
+
+    List<Reserva> findByPropiedadId(Long propiedadId);
+
+    @Query("""
+    SELECT r
+    FROM Reserva r
+    WHERE r.propiedad.propietario.id = :clienteId
+    """)
+    List<Reserva> findReservasDePropiedadesDeCliente(@Param("clienteId") Long clienteId);
+
+
 }

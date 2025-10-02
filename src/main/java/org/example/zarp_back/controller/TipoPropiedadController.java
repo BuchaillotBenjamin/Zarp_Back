@@ -19,6 +19,11 @@ public class TipoPropiedadController extends GenericoControllerImpl<TipoPropieda
     @Autowired
     private TipoPropiedadService servicio;
 
+    @Override
+    protected String entidadNombre() {
+        return "tipoPropiedades";
+    }
+
     public TipoPropiedadController(TipoPropiedadService servicio) {
         super(servicio);
     }

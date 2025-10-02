@@ -17,6 +17,11 @@ public class EmpleadoController extends GenericoControllerImpl<Empleado, Emplead
     @Autowired
     private EmpleadoService empleadoService;
 
+    @Override
+    protected String entidadNombre() {
+        return "empleados";
+    }
+
     public EmpleadoController(EmpleadoService servicio) {
         super(servicio);
     }

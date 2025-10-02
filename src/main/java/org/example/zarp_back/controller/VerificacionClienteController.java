@@ -19,6 +19,10 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
     @Autowired
     private VerificacionClienteService verificacionClienteService;
 
+    @Override
+    protected String entidadNombre() {
+        return "verificacionClientes";
+    }
 
     public VerificacionClienteController(VerificacionClienteService servicio) {
         super(servicio);
@@ -31,5 +35,5 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
 
     }
 
-    // Aquí puedes agregar métodos específicos para el controlador de VerificacionCliente si es necesario
+
 }
