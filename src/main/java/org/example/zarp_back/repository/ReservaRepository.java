@@ -52,4 +52,6 @@ public interface ReservaRepository extends GenericoRepository<Reserva, Long> {
             @Param("fin") LocalDate fin
     );
 
+    List<Reserva> findByClienteId(Long clienteId);
+
 }

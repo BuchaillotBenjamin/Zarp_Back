@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/reservas")
 public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long, ReservaService> {
@@ -39,6 +41,13 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
         notificacionService.notificarReservaPropietario(reserva);
         return ResponseEntity.ok("Correo enviado");
     }
+
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<ReservaResponseDTO>> getReservasByClienteId(@PathVariable Long clienteId) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorClienteId(clienteId);
+        return ResponseEntity.ok(reservas);
+    }
+
 
     // Aquí puedes agregar métodos específicos para el controlador de Reserva si es necesario
 }

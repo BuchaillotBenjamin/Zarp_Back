@@ -130,5 +130,11 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         return null;
     }
 
+    public List<ReservaResponseDTO>obtenerReservasPorClienteId(Long clienteId){
+
+        List<Reserva> reservas = reservaRepository.findByClienteId(clienteId);
+        return reservaMapper.toResponseDTOList(reservas);
+    }
+
     // Aquí puedes agregar métodos específicos para el servicio de Reserva si es necesario
 }
