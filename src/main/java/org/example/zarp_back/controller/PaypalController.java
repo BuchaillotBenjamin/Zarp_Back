@@ -22,13 +22,13 @@ public class PaypalController {
     @Autowired
     private PaypalService paypalService;
 
-    @PostMapping("/create-order")
+   /* @PostMapping("/create-order")
     public ResponseEntity<String> createOrder(@RequestBody ReservaDTO reserva) {
 
         String order = paypalService.createPayout(reserva);
         return ResponseEntity.ok(order);
 
-    }
+    }*/
 
     @PostMapping("/webhook/getpayout")
     public ResponseEntity<String> getPayout(@RequestBody Map<String, Object> payload) {
@@ -49,6 +49,25 @@ public class PaypalController {
         return ResponseEntity.ok("Guardado con exito: " + status);
     }
 
+    @PostMapping("/crearOrdenPago")
+    public ResponseEntity<String> crearOrdenPago(@RequestBody ReservaDTO reserva) {
+        String ordenId = paypalService.createPayPalOrder(reserva);
+        return ResponseEntity.ok(ordenId);
+    }
+
+    @PostMapping("/webhook/getOrdenPago")
+    public ResponseEntity<String> getOrdenPago(@RequestBody Map<String, Object> payload) {
+
+        log.info("Webhook recibido: {}", payload);
+        Boolean exito =paypalService.procesarWebhookOrdenPago(payload);
+
+        if (!exito) {
+            log.error("Error al procesar el webhook de orden de pago");
+            return ResponseEntity.ok().body("Error al procesar el webhook");
+        }
+        return ResponseEntity.ok().build();
+
+    }
 
 
 }
