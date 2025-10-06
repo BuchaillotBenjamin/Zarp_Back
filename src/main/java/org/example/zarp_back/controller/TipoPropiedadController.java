@@ -1,5 +1,7 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadResponseDTO;
 import org.example.zarp_back.model.entity.TipoPropiedad;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tipoPropiedades")
+@Slf4j
 public class TipoPropiedadController extends GenericoControllerImpl<TipoPropiedad, TipoPropiedadDTO, TipoPropiedadResponseDTO, Long, TipoPropiedadService> {
 
     @Autowired
@@ -29,10 +32,14 @@ public class TipoPropiedadController extends GenericoControllerImpl<TipoPropieda
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<List<TipoPropiedadResponseDTO>> getActivos(Long id, TipoPropiedadDTO tipoPropiedadDTO) {
+    public ResponseEntity<List<TipoPropiedadResponseDTO>> getActivos(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} solicitó tipos de propiedad activos", uid);
+
         List<TipoPropiedadResponseDTO> response = servicio.getActivos();
         return ResponseEntity.ok(response);
     }
+
 
     // Aquí puedes agregar métodos específicos para el controlador de TipoPropiedad si es necesario
 }

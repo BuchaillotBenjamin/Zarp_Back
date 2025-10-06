@@ -1,5 +1,7 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.ambiente.AmbienteDTO;
 import org.example.zarp_back.model.dto.ambiente.AmbienteResponseDTO;
 import org.example.zarp_back.model.entity.Ambiente;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/ambientes")
+@Slf4j
 public class AmbienteController extends GenericoControllerImpl<Ambiente, AmbienteDTO, AmbienteResponseDTO, Long, AmbienteService> {
 
 
@@ -30,8 +33,13 @@ public class AmbienteController extends GenericoControllerImpl<Ambiente, Ambient
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<List<AmbienteResponseDTO>> getActivos() {
+    public ResponseEntity<List<AmbienteResponseDTO>> getActivos(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+
+        log.info("UID del usuario autenticado: " + uid + " accedió a /api/ambientes/activos");
+
         List<AmbienteResponseDTO> ambientesActivos = ambienteServicio.getActivos();
+
         return ResponseEntity.ok(ambientesActivos);
     }
 

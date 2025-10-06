@@ -1,9 +1,12 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
+import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.ClienteService;
 import org.example.zarp_back.service.EmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(
-        origins = "http://localhost:5173",
-        methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.OPTIONS },
-        allowedHeaders = { "Content-Type", "Authorization" },
-        allowCredentials = "true" // si usás cookies/session
-)
+@Slf4j
 public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long, ClienteService> {
 
     @Autowired
@@ -27,6 +25,8 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     private EmpleadoService empleadoService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     @Override
     protected String entidadNombre() {
@@ -38,16 +38,28 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     }
 
     @PatchMapping("/verificacion-correo/{id}")
-    public ResponseEntity<ClienteResponseDTO> verificacionCorreo(@PathVariable Long id) {
+    public ResponseEntity<ClienteResponseDTO> verificacionCorreo(@PathVariable Long id, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} ejecutó verificación de correo para cliente ID {}", uid, id);
+
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
         messagingTemplate.convertAndSend("/topic/clientes/update", response);
+        auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",id.toString());
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/verificacion-documento/{id}")
-    public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
+    public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} ejecutó verificación de documento para cliente ID {} con estado {}", uid, id, verificado);
+
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
-        messagingTemplate.convertAndSend("/topic/clientes/update", response);
+
+        if (verificado){
+            messagingTemplate.convertAndSend("/topic/clientes/update", response);
+        }
+        auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,id.toString());
+
         return ResponseEntity.ok(response);
     }
 

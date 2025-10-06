@@ -41,6 +41,9 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         super(clienteRepository, clienteMapper);
     }
 
+    //PRUEBA
+
+
     @Override
     @Transactional
     public ClienteResponseDTO save(ClienteDTO clienteDTO) {

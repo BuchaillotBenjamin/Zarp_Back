@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
+import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.MercadoPagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,11 +27,17 @@ import java.util.stream.Collectors;
 public class MercadoPagoController {
 
     @Autowired
-    MercadoPagoService mercadoPagoService;
+    private MercadoPagoService mercadoPagoService;
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     @PostMapping("/create-preference")
-    public ResponseEntity<String> createPreference(@Valid @RequestBody ReservaDTO reserva) throws MPException, MPApiException {
+    public ResponseEntity<String> createPreference(@Valid @RequestBody ReservaDTO reserva, HttpServletRequest request) throws MPException, MPApiException {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} inició la creación de una preferencia de pago para la reserva", uid);
+
         Preference preference = mercadoPagoService.createPreference(reserva);
+        auditoriaService.registrar(uid, "Reserva", "Crear preferencia de pago", "N/A");
         return ResponseEntity.ok(preference.getInitPoint());
     }
 
@@ -79,8 +86,12 @@ public class MercadoPagoController {
     }
 
     @PostMapping("/createAuthClient/{clienteId}")
-    public ResponseEntity<String> createAuthClient(@PathVariable Long clienteId) throws MPException, MPApiException  {
+    public ResponseEntity<String> createAuthClient(@PathVariable Long clienteId, HttpServletRequest request) throws MPException, MPApiException {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} inició autorización de cliente ID {}", uid, clienteId);
+
         String authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
+        auditoriaService.registrar(uid, "Cliente", "Iniciar autorización Mercado Pago", clienteId.toString());
         return ResponseEntity.ok(authUrl);
     }
 

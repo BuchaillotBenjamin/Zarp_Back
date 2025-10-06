@@ -1,5 +1,7 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.caracteristicas.CaracteristicaDTO;
 import org.example.zarp_back.model.dto.caracteristicas.CaracteristicaResponseDTO;
 import org.example.zarp_back.model.entity.Caracteristica;
@@ -13,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/caracteristicas")
+@Slf4j
 public class CaracteristicaController extends GenericoControllerImpl<Caracteristica, CaracteristicaDTO, CaracteristicaResponseDTO, Long, CaracteristicaService> {
 
     @Autowired
@@ -31,8 +33,12 @@ public class CaracteristicaController extends GenericoControllerImpl<Caracterist
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<List<CaracteristicaResponseDTO>> getActivos(Long propiedadId) {
-        List<CaracteristicaResponseDTO> caracteristicas = servicio.getActivos(propiedadId);
+    public ResponseEntity<List<CaracteristicaResponseDTO>> getActivos( HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID del usuario autenticado: " + uid);
+
+        List<CaracteristicaResponseDTO> caracteristicas = servicio.getActivos();
+
         return ResponseEntity.ok(caracteristicas);
     }
 

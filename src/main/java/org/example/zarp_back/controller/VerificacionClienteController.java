@@ -1,5 +1,7 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
 import org.example.zarp_back.model.entity.VerificacionCliente;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/verificacionClientes")
+@Slf4j
 public class VerificacionClienteController extends GenericoControllerImpl<VerificacionCliente, VerificacionClienteDTO, VerificacionClienteResponseDTO, Long, VerificacionClienteService> {
 
     @Autowired
@@ -29,11 +32,14 @@ public class VerificacionClienteController extends GenericoControllerImpl<Verifi
     }
 
     @GetMapping("/activas")
-    public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas() {
+    public ResponseEntity<List<VerificacionClienteResponseDTO>> getVerificacionesActivas(HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} solicitó verificaciones activas de clientes", uid);
 
-        return ResponseEntity.ok(verificacionClienteService.getVerificacionesActivas());
-
+        List<VerificacionClienteResponseDTO> verificaciones = verificacionClienteService.getVerificacionesActivas();
+        return ResponseEntity.ok(verificaciones);
     }
+
 
 
 }

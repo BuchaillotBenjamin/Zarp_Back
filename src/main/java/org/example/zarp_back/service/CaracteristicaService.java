@@ -80,7 +80,7 @@ public class CaracteristicaService extends GenericoServiceImpl<Caracteristica, C
         return genericoMapper.toResponseDTO(existente);
     }
 
-    public List<CaracteristicaResponseDTO> getActivos(Long propiedadId) {
+    public List<CaracteristicaResponseDTO> getActivos() {
         List<Caracteristica> caracteristicas = caracteristicaRepository.findByActivo(true);
         return caracteristicaMapper.toResponseDTOList(caracteristicas);
     }

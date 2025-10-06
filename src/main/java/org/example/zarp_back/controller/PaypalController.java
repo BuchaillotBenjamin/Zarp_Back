@@ -2,8 +2,10 @@ package org.example.zarp_back.controller;
 
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
+import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.PaypalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ public class PaypalController {
 
     @Autowired
     private PaypalService paypalService;
+    @Autowired
+    private AuditoriaService auditoriaService;
 
    /* @PostMapping("/create-order")
     public ResponseEntity<String> createOrder(@RequestBody ReservaDTO reserva) {
@@ -44,16 +48,29 @@ public class PaypalController {
     }
 
     @PutMapping("/guardarDireccionPaypal/{clienteId}")
-    public ResponseEntity<String> captureOrder(@PathVariable Long clienteId, @RequestBody String direccionPaypal) {
+    public ResponseEntity<String> captureOrder(@PathVariable Long clienteId,
+                                               @RequestBody String direccionPaypal,
+                                               HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} guardó dirección PayPal para cliente ID {}", uid, clienteId);
+
         Boolean status = paypalService.guardarDireccionPaypal(clienteId, direccionPaypal);
-        return ResponseEntity.ok("Guardado con exito: " + status);
+        auditoriaService.registrar(uid, "Cliente", "Guardar dirección PayPal", clienteId.toString());
+        return ResponseEntity.ok("Guardado con éxito: " + status);
     }
 
+
     @PostMapping("/crearOrdenPago")
-    public ResponseEntity<String> crearOrdenPago(@RequestBody ReservaDTO reserva) {
+    public ResponseEntity<String> crearOrdenPago(@RequestBody ReservaDTO reserva,
+                                                 HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} inició la creación de una orden de pago para la reserva", uid);
+
         String ordenId = paypalService.createPayPalOrder(reserva);
+        auditoriaService.registrar(uid, "Reserva", "Crear orden de pago", "N/A");
         return ResponseEntity.ok(ordenId);
     }
+
 
     @PostMapping("/webhook/getOrdenPago")
     public ResponseEntity<String> getOrdenPago(@RequestBody Map<String, Object> payload) {

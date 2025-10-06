@@ -1,5 +1,7 @@
 package org.example.zarp_back.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Reserva;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservas")
+@Slf4j
 public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDTO, ReservaResponseDTO, Long, ReservaService> {
 
     @Autowired
@@ -48,22 +51,32 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
     }
 
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<ReservaResponseDTO>> getReservasByClienteId(@PathVariable Long clienteId) {
+    public ResponseEntity<List<ReservaResponseDTO>> getReservasByClienteId(@PathVariable Long clienteId, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} solicitó reservas del cliente ID {}", uid, clienteId);
+
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorClienteId(clienteId);
         return ResponseEntity.ok(reservas);
     }
 
     @GetMapping("/propiedad/{propiedadId}")
-    public ResponseEntity<List<ReservaResponseDTO>> getReservasByPropiedadId(@PathVariable Long propiedadId) {
+    public ResponseEntity<List<ReservaResponseDTO>> getReservasByPropiedadId(@PathVariable Long propiedadId, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} solicitó reservas de la propiedad ID {}", uid, propiedadId);
+
         List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorPropiedad(propiedadId);
         return ResponseEntity.ok(reservas);
     }
 
     @GetMapping("/propietario/{propietarioId}")
-    public ResponseEntity<List<List<ReservaResponseDTO>>> getReservasByPropietarioId(@PathVariable Long propietarioId) {
+    public ResponseEntity<List<List<ReservaResponseDTO>>> getReservasByPropietarioId(@PathVariable Long propietarioId, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID: {} solicitó reservas agrupadas por propietario ID {}", uid, propietarioId);
+
         List<List<ReservaResponseDTO>> reservas = reservaService.obeterReservasDePropietario(propietarioId);
         return ResponseEntity.ok(reservas);
     }
+
 
 
 
