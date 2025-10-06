@@ -85,6 +85,14 @@ public class ConversacionService extends GenericoServiceImpl<Conversacion, Conve
         return conversacionMapper.toResponseDTO(conversacion);
     }
 
+    public List<ConversacionResponseDTO> findByClienteId(Long clienteId) {
+        List<Conversacion> conversaciones = conversacionRepository.findByClienteId(clienteId);
+        if (conversaciones.isEmpty()) {
+            throw new NotFoundException("No se encontraron conversaciones para el cliente con ID: " + clienteId);
+        }
+        return conversacionMapper.toResponseDTOList(conversaciones);
+    }
+
     private void cargarMensajes(MensajeDTO mensajeDTO, Conversacion conversacion) {
 
         Cliente cliente = clienteRepository.findById(mensajeDTO.getEmisorId())
