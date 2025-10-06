@@ -31,7 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
-
 .env
 
+# Ignorar toda la carpeta de credenciales
+src/main/resources/firebase/
 
