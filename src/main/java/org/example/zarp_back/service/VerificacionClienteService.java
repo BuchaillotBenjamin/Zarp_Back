@@ -76,7 +76,7 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
         verificacionClienteRepository.save(verificacionCliente);
 
-        return verificacionClienteMapper.toResponseDTO(verificacionCliente);
+        return toResponseDTODesencriptado(verificacionCliente);
     }
 
     public List<VerificacionClienteResponseDTO> getVerificacionesActivas() {
