@@ -74,9 +74,9 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
         //cliente
         verificacionCliente.setCliente(cliente);
 
-        verificacionClienteRepository.save(verificacionCliente);
+        VerificacionCliente verificacionPersistida = verificacionClienteRepository.save(verificacionCliente);
 
-        return toResponseDTODesencriptado(verificacionCliente);
+        return toResponseDTODesencriptado(verificacionPersistida);
     }
 
     public List<VerificacionClienteResponseDTO> getVerificacionesActivas() {
@@ -101,10 +101,13 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
         try {
             fotoFrontal.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoFrontal().getUrlImagen()));
+            fotoFrontal.setId(verificacionCliente.getFotoFrontal().getId());
 
             fotoDocumentoFrontal.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoDocumentoFrontal().getUrlImagen()));
+            fotoDocumentoFrontal.setId(verificacionCliente.getFotoDocumentoFrontal().getId());
 
             fotoDocumentoTrasero.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoDocumentoTrasero().getUrlImagen()));
+            fotoDocumentoTrasero.setId(verificacionCliente.getFotoDocumentoTrasero().getId());
 
         } catch (Exception e) {
             throw new RuntimeException("Error al desencriptar las imágenes de la verificación." + e.getMessage());
