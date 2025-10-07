@@ -29,6 +29,15 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
         super(servicio);
     }
 
+    @Override
+    @PostMapping("/save")
+    public ResponseEntity<ConversacionResponseDTO> save(@Valid @RequestBody ConversacionDTO dto) {
+        ConversacionResponseDTO response = conversacionService.save(dto);
+        messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente2().getId(), response);
+        messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente1().getId(), response);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/agregar-mensaje/{idConversacion}")
     public ResponseEntity<ConversacionResponseDTO> agregarMensaje(@Valid @RequestBody MensajeDTO mensajeDTO, @PathVariable Long idConversacion) {
 
