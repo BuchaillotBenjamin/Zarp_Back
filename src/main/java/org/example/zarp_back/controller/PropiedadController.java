@@ -87,7 +87,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
 
         messagingTemplate.convertAndSend("/topic/propiedades/update", propiedadActualizada);
 
-        auditoriaService.registrar(uid, "Propiedad", activar ? "Aprobar verificación" : "Rechazar verificación", id.toString());
+        auditoriaService.registrar(uid, "Propiedad", activar ? "Aprobar verificación" : "Rechazar verificación", propiedadActualizada.toString());
         return ResponseEntity.ok(propiedadActualizada);
     }
 

@@ -44,7 +44,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
         messagingTemplate.convertAndSend("/topic/clientes/update", response);
-        auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",id.toString());
+        auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",response.toString());
         return ResponseEntity.ok(response);
     }
 
@@ -58,7 +58,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         if (verificado){
             messagingTemplate.convertAndSend("/topic/clientes/update", response);
         }
-        auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,id.toString());
+        auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,response.toString());
 
         return ResponseEntity.ok(response);
     }
