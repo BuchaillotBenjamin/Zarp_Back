@@ -85,6 +85,7 @@ public class PaypalService {
     private PayPalHttpClient payPalHttpClient;
 
     private String accessToken;
+
     private Instant tokenExpiry;
 
     private RestTemplate restTemplate = new RestTemplate();
@@ -92,6 +93,8 @@ public class PaypalService {
 
     private final Map <String, ReservaDTO> reservasTemporales = new HashMap();
 
+    @Autowired
+    private ClienteService clienteService;
 
 
     //payout a propietario
@@ -380,6 +383,7 @@ public class PaypalService {
         credencialesPP.setMailPaypal(direccionPaypal);
         cliente.setCredencialesPP(credencialesPP);
         clienteRepository.save(cliente);
+        clienteService.actualizarAutorizaciones(clienteId);
 
         return true;
     }

@@ -161,10 +161,19 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
         }
         if(cliente.getAutorizaciones() == AutorizacionesCliente.NINGUNA){
 
-            if(cliente.getCredencialesMP()!=null){
+            if (cliente.getCredencialesMP()!=null && cliente.getCredencialesPP()!=null){
+                cliente.setAutorizaciones(AutorizacionesCliente.AMBAS);
+                updated = true;
+            }
+            if(cliente.getCredencialesMP()!=null&& updated==false){
                 cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
                 updated = true;
             }
+            if (cliente.getCredencialesPP()!=null && updated==false){
+                cliente.setAutorizaciones(AutorizacionesCliente.PAYPAL);
+                updated = true;
+            }
+
 
         }
         if (updated){
