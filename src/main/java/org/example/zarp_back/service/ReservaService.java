@@ -17,6 +17,7 @@ import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.repository.ReservaRepository;
 import org.example.zarp_back.service.utils.NotificacionService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,8 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
     private ClienteRepository clienteRepository;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private WebSocketsNotificacion webSocketsNotificacion;
 
 
     public ReservaService(ReservaRepository reservaRepository, ReservaMapper reservaMapper) {
@@ -109,6 +112,8 @@ public class ReservaService extends GenericoServiceImpl<Reserva, ReservaDTO, Res
         }
 
         reservaRepository.save(reserva);
+        webSocketsNotificacion.NotificarUpdate("reservas",reserva);
+
         return null;
     }
 

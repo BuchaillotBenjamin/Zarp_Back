@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.zarp_back.model.entity.Base;
 import org.example.zarp_back.model.interfaces.GenericoController;
 import org.example.zarp_back.model.interfaces.GenericoService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,7 +18,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
     protected S s;
     @Autowired
-    protected SimpMessagingTemplate messagingTemplate;
+    protected WebSocketsNotificacion webSocketsNotificacion;
     protected abstract String entidadNombre();
 
     public GenericoControllerImpl(S servicio) {
@@ -28,7 +29,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PostMapping("/save")
     public ResponseEntity<R> save(@Valid @RequestBody D dto) {
         R response = s.save(dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/save", response);
+        webSocketsNotificacion.NotificarSave(entidadNombre(), response);
         return ResponseEntity.ok(response);
     }
 
@@ -36,7 +37,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PutMapping("/update/{id}")
     public ResponseEntity<R> update(@PathVariable ID id,@Valid @RequestBody D dto) {
         R response = s.update(id, dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() +"/update", response);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         return ResponseEntity.ok(response);
     }
 
@@ -44,7 +45,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<R> delete(@PathVariable ID id) {
         R response = s.delete(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre()+"/delete", response);
+        webSocketsNotificacion.NotificarDelete(entidadNombre(), response);
         return ResponseEntity.ok(response);
     }
 
@@ -65,7 +66,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
     @PatchMapping("/toggleActivo/{id}")
     public ResponseEntity<R> toggleActivo(@PathVariable ID id) {
         R response= s.toggleActivo(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre()+"/update", response);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         return ResponseEntity.ok(response);
     }
 

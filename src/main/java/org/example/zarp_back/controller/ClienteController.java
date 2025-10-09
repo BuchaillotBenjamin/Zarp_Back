@@ -6,6 +6,7 @@ import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.service.ClienteService;
 import org.example.zarp_back.service.EmpleadoService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,7 +27,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     @Autowired
     private EmpleadoService empleadoService;
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private WebSocketsNotificacion webSocketsNotificacion;
 
     @Override
     protected String entidadNombre() {
@@ -40,14 +41,16 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     @PatchMapping("/verificacion-correo/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionCorreo(@PathVariable Long id) {
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
-        messagingTemplate.convertAndSend("/topic/clientes/update", response);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/verificacion-documento/{id}")
     public ResponseEntity<ClienteResponseDTO> verificacionDocumento(@PathVariable Long id, @RequestParam Boolean verificado) {
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
-        messagingTemplate.convertAndSend("/topic/clientes/update", response);
+        if (verificado){
+            webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
+        }
         return ResponseEntity.ok(response);
     }
 
