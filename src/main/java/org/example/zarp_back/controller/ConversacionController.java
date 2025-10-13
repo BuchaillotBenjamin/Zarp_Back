@@ -59,6 +59,8 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
             return ResponseEntity.ok(conversacion);
         } else {
             ConversacionResponseDTO nuevaConversacion = conversacionService.saveConversacionVacia(cliente1Id, cliente2Id);
+            messagingTemplate.convertAndSend("/topic/conversaciones/save/"+nuevaConversacion.getCliente2().getId(), nuevaConversacion);
+            messagingTemplate.convertAndSend("/topic/conversaciones/save/"+nuevaConversacion.getCliente1().getId(), nuevaConversacion);
             return ResponseEntity.ok(nuevaConversacion);
         }
     }
