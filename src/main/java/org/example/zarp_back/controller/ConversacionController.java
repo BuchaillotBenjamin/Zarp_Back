@@ -52,6 +52,15 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
         return ResponseEntity.ok(conversacionService.findByClienteId(clienteId));
     }
 
+    @GetMapping("/existe-conversacion/{cliente1Id}/{cliente2Id}")
+    public ResponseEntity<ConversacionResponseDTO> existeConversacion(@PathVariable Long cliente1Id, @PathVariable Long cliente2Id) {
+        ConversacionResponseDTO conversacion = conversacionService.getByClientesIds(cliente1Id, cliente2Id);
+        if (conversacion != null) {
+            return ResponseEntity.ok(conversacion);
+        } else {
+            ConversacionResponseDTO nuevaConversacion = conversacionService.saveConversacionVacia(cliente1Id, cliente2Id);
+            return ResponseEntity.ok(nuevaConversacion);
+        }
+    }
 
-    // Aquí puedes agregar métodos específicos para el controlador de Conversación si es necesario
 }
