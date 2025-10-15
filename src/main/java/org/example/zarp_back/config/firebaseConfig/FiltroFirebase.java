@@ -26,31 +26,27 @@ public class FiltroFirebase extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // rutas protegidas
-        // rutas protegidas
-        // rutas protegidas
         boolean isProtectedRoute =
-                        path.contains("/clientes/verificacion-correo/") ||           // ClienteController
-                        path.contains("/clientes/verificacion-documento/") ||        // ClienteController
-                        path.contains("/save") ||                                    // GenericoControllerImpl
-                        path.contains("/update/") ||                                 // GenericoControllerImpl
-                        path.contains("/delete/") ||                                 // GenericoControllerImpl
-                        path.contains("/toggleActivo/") ||                           // GenericoControllerImpl
-                        path.contains("/ambientes/activos") ||                       // AmbienteController
-                        path.contains("/verificacionClientes/activas") ||            // VerificacionClienteController
-                        path.contains("/create-preference") ||                       // MercadoPagoController
-                        path.contains("/createAuthClient/") ||                       // MercadoPagoController
-                        path.contains("/guardarDireccionPaypal/") ||                 // PaypalController
-                        path.contains("/crearOrdenPago") ||                          // PaypalController
-                        path.contains("/agregar-mensaje/") ||                        // ConversacionController
-                        path.contains("/conversaciones/cliente/") ||                 // ConversacionController
-                        path.contains("/propiedades/reservas/") ||                   // PropiedadController
-                        path.contains("/propiedades/verificacion/") ||               // PropiedadController
-                        path.contains("/propiedades/aVerificar") ||                  // PropiedadController
-                        path.contains("/reservas/cliente/") ||                       // ReservaController
-                        path.contains("/reservas/propiedad/") ||                     // ReservaController
-                        path.contains("/reservas/propietario/");                     // ReservaController
-        // ReservaController
-
+                        path.contains("/save") ||                                          // GenericoControllerImpl
+                        path.contains("/update/") ||
+                        path.contains("/delete/") ||
+                        path.contains("/toggleActivo/") ||
+                        path.contains("/activos") ||
+                        path.startsWith("/api/clientes/verificacion-correo/") ||           // ClienteControlle
+                        path.startsWith("/api/clientes/verificacion-documento/") ||        
+                        path.startsWith("/api/verificacionClientes/activas") ||            // VerificacionClienteController
+                        path.startsWith("/api/mercadoPago/create-preference") ||           // MercadoPagoController
+                        path.startsWith("/api/mercadoPago/createAuthClient/") ||
+                        path.startsWith("/api/paypal/guardarDireccionPaypal/") ||          // PaypalController
+                        path.startsWith("/api/paypal/crearOrdenPago") ||
+                        path.startsWith("/api/conversaciones/agregar-mensaje/") ||         // ConversacionController
+                        path.startsWith("/api/conversaciones/cliente/") ||
+                        path.startsWith("/api/propiedades/reservas/") ||                   // PropiedadController
+                        path.startsWith("/api/propiedades/verificacion/") ||
+                        path.startsWith("/api/propiedades/aVerificar") ||
+                        path.startsWith("/api/reservas/cliente/") ||                       // ReservaController
+                        path.startsWith("/api/reservas/propiedad/") ||
+                        path.startsWith("/api/reservas/propietario/");
 
         return !isProtectedRoute;
     }
