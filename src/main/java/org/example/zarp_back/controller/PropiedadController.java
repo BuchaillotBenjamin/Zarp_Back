@@ -50,19 +50,13 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     }
 
     @GetMapping("/provincias")
-    public ResponseEntity<List<List<PropiedadResponseDTO>>> getPropiedadByProvincia(HttpServletRequest request) {
-        String uid = (String) request.getAttribute("firebaseUid");
-        log.info("UID: {} solicitó propiedades agrupadas por provincia", uid);
-
+    public ResponseEntity<List<List<PropiedadResponseDTO>>> getPropiedadByProvincia() {
         List<List<PropiedadResponseDTO>> propiedadesPorProvincia = propiedadService.getPropiedadesByProvincia();
         return ResponseEntity.ok(propiedadesPorProvincia);
     }
 
     @GetMapping("/provicias/{provincia}")
-    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesByProvincia(@PathVariable Provincia provincia, HttpServletRequest request) {
-        String uid = (String) request.getAttribute("firebaseUid");
-        log.info("UID: {} solicitó propiedades en la provincia {}", uid, provincia);
-
+    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesByProvincia(@PathVariable Provincia provincia) {
         List<PropiedadResponseDTO> propiedades = propiedadService.getPropiedadesByProvincia(provincia);
         return ResponseEntity.ok(propiedades);
     }
@@ -101,10 +95,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     }
 
     @GetMapping("/activas")
-    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesActivas(HttpServletRequest request) {
-        String uid = (String) request.getAttribute("firebaseUid");
-        log.info("UID: {} solicitó propiedades activas y verificadas", uid);
-
+    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesActivas() {
         List<PropiedadResponseDTO> propiedades = propiedadService.getActivasVerificadas();
         return ResponseEntity.ok(propiedades);
     }

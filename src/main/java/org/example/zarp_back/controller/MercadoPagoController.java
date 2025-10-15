@@ -41,17 +41,6 @@ public class MercadoPagoController {
         return ResponseEntity.ok(preference.getInitPoint());
     }
 
-    /*@PostMapping("/webhook/notification")
-    public ResponseEntity<String> mercadoPagoWebhook(@RequestBody Map<String, Object> body)throws MPException, MPApiException {
-
-        if (!mercadoPagoService.handlePayment(body)) {
-            return ResponseEntity.badRequest().body("Error al procesar el webhook de Mercado Pago");
-        }
-
-        return ResponseEntity.status(200).body("Webhook de Mercado Pago recibido correctamente");
-
-    }*/
-
     @PostMapping("/webhook/notification")
     public ResponseEntity<String> mercadoPagoWebhook(HttpServletRequest request) {
         try {

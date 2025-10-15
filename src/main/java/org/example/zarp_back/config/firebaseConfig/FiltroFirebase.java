@@ -20,6 +20,41 @@ import java.util.Collections;
 @Slf4j
 public class FiltroFirebase extends OncePerRequestFilter {
 
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // rutas protegidas
+        // rutas protegidas
+        // rutas protegidas
+        boolean isProtectedRoute =
+                        path.contains("/clientes/verificacion-correo/") ||           // ClienteController
+                        path.contains("/clientes/verificacion-documento/") ||        // ClienteController
+                        path.contains("/save") ||                                    // GenericoControllerImpl
+                        path.contains("/update/") ||                                 // GenericoControllerImpl
+                        path.contains("/delete/") ||                                 // GenericoControllerImpl
+                        path.contains("/toggleActivo/") ||                           // GenericoControllerImpl
+                        path.contains("/ambientes/activos") ||                       // AmbienteController
+                        path.contains("/verificacionClientes/activas") ||            // VerificacionClienteController
+                        path.contains("/create-preference") ||                       // MercadoPagoController
+                        path.contains("/createAuthClient/") ||                       // MercadoPagoController
+                        path.contains("/guardarDireccionPaypal/") ||                 // PaypalController
+                        path.contains("/crearOrdenPago") ||                          // PaypalController
+                        path.contains("/agregar-mensaje/") ||                        // ConversacionController
+                        path.contains("/conversaciones/cliente/") ||                 // ConversacionController
+                        path.contains("/propiedades/reservas/") ||                   // PropiedadController
+                        path.contains("/propiedades/verificacion/") ||               // PropiedadController
+                        path.contains("/propiedades/aVerificar") ||                  // PropiedadController
+                        path.contains("/reservas/cliente/") ||                       // ReservaController
+                        path.contains("/reservas/propiedad/") ||                     // ReservaController
+                        path.contains("/reservas/propietario/");                     // ReservaController
+        // ReservaController
+
+
+        return !isProtectedRoute;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

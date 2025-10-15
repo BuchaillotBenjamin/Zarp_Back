@@ -88,9 +88,4 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         return ResponseEntity.ok(response);
     }
 
-
-
-
-
-
 }
