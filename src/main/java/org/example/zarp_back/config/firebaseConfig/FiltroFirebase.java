@@ -24,6 +24,7 @@ public class FiltroFirebase extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
+        log.info("Evaluando ruta: {}", path);
 
         // rutas protegidas
         boolean isProtectedRoute =
@@ -47,7 +48,7 @@ public class FiltroFirebase extends OncePerRequestFilter {
                         path.startsWith("/api/reservas/cliente/") ||                       // ReservaController
                         path.startsWith("/api/reservas/propiedad/") ||
                         path.startsWith("/api/reservas/propietario/");
-
+        log.info("¿Ruta protegida?: {}", isProtectedRoute);
         return !isProtectedRoute;
     }
 

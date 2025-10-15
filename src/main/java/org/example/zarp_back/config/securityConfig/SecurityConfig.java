@@ -20,8 +20,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // TODAS las rutas son públicas por defecto
                 )
                 .addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class);
 
