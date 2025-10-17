@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -79,13 +80,14 @@ public class MercadoPagoController {
     }
 
     @PostMapping("/createAuthClient/{clienteId}")
-    public ResponseEntity<String> createAuthClient(@PathVariable Long clienteId) throws MPException, MPApiException  {
-        String authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
+    public ResponseEntity<URI> createAuthClient(@PathVariable Long clienteId) throws MPException, MPApiException  {
+        URI authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
         return ResponseEntity.ok(authUrl);
     }
 
     @GetMapping("/webhook/getAuthClient")
     public ResponseEntity<Boolean> getAuthUrl(@RequestParam String code, @RequestParam String state) throws MPException, MPApiException {
+        log.info("Received code: {}, state: {}", code, state);
         Boolean authUrl = mercadoPagoService.getAuthorizationClient(code, state);
         return ResponseEntity.ok(authUrl);
     }

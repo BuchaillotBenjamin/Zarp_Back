@@ -2,7 +2,6 @@ package org.example.zarp_back.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
-import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
 import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteDTO;
@@ -11,8 +10,6 @@ import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropi
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
-import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
-import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Provincia;
@@ -20,15 +17,10 @@ import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
 import org.example.zarp_back.service.utils.NotificacionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

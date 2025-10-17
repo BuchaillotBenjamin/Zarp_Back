@@ -3,7 +3,6 @@ package org.example.zarp_back.service;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.config.mappers.VerificacionClienteMapper;
-import org.example.zarp_back.model.dto.imagen.ImagenDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
@@ -24,8 +23,6 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
     @Autowired
     private VerificacionClienteRepository verificacionClienteRepository;
-    @Autowired
-    private VerificacionClienteMapper verificacionClienteMapper;
     @Autowired
     private ClienteRepository clienteRepository;
     @Autowired

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.example.zarp_back.config.mappers.ReseniaMapper;
-import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaDTO;
 import org.example.zarp_back.model.dto.resenia.ReseniaResponseDTO;
 import org.example.zarp_back.model.entity.Propiedad;

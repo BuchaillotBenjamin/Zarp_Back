@@ -11,6 +11,7 @@ import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
+import org.example.zarp_back.config.mercadoPagoConfig.MercadoPagoConfig;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
@@ -25,16 +26,18 @@ import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.util.UriComponentsBuilder;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,34 +55,11 @@ public class MercadoPagoService {
     @Autowired
     private PropiedadRepository propiedadRepository;
     @Autowired
-    private ReservaRepository ReservaRepository;
-    @Value("${mercadopago.access_token}")
-    private String mpAccess;
-    @Value("${mercadopago.back_url.success}")
-    private String mpSuccessBackUrl;
-    @Value("${mercadopago.back_url.pending}")
-    private String mpPendingBackUrl;
-    @Value("${mercadopago.back_url.failure}")
-    private String mpFailureBackUrl;
-    @Value("${api.url}")
-    private String publicUrl;
-    @Value("${mercadopago.client_id}")
-    private String mpClientId;
-    @Value("${mercadopago.client_secret}")
-    private String mpClientSecret;
-    @Value("${mercadopago.secret_key_webhook}")
-    private String mpSecretKeyWebhook;
-
-    private final CryptoUtils cryptoUtils;
-    private final OauthClient oauthClient;
+    private MercadoPagoConfig mercadoPagoConfig;
+    @Autowired
+    private CryptoUtils cryptoUtils;
     @Autowired
     private ReservaRepository reservaRepository;
-
-    @Autowired
-    public MercadoPagoService(CryptoUtils cryptoUtils, OauthClient oauthClient) {
-        this.cryptoUtils = cryptoUtils;
-        this.oauthClient = oauthClient;
-    }
 
     // Mapa temporal
     private static final Map<String, ReservaDTO> reservasTemporales = new ConcurrentHashMap<>();
@@ -138,12 +118,12 @@ public class MercadoPagoService {
                 )
                 .backUrls(
                         PreferenceBackUrlsRequest.builder()
-                                .success(mpSuccessBackUrl)
-                                .pending(mpPendingBackUrl)
-                                .failure(mpFailureBackUrl)
+                                .success(mercadoPagoConfig.getMpSuccessBackUrl())
+                                .pending(mercadoPagoConfig.getMpPendingBackUrl())
+                                .failure(mercadoPagoConfig.getMpFailureBackUrl())
                                 .build()
                 )
-                .notificationUrl(publicUrl + "/api/mercadoPago/webhook/notification")
+                .notificationUrl(mercadoPagoConfig.getPublicUrl() + "/api/mercadoPago/webhook/notification")
                 .build();
 
         MPRequestOptions requestOptions = MPRequestOptions.builder()
@@ -170,7 +150,7 @@ public class MercadoPagoService {
         Long paymentId = Long.valueOf((String) data.get("id"));
 
         MPRequestOptions requestOptionsAppOwner = MPRequestOptions.builder()
-                .accessToken(mpAccess)
+                .accessToken(mercadoPagoConfig.getMpAccess())
                 .build();
 
         PaymentClient paymentClient = new PaymentClient();
@@ -201,7 +181,7 @@ public class MercadoPagoService {
         return exito;
     }
 
-    public String createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
+    public URI createAuthorizationClient(Long ClienteId) throws MPException, MPApiException {
         Cliente cliente = clienteRepository.findById(ClienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
         String tempId = UUID.randomUUID().toString();
@@ -212,23 +192,26 @@ public class MercadoPagoService {
             throw new RuntimeException("El cliente ya tiene autorizaciones de Mercado Pago");
         }
             log.info("Generando URL de autorización para cliente ID: {}", cliente.getId());
-            return buildAuthUrl(tempId);
+
+        URI authUrl = buildAuthUrl(tempId);
+            return authUrl;
     }
 
     @Transactional
     public boolean getAuthorizationClient(String code, String state) throws MPException, MPApiException {
 
         String url = "https://api.mercadopago.com/oauth/token";
+        log.info("Intercambiando código por tokens en URL: {}", url);
 
         RestTemplate restTemplate = new RestTemplate();
 
         // Body de la request
         Map<String, String> body = new HashMap<>();
-        body.put("client_id", mpClientId);
-        body.put("client_secret", mpClientSecret);
+        body.put("client_id", mercadoPagoConfig.getMpClientId());
+        body.put("client_secret", mercadoPagoConfig.getMpClientSecret());
         body.put("grant_type", "authorization_code");
         body.put("code", code);
-        body.put("redirect_uri", publicUrl + "/api/mercadoPago/webhook/getAuthClient");
+        body.put("redirect_uri", mercadoPagoConfig.getPublicUrl() + "/api/mercadoPago/webhook/getAuthClient");
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, body, Map.class);
 
@@ -270,6 +253,8 @@ public class MercadoPagoService {
         CredencialesMP cred = cliente.getCredencialesMP();
         if (cred == null) return;
 
+        OauthClient oauthClient = new OauthClient();
+
         try {
             CreateOauthCredential newCreds = oauthClient.createCredential(cryptoUtils.decrypt(cred.getRefreshToken()), null);
 
@@ -296,7 +281,7 @@ public class MercadoPagoService {
 
     public boolean isValidWebhookSignature(String signatureHeader, String requestId, String dataId) {
         try {
-            if (signatureHeader == null || mpSecretKeyWebhook == null) {
+            if (signatureHeader == null || mercadoPagoConfig.getMpSecretKeyWebhook() == null) {
                 log.warn("Faltan headers o clave secreta");
                 return false;
             }
@@ -327,7 +312,7 @@ public class MercadoPagoService {
 
             // Calcular HMAC-SHA256 en hexadecimal
             Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(mpSecretKeyWebhook.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(mercadoPagoConfig.getMpSecretKeyWebhook().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             mac.init(secretKey);
             byte[] hmacBytes = mac.doFinal(manifest.toString().getBytes(StandardCharsets.UTF_8));
             String expectedSignature = bytesToHex(hmacBytes);
@@ -358,13 +343,67 @@ public class MercadoPagoService {
         return false;
     }
 
-    private String buildAuthUrl(String tempId) throws MPException, MPApiException {
-        try {String url = oauthClient.getAuthorizationURL(mpClientId, publicUrl + "/api/mercadoPago/webhook/getAuthClient");
+    /*private String buildAuthUrl(String tempId) throws MPException, MPApiException {
+        String redirectUrl = publicUrl + "/api/mercadoPago/webhook/getAuthClient";
+        log.info("redirectURL {}",redirectUrl );
+        OauthClient oauthClient = new OauthClient();
+        try {String url = oauthClient.getAuthorizationURL(mpClientId, redirectUrl);
         url += "&state=" + tempId;
         return url;}
         catch (MPApiException e){
             log.error("MercadoPago API error: {}", e.getApiResponse().getContent());
             throw new RuntimeException("Error al construir la URL de autorización: " + e.getApiResponse().getContent());
+        }
+    }*/
+
+    private URI buildAuthUrl(String tempId) throws MPException, MPApiException {
+        String codeVerifier = generateCodeVerifier();
+        String codeChallenge = generateCodeChallenge(codeVerifier);
+        String codeMethod = "S256";
+
+        System.out.println("codeVerifier: " + codeVerifier);
+        System.out.println("codeChallenge: " + codeChallenge);
+        String baseUrl="";
+
+        // Usar el SDK oficial para obtener la URL base
+        try {
+            baseUrl = new OauthClient().getAuthorizationURL(
+                    mercadoPagoConfig.getMpClientId(),
+                    mercadoPagoConfig.getPublicUrl() + "/api/mercadoPago/webhook/getAuthClient",
+                    MPRequestOptions.createDefault()
+            );
+        }catch (MPApiException e) {
+            log.error("MercadoPago API error: {}", e.getApiResponse().getContent());
+            throw e; // o manejarlo como prefieras
+        } catch (Exception e) {
+            log.error("Error inesperado al obtener la URL de autorización: {}", e.getMessage());
+            throw e;
+        }
+
+
+
+        // Agregar parámetros PKCE y estado
+        return UriComponentsBuilder.fromUriString(baseUrl)
+                .queryParam("code_challenge", codeChallenge)
+                .queryParam("code_challenge_method", codeMethod)
+                .queryParam("state", tempId)
+                .build(true)
+                .toUri();
+    }
+
+    private String generateCodeVerifier() {
+        byte[] code = new byte[32]; // 256 bits
+        new SecureRandom().nextBytes(code);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(code);
+    }
+
+    private String generateCodeChallenge(String codeVerifier) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.US_ASCII));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error al generar code_challenge", e);
         }
     }
 
