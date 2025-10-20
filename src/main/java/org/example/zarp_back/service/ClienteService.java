@@ -5,7 +5,6 @@ import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
-import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
