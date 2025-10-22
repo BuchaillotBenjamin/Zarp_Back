@@ -17,10 +17,6 @@ import java.time.LocalDateTime;
 @Entity
 public class CredencialesMP extends Base {
 
-    private String accessToken;
-    private String refreshToken;
-    private Long userIdMp;
-    private LocalDateTime tokenExpiration;
-
-
+    private String Cvu;
+    private String nombreTitular;
 }
