@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.example.zarp_back.model.enums.EstadoPagosPendientes;
 import org.example.zarp_back.model.enums.FormaPago;
 
 import java.time.LocalDateTime;
@@ -24,4 +25,5 @@ public class PagoPendiente extends Base{
     private Cliente propietario;
     private LocalDateTime fechaCreacion;
     private FormaPago formaPago;
+    private EstadoPagosPendientes estadoPagosPendientes;
 }

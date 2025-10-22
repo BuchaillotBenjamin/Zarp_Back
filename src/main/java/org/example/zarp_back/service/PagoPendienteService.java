@@ -5,8 +5,10 @@ import org.example.zarp_back.config.mappers.PagoPendienteMapper;
 import org.example.zarp_back.model.dto.pagosPendientes.PagoPendienteResponseDTO;
 import org.example.zarp_back.model.entity.PagoPendiente;
 import org.example.zarp_back.model.entity.Reserva;
+import org.example.zarp_back.model.enums.EstadoPagosPendientes;
 import org.example.zarp_back.repository.PagosPendientesRepository;
 import org.example.zarp_back.repository.ReservaRepository;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ public class PagoPendienteService {
     private ReservaRepository reservaRepository;
     @Autowired
     private PagoPendienteMapper pagoPendienteMapper;
+    @Autowired
+    private WebSocketsNotificacion webSocketsNotificacion;
 
     public void save(Long reservaID){
 
@@ -33,8 +37,10 @@ public class PagoPendienteService {
                 .fechaCreacion(LocalDateTime.now())
                 .propietario(reserva.getCliente())
                 .monto(reserva.getPrecioTotal()-comision)
+                .estadoPagosPendientes(EstadoPagosPendientes.PENDIENTE)
                 .build();
-        pagosPendientesRepository.save(pagosPendientes);
+        PagoPendiente pagoPendienteSave =  pagosPendientesRepository.save(pagosPendientes);
+        webSocketsNotificacion.NotificarSave("pagosPendientes", pagoPendienteMapper.toDto(pagoPendienteSave));
     }
 
     public PagoPendienteResponseDTO toggleActivo(Long id){
@@ -49,6 +55,24 @@ public class PagoPendienteService {
 
         List<PagoPendiente> pagosPendientes = pagosPendientesRepository.findByActivoTrue();
         return pagoPendienteMapper.toDtoList(pagosPendientes);
+    }
+
+    public PagoPendienteResponseDTO cambiarEstado(Long id){
+        PagoPendiente pagoPendiente = pagosPendientesRepository.findById(id).orElseThrow(() -> new NotFoundException("Pago pendiente no encontrado"));
+
+        if (!pagoPendiente.getActivo()){
+            throw new IllegalStateException("No se puede cambiar el estado de un pago pendiente inactivo");
+        }
+
+        pagoPendiente.setEstadoPagosPendientes(pagoPendiente.getEstadoPagosPendientes().siguiente());
+
+        if (pagoPendiente.getEstadoPagosPendientes() == EstadoPagosPendientes.COMPLETADO){
+            pagoPendiente.setActivo(false);
+        }
+
+        pagosPendientesRepository.save(pagoPendiente);
+        return pagoPendienteMapper.toDto(pagoPendiente);
+
     }
 
 }
