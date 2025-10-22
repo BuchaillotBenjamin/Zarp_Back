@@ -11,7 +11,7 @@ import lombok.*;
 public class CredencialesMPDTO {
 
     @NotBlank(message = "El CVU no puede estar vacío")
-    private String Cvu;
+    private String cvu;
     @NotBlank(message = "El nombre del titular no puede estar vacío")
     private String nombreTitular;
 

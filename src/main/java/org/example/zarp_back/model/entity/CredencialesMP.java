@@ -17,6 +17,6 @@ import java.time.LocalDateTime;
 @Entity
 public class CredencialesMP extends Base {
 
-    private String Cvu;
+    private String cvu;
     private String nombreTitular;
 }
