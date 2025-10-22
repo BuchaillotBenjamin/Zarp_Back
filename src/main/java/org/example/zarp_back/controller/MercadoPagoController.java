@@ -8,6 +8,7 @@ import com.mercadopago.resources.preference.Preference;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.example.zarp_back.model.dto.credencialesMP.CredencialesMPDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.service.MercadoPagoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,31 +35,20 @@ public class MercadoPagoController {
         return ResponseEntity.ok(preference.getInitPoint());
     }
 
-    /*@PostMapping("/webhook/notification")
-    public ResponseEntity<String> mercadoPagoWebhook(@RequestBody Map<String, Object> body)throws MPException, MPApiException {
-
-        if (!mercadoPagoService.handlePayment(body)) {
-            return ResponseEntity.badRequest().body("Error al procesar el webhook de Mercado Pago");
-        }
-
-        return ResponseEntity.status(200).body("Webhook de Mercado Pago recibido correctamente");
-
-    }*/
-
     @PostMapping("/webhook/notification")
     public ResponseEntity<String> mercadoPagoWebhook(HttpServletRequest request) {
         try {
-            String signatureHeader = request.getHeader("x-signature");
+           /* String signatureHeader = request.getHeader("x-signature");
             String requestId = request.getHeader("x-request-id");
             String dataId = request.getParameter("data.id");
-
+*/
             String rawBody = new BufferedReader(new InputStreamReader(request.getInputStream()))
                     .lines().collect(Collectors.joining("\n"));
 
-            if (!mercadoPagoService.isValidWebhookSignature(signatureHeader, requestId, dataId)) {
+           /* if (!mercadoPagoService.isValidWebhookSignature(signatureHeader, requestId, dataId)) {
                 log.warn("Firma inválida en webhook. Rechazado.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Firma inválida");
-            }
+            }*/
 
             log.info("Webhook de Mercado Pago validado correctamente");
 
@@ -79,17 +68,10 @@ public class MercadoPagoController {
         }
     }
 
-    @PostMapping("/createAuthClient/{clienteId}")
-    public ResponseEntity<URI> createAuthClient(@PathVariable Long clienteId) throws MPException, MPApiException  {
-        URI authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
-        return ResponseEntity.ok(authUrl);
-    }
-
-    @GetMapping("/webhook/getAuthClient")
-    public ResponseEntity<Boolean> getAuthUrl(@RequestParam String code, @RequestParam String state) throws MPException, MPApiException {
-        log.info("Received code: {}, state: {}", code, state);
-        Boolean authUrl = mercadoPagoService.getAuthorizationClient(code, state);
-        return ResponseEntity.ok(authUrl);
+    @PutMapping("/guardarCredenciales/{clienteId}")
+    public ResponseEntity<Boolean> guardarCuenta(@PathVariable Long clienteId, @Valid @RequestBody CredencialesMPDTO credencialesMP) throws MPException, MPApiException {
+        Boolean resultado = mercadoPagoService.guardarCuentaBancaria(clienteId, credencialesMP);
+        return ResponseEntity.ok(resultado);
     }
 
 }

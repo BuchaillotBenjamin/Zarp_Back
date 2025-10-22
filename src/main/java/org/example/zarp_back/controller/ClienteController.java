@@ -14,12 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(
-        origins = "http://localhost:5173",
-        methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.OPTIONS },
-        allowedHeaders = { "Content-Type", "Authorization" },
-        allowCredentials = "true" // si usás cookies/session
-)
 public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long, ClienteService> {
 
     @Autowired
