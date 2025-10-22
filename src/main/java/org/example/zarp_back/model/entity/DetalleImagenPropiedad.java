@@ -1,5 +1,6 @@
 package org.example.zarp_back.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -23,6 +24,7 @@ public class DetalleImagenPropiedad extends Base{
     @JoinColumn(name = "imagen_id")
     private Imagen imagen;
     @ManyToOne
-    @JoinColumn(name = "datos_propiedad_id")
+    @JsonBackReference
     private Propiedad propiedad;
 }
+

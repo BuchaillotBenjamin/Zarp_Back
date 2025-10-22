@@ -1,5 +1,6 @@
 package org.example.zarp_back.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,7 +23,8 @@ public class DetalleTipoPersona extends Base{
     @JoinColumn(name = "tipo_persona_id")
     private TipoPersona tipoPersona;
     @ManyToOne
-    @JoinColumn(name = "datos_propiedad_id")
+    @JsonBackReference
     private Propiedad propiedad;
+
 
 }
