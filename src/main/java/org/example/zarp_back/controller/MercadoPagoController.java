@@ -38,6 +38,7 @@ public class MercadoPagoController {
     @PostMapping("/webhook/notification")
     public ResponseEntity<String> mercadoPagoWebhook(HttpServletRequest request) {
         try {
+            //TODO: VER TEMA DE LA FIRMA DEL WEBHOOK
            /* String signatureHeader = request.getHeader("x-signature");
             String requestId = request.getHeader("x-request-id");
             String dataId = request.getParameter("data.id");
