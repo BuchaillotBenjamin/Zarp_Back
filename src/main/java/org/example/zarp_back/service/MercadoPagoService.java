@@ -28,7 +28,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -232,7 +231,7 @@ public class MercadoPagoService {
         }
 
         CredencialesMP credencialesMpEntity = CredencialesMP.builder()
-                .Cvu(credencialesMP.getCvu())
+                .cvu(credencialesMP.getCvu())
                 .nombreTitular(credencialesMP.getNombreTitular())
                 .build();
 
