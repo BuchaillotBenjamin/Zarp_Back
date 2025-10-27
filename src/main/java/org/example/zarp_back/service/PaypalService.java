@@ -18,7 +18,6 @@ import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
 import org.example.zarp_back.repository.ReservaRepository;
-import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.paypal.core.PayPalHttpClient;
 
 @Service
 @Slf4j
