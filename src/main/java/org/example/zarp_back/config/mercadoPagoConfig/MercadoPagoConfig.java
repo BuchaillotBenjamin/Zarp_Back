@@ -20,10 +20,6 @@ public class MercadoPagoConfig {
     private String mpFailureBackUrl;
     @Value("${api.url}")
     private String publicUrl;
-    @Value("${mercadopago.client_id}")
-    private String mpClientId;
-    @Value("${mercadopago.client_secret}")
-    private String mpClientSecret;
     @Value("${mercadopago.secret_key_webhook}")
     private String mpSecretKeyWebhook;
 
