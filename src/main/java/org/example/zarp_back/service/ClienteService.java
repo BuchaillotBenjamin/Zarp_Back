@@ -153,33 +153,27 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     public void actualizarAutorizaciones(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
-        Boolean updated = false;
 
-        if (cliente.getAutorizaciones() == AutorizacionesCliente.AMBAS) {
-            return; // Ya tiene la autorización, no hacer nada
+        AutorizacionesCliente nuevaAutorizacion;
+
+        boolean tieneMP = cliente.getCredencialesMP() != null;
+        boolean tienePP = cliente.getCredencialesPP() != null;
+
+        if (tieneMP && tienePP) {
+            nuevaAutorizacion = AutorizacionesCliente.AMBAS;
+        } else if (tieneMP) {
+            nuevaAutorizacion = AutorizacionesCliente.MERCADO_PAGO;
+        } else if (tienePP) {
+            nuevaAutorizacion = AutorizacionesCliente.PAYPAL;
+        } else {
+            nuevaAutorizacion = AutorizacionesCliente.NINGUNA;
         }
-        if(cliente.getAutorizaciones() == AutorizacionesCliente.NINGUNA){
 
-            if (cliente.getCredencialesMP()!=null && cliente.getCredencialesPP()!=null){
-                cliente.setAutorizaciones(AutorizacionesCliente.AMBAS);
-                updated = true;
-            }
-            if(cliente.getCredencialesMP()!=null&& updated==false){
-                cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
-                updated = true;
-            }
-            if (cliente.getCredencialesPP()!=null && updated==false){
-                cliente.setAutorizaciones(AutorizacionesCliente.PAYPAL);
-                updated = true;
-            }
-
-
-        }
-        if (updated){
+        if (cliente.getAutorizaciones() != nuevaAutorizacion) {
+            cliente.setAutorizaciones(nuevaAutorizacion);
             clienteRepository.save(cliente);
-            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
+            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, nuevaAutorizacion);
         }
-
     }
 
     private void verificacionCompleta(long clienteId){
