@@ -153,26 +153,24 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     public void actualizarAutorizaciones(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
+        boolean updated = false;
 
-        AutorizacionesCliente nuevaAutorizacion;
-
-        boolean tieneMP = cliente.getCredencialesMP() != null;
-        boolean tienePP = cliente.getCredencialesPP() != null;
-
-        if (tieneMP && tienePP) {
-            nuevaAutorizacion = AutorizacionesCliente.AMBAS;
-        } else if (tieneMP) {
-            nuevaAutorizacion = AutorizacionesCliente.MERCADO_PAGO;
-        } else if (tienePP) {
-            nuevaAutorizacion = AutorizacionesCliente.PAYPAL;
+        if (cliente.getCredencialesMP()!=null && cliente.getCredencialesPP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.AMBAS);
+            updated = true;
+        } else if (cliente.getCredencialesMP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.PAYPAL);
+            updated = true;
+        } else if (cliente.getCredencialesPP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.PAYPAL);
+            updated = true;
         } else {
-            nuevaAutorizacion = AutorizacionesCliente.NINGUNA;
+            cliente.setAutorizaciones(AutorizacionesCliente.NINGUNA);
         }
 
-        if (cliente.getAutorizaciones() != nuevaAutorizacion) {
-            cliente.setAutorizaciones(nuevaAutorizacion);
+        if (updated) {
             clienteRepository.save(cliente);
-            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, nuevaAutorizacion);
+            log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
         }
     }
 
