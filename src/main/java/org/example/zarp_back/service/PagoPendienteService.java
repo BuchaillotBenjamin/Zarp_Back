@@ -75,4 +75,9 @@ public class PagoPendienteService {
 
     }
 
+    public PagoPendienteResponseDTO getById(Long id){
+        PagoPendiente pagoPendiente = pagosPendientesRepository.findById(id).orElseThrow(() -> new NotFoundException("Pago pendiente no encontrado"));
+        return pagoPendienteMapper.toDto(pagoPendiente);
+    }
+
 }

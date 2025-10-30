@@ -40,6 +40,12 @@ public class PagoPendienteController {
         return ResponseEntity.ok(pagoPendiente);
     }
 
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<PagoPendienteResponseDTO> getById(@PathVariable Long id){
+        PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.getById(id);
+        return ResponseEntity.ok(pagoPendiente);
+    }
+
     //PARA PRUEBAS
     @PostMapping("/save/{reservaID}")
     public ResponseEntity<String> save(@PathVariable Long reservaID){
