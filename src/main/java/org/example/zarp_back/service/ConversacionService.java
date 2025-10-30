@@ -36,8 +36,6 @@ public class ConversacionService extends GenericoServiceImpl<Conversacion, Conve
         super(conversacionRepository, conversacionMapper);
     }
 
-    //TODO : agregar find by cliente id
-
     @Override
     @Transactional
     public ConversacionResponseDTO save(ConversacionDTO conversacionDTO) {
