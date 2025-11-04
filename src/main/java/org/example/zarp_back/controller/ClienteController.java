@@ -8,6 +8,7 @@ import org.example.zarp_back.service.ClienteService;
 import org.example.zarp_back.service.EmpleadoService;
 import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -84,10 +85,20 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         ClienteResponseDTO cliente = null;
         try {
            cliente = clienteService.getByUid(uid);
+            if (!cliente.getActivo()) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(null); // o un DTO con mensaje si querés
+            }
            return ResponseEntity.ok(cliente);
         }catch (NotFoundException e) {
             try{
                 cliente = empleadoService.getByUidLogin(uid);
+                if (!cliente.getActivo()){
+                    return ResponseEntity
+                            .status(HttpStatus.FORBIDDEN)
+                            .body(null); // o un DTO con mensaje si querés
+                }
                 return ResponseEntity.ok(cliente);
             }catch (NotFoundException ex){
                 throw new NotFoundException("No se encontró un cliente o empleado con el UID: " + uid);
