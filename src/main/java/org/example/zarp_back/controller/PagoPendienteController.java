@@ -1,6 +1,7 @@
 package org.example.zarp_back.controller;
 
 import org.example.zarp_back.model.dto.pagosPendientes.PagoPendienteResponseDTO;
+import org.example.zarp_back.model.enums.EstadoPagosPendientes;
 import org.example.zarp_back.service.PagoPendienteService;
 import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,14 @@ public class PagoPendienteController {
         PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.getById(id);
         return ResponseEntity.ok(pagoPendiente);
     }
+
+    @GetMapping("getByEstado/{estado}")
+    public ResponseEntity<List<PagoPendienteResponseDTO>> getByEstado(@PathVariable EstadoPagosPendientes estado){
+        List<PagoPendienteResponseDTO> pagosPendientes = pagoPendienteService.getByEstado(estado);
+        return ResponseEntity.ok(pagosPendientes);
+    }
+
+    //TODO: GET BY ESTADO
 
     //PARA PRUEBAS
     @PostMapping("/save/{reservaID}")

@@ -71,6 +71,7 @@ public class PagoPendienteService {
         }
 
         pagosPendientesRepository.save(pagoPendiente);
+        webSocketsNotificacion.NotificarUpdate("pagosPendientes", pagoPendienteMapper.toDto(pagoPendiente));
         return pagoPendienteMapper.toDto(pagoPendiente);
 
     }
@@ -78,6 +79,13 @@ public class PagoPendienteService {
     public PagoPendienteResponseDTO getById(Long id){
         PagoPendiente pagoPendiente = pagosPendientesRepository.findById(id).orElseThrow(() -> new NotFoundException("Pago pendiente no encontrado"));
         return pagoPendienteMapper.toDto(pagoPendiente);
+    }
+
+    public List<PagoPendienteResponseDTO> getByEstado(EstadoPagosPendientes estado){
+
+        List<PagoPendiente> pagosPendientes = pagosPendientesRepository.findByEstadoPagosPendientes(estado);
+        return pagoPendienteMapper.toDtoList(pagosPendientes);
+
     }
 
 }
