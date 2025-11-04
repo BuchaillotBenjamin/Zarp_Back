@@ -35,6 +35,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     private VerificacionClienteService verificacionClienteService;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private PropiedadService propiedadService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -172,6 +174,20 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
             clienteRepository.save(cliente);
             log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
         }
+    }
+
+    @Override
+    @Transactional
+    public ClienteResponseDTO toggleActivo(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
+        cliente.setActivo(!cliente.getActivo());
+        clienteRepository.save(cliente);
+
+        propiedadService.toggleActivoCliente(cliente.getActivo(), id);
+
+        log.info("Cliente con id {} cambiado estado activo a {}", id, cliente.getActivo());
+        return clienteMapper.toResponseDTO(cliente);
     }
 
     private void verificacionCompleta(long clienteId){

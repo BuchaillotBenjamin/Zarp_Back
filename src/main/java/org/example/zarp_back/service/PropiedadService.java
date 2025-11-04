@@ -201,6 +201,41 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         return propiedadMapper.toResponseDTOList(propiedades);
     }
 
+    @Transactional
+    public void toggleActivoCliente(boolean estado, long clienteId) {
+        List<Propiedad> propiedades = propiedadRepository.findByPropietario_Id(clienteId);
+
+        // Filtrar solo las propiedades aprobadas
+        List<Propiedad> aprobadas = propiedades.stream()
+                .filter(p -> p.getVerificacionPropiedad() == VerificacionPropiedad.APROBADA)
+                .collect(Collectors.toList());
+
+        // Actualizar estado solo si hay cambios
+        for (Propiedad propiedad : aprobadas) {
+            if (propiedad.getActivo() != estado) {
+                propiedad.setActivo(estado);
+            }
+        }
+
+        // Guardar solo si hay propiedades modificadas
+        propiedadRepository.saveAll(aprobadas);
+    }
+
+    @Override
+    @Transactional
+    public PropiedadResponseDTO toggleActivo(Long id) {
+        Propiedad entity = propiedadRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
+
+        if (!entity.getPropietario().getActivo()){
+            throw new IllegalArgumentException("No se puede activar la propiedad porque el propietario está inactivo.");
+        }
+
+        entity.setActivo(!entity.getActivo());
+        propiedadRepository.save(entity);
+        log.info("Propiedad con ID {} cambiado estado a activo: {}", entity.getId(), entity.getActivo());
+        return propiedadMapper.toResponseDTO(entity);
+    }
 
     //metodos privadps
 
