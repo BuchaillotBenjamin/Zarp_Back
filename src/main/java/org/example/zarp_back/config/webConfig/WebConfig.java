@@ -15,7 +15,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Permite todos los endpoints
                         .allowedOrigins(
-                                "http://127.0.0.1:5500",          // tu front local
+                                "http://127.0.0.1:5173","http://localhost:5173",          // tu front local
                                 "https://1480d5bc9d93.ngrok-free.app" // front en ngrok cambiar cada vez que se ejecuta el ngrok
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
