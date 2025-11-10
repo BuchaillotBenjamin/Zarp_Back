@@ -60,8 +60,6 @@ public class PagoPendienteController {
         return ResponseEntity.ok(pagosPendientes);
     }
 
-    //TODO: GET BY ESTADO
-
     //PARA PRUEBAS
     @PostMapping("/save/{reservaID}")
     public ResponseEntity<String> save(@PathVariable Long reservaID){
