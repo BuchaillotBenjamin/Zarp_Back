@@ -3,9 +3,11 @@ package org.example.zarp_back.service;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.PagoPendienteMapper;
 import org.example.zarp_back.model.dto.pagosPendientes.PagoPendienteResponseDTO;
+import org.example.zarp_back.model.entity.Empleado;
 import org.example.zarp_back.model.entity.PagoPendiente;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.enums.EstadoPagosPendientes;
+import org.example.zarp_back.repository.EmpleadoRepository;
 import org.example.zarp_back.repository.PagosPendientesRepository;
 import org.example.zarp_back.repository.ReservaRepository;
 import org.example.zarp_back.service.utils.WebSocketsNotificacion;
@@ -26,6 +28,8 @@ public class PagoPendienteService {
     private PagoPendienteMapper pagoPendienteMapper;
     @Autowired
     private WebSocketsNotificacion webSocketsNotificacion;
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
 
     public void save(Long reservaID){
 
@@ -38,6 +42,7 @@ public class PagoPendienteService {
                 .propietario(reserva.getCliente())
                 .monto(reserva.getPrecioTotal()-comision)
                 .estadoPagosPendientes(EstadoPagosPendientes.PENDIENTE)
+                .empleado(null)
                 .build();
         PagoPendiente pagoPendienteSave =  pagosPendientesRepository.save(pagosPendientes);
         webSocketsNotificacion.NotificarSave("pagosPendientes", pagoPendienteMapper.toDto(pagoPendienteSave));
@@ -74,6 +79,21 @@ public class PagoPendienteService {
         webSocketsNotificacion.NotificarUpdate("pagosPendientes", pagoPendienteMapper.toDto(pagoPendiente));
         return pagoPendienteMapper.toDto(pagoPendiente);
 
+    }
+
+    public PagoPendienteResponseDTO iniciarPago(Long idPago, String uidEmpleado){
+
+        PagoPendiente pagoPendiente = pagosPendientesRepository.findById(idPago).orElseThrow(() -> new NotFoundException("Pago pendiente no encontrado"));
+        if(pagoPendiente.getEstadoPagosPendientes() != EstadoPagosPendientes.PENDIENTE){
+            throw new IllegalStateException("El pago pendiente no se encuentra en estado PENDIENTE");
+        }
+        Empleado empleado = empleadoRepository.findByUid(uidEmpleado).orElseThrow(() -> new NotFoundException("Empleado no encontrado"));
+
+        pagoPendiente.setEmpleado(empleado);
+        pagoPendiente.setEstadoPagosPendientes(EstadoPagosPendientes.INICIADO);
+        pagosPendientesRepository.save(pagoPendiente);
+
+        return pagoPendienteMapper.toDto(pagoPendiente);
     }
 
     public PagoPendienteResponseDTO getById(Long id){

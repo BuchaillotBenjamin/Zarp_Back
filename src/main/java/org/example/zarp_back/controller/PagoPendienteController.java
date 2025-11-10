@@ -34,6 +34,13 @@ public class PagoPendienteController {
         return ResponseEntity.ok(pagoPendiente);
     }
 
+    @PatchMapping("/iniciar/{id}")
+    public ResponseEntity<PagoPendienteResponseDTO> iniciarPago(@PathVariable Long id, @RequestParam String uidEmpleado){
+        PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.iniciarPago(id, uidEmpleado);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre, pagoPendiente);
+        return ResponseEntity.ok(pagoPendiente);
+    }
+
     @PatchMapping("/cambiarEstado/{id}")
     public ResponseEntity<PagoPendienteResponseDTO> cambiarEstado(@PathVariable Long id){
         PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.cambiarEstado(id);

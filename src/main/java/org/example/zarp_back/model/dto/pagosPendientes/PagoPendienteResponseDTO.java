@@ -2,6 +2,7 @@ package org.example.zarp_back.model.dto.pagosPendientes;
 
 import lombok.*;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
+import org.example.zarp_back.model.dto.empleado.EmpleadoResponseDTO;
 import org.example.zarp_back.model.enums.EstadoPagosPendientes;
 import org.example.zarp_back.model.enums.FormaPago;
 
@@ -20,4 +21,5 @@ public class PagoPendienteResponseDTO {
     private LocalDateTime fechaCreacion;
     private FormaPago formaPago;
     private EstadoPagosPendientes estadoPagosPendientes;
+    private EmpleadoResponseDTO empleado;
 }
