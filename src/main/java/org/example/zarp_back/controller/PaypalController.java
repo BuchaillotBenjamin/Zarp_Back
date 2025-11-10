@@ -2,6 +2,7 @@ package org.example.zarp_back.controller;
 
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.service.PaypalService;
@@ -50,7 +51,7 @@ public class PaypalController {
     }
 
     @PostMapping("/crearOrdenPago")
-    public ResponseEntity<String> crearOrdenPago(@RequestBody ReservaDTO reserva) {
+    public ResponseEntity<String> crearOrdenPago(@Valid @RequestBody ReservaDTO reserva) {
         String ordenId = paypalService.createPayPalOrder(reserva);
         return ResponseEntity.ok(ordenId);
     }
