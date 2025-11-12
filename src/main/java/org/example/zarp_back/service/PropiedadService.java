@@ -17,6 +17,7 @@ import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
 import org.example.zarp_back.service.utils.NotificacionService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,8 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private DetalleImagenPropiedadRepository detalleImagenRepository;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private WebSocketsNotificacion webSocketsNotificacion;
 
 
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
@@ -214,10 +217,12 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         for (Propiedad propiedad : aprobadas) {
             if (propiedad.getActivo() != estado) {
                 propiedad.setActivo(estado);
+                webSocketsNotificacion.NotificarUpdate("propiedades", propiedadMapper.toResponseDTO(propiedad));
             }
         }
 
         // Guardar solo si hay propiedades modificadas
+
         propiedadRepository.saveAll(aprobadas);
     }
 
