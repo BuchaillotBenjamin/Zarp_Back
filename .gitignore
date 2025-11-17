@@ -36,3 +36,5 @@ build/
 # Ignorar toda la carpeta de credenciales
 src/main/resources/firebase/
 
+
+

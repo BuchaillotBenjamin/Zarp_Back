@@ -2,6 +2,7 @@ package org.example.zarp_back.controller;
 
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
@@ -61,7 +62,7 @@ public class PaypalController {
 
 
     @PostMapping("/crearOrdenPago")
-    public ResponseEntity<String> crearOrdenPago(@RequestBody ReservaDTO reserva,
+    public ResponseEntity<String> crearOrdenPago(@Valid @RequestBody ReservaDTO reserva,
                                                  HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
         log.info("UID: {} inició la creación de una orden de pago para la reserva", uid);

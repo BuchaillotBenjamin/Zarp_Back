@@ -9,7 +9,9 @@ import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.ClienteService;
 import org.example.zarp_back.service.EmpleadoService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/clientes")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:5173")
 public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long, ClienteService> {
 
     @Autowired
@@ -24,7 +27,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
     @Autowired
     private EmpleadoService empleadoService;
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private WebSocketsNotificacion webSocketsNotificacion;
     @Autowired
     private AuditoriaService auditoriaService;
 
@@ -43,7 +46,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         log.info("UID: {} ejecutó verificación de correo para cliente ID {}", uid, id);
 
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
-        messagingTemplate.convertAndSend("/topic/clientes/update", response);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",response.toString());
         return ResponseEntity.ok(response);
     }
@@ -56,7 +59,8 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         ClienteResponseDTO response = clienteService.verificacionDocumentacion(id, verificado);
 
         if (verificado){
-            messagingTemplate.convertAndSend("/topic/clientes/update", response);
+            webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
+        }
         }
         auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,response.toString());
 
@@ -98,10 +102,20 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         ClienteResponseDTO cliente = null;
         try {
            cliente = clienteService.getByUid(uid);
+            if (!cliente.getActivo()) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(null); // o un DTO con mensaje si querés
+            }
            return ResponseEntity.ok(cliente);
         }catch (NotFoundException e) {
             try{
                 cliente = empleadoService.getByUidLogin(uid);
+                if (!cliente.getActivo()){
+                    return ResponseEntity
+                            .status(HttpStatus.FORBIDDEN)
+                            .body(null); // o un DTO con mensaje si querés
+                }
                 return ResponseEntity.ok(cliente);
             }catch (NotFoundException ex){
                 throw new NotFoundException("No se encontró un cliente o empleado con el UID: " + uid);

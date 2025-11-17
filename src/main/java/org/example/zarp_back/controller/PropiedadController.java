@@ -10,6 +10,7 @@ import org.example.zarp_back.model.enums.Provincia;
 import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.PropiedadService;
 import org.example.zarp_back.service.ReservaService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,7 +28,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     @Autowired
     private ReservaService reservaService;
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private WebSocketsNotificacion webSocketsNotificacion;
     @Autowired
     private AuditoriaService auditoriaService;
 
@@ -79,7 +80,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
 
         PropiedadResponseDTO propiedadActualizada = propiedadService.verificarPropiedad(id, activar);
 
-        messagingTemplate.convertAndSend("/topic/propiedades/update", propiedadActualizada);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), propiedadActualizada);
 
         auditoriaService.registrar(uid, "Propiedad", activar ? "Aprobar verificación" : "Rechazar verificación", propiedadActualizada.toString());
         return ResponseEntity.ok(propiedadActualizada);

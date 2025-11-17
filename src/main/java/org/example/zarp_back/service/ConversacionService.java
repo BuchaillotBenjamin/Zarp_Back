@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConversacionService extends GenericoServiceImpl<Conversacion, ConversacionDTO, ConversacionResponseDTO, Long> {
@@ -34,8 +35,6 @@ public class ConversacionService extends GenericoServiceImpl<Conversacion, Conve
     public ConversacionService(ConversacionRepository conversacionRepository, ConversacionMapper conversacionMapper) {
         super(conversacionRepository, conversacionMapper);
     }
-
-    //TODO : agregar find by cliente id
 
     @Override
     @Transactional
@@ -72,6 +71,28 @@ public class ConversacionService extends GenericoServiceImpl<Conversacion, Conve
         return conversacionMapper.toResponseDTO(conversacion);
     }
 
+    public ConversacionResponseDTO saveConversacionVacia(Long cliente1id, Long cliente2id){
+
+        if (cliente1id.equals(cliente2id)) {
+            throw new IllegalArgumentException("Los clientes no pueden ser los mismos");
+        }
+
+        Cliente cliente1 = clienteRepository.findById(cliente1id)
+                .orElseThrow(() -> new NotFoundException("Cliente 1 no encontrado"));
+        Cliente cliente2 = clienteRepository.findById(cliente2id)
+                .orElseThrow(() -> new NotFoundException("Cliente 2 no encontrado"));
+
+        Conversacion conversacion = Conversacion.builder()
+                .cliente1(cliente1)
+                .cliente2(cliente2)
+                .mensajes(new ArrayList<>())
+                .fechaCreacion(LocalDate.now())
+                .build();
+
+        conversacionRepository.save(conversacion);
+        return conversacionMapper.toResponseDTO(conversacion);
+    }
+
     public ConversacionResponseDTO agregarMensajes(Long conversacionId, MensajeDTO mensajeDTO) {
 
         Conversacion conversacion = conversacionRepository.findById(conversacionId)
@@ -88,10 +109,23 @@ public class ConversacionService extends GenericoServiceImpl<Conversacion, Conve
     public List<ConversacionResponseDTO> findByClienteId(Long clienteId) {
         List<Conversacion> conversaciones = conversacionRepository.findByClienteId(clienteId);
         if (conversaciones.isEmpty()) {
-            throw new NotFoundException("No se encontraron conversaciones para el cliente con ID: " + clienteId);
+            return new ArrayList<>();
         }
         return conversacionMapper.toResponseDTOList(conversaciones);
     }
+
+    public ConversacionResponseDTO getByClientesIds(Long cliente1id, Long cliente2id){
+
+        Optional<Conversacion> conversacion = conversacionRepository.findByClienteIds(cliente1id, cliente2id);
+
+        if (conversacion.isPresent()) {
+            return conversacionMapper.toResponseDTO(conversacion.get());
+        } else {
+            return null;
+        }
+
+    }
+
 
     private void cargarMensajes(MensajeDTO mensajeDTO, Conversacion conversacion) {
 

@@ -2,7 +2,6 @@ package org.example.zarp_back.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
-import org.example.zarp_back.config.mappers.DireccionMapper;
 import org.example.zarp_back.config.mappers.ImagenMapper;
 import org.example.zarp_back.config.mappers.PropiedadMapper;
 import org.example.zarp_back.model.dto.detalleAmbiente.DetalleAmbienteDTO;
@@ -11,8 +10,6 @@ import org.example.zarp_back.model.dto.detalleImagenPropiedad.DetalleImagenPropi
 import org.example.zarp_back.model.dto.detalleTipoPersona.DetalleTipoPersonaDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadDTO;
 import org.example.zarp_back.model.dto.propiedad.PropiedadResponseDTO;
-import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
-import org.example.zarp_back.model.dto.tipoPropiedad.TipoPropiedadDTO;
 import org.example.zarp_back.model.entity.*;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Provincia;
@@ -20,15 +17,11 @@ import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.model.enums.VerificacionPropiedad;
 import org.example.zarp_back.repository.*;
 import org.example.zarp_back.service.utils.NotificacionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,6 +50,8 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
     private DetalleImagenPropiedadRepository detalleImagenRepository;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private WebSocketsNotificacion webSocketsNotificacion;
 
 
     public PropiedadService(PropiedadRepository propiedadRepository, PropiedadMapper propiedadMapper) {
@@ -209,6 +204,43 @@ public class PropiedadService extends GenericoServiceImpl<Propiedad, PropiedadDT
         return propiedadMapper.toResponseDTOList(propiedades);
     }
 
+    @Transactional
+    public void toggleActivoCliente(boolean estado, long clienteId) {
+        List<Propiedad> propiedades = propiedadRepository.findByPropietario_Id(clienteId);
+
+        // Filtrar solo las propiedades aprobadas
+        List<Propiedad> aprobadas = propiedades.stream()
+                .filter(p -> p.getVerificacionPropiedad() == VerificacionPropiedad.APROBADA)
+                .collect(Collectors.toList());
+
+        // Actualizar estado solo si hay cambios
+        for (Propiedad propiedad : aprobadas) {
+            if (propiedad.getActivo() != estado) {
+                propiedad.setActivo(estado);
+                webSocketsNotificacion.NotificarUpdate("propiedades", propiedadMapper.toResponseDTO(propiedad));
+            }
+        }
+
+        // Guardar solo si hay propiedades modificadas
+
+        propiedadRepository.saveAll(aprobadas);
+    }
+
+    @Override
+    @Transactional
+    public PropiedadResponseDTO toggleActivo(Long id) {
+        Propiedad entity = propiedadRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
+
+        if (!entity.getPropietario().getActivo()){
+            throw new IllegalArgumentException("No se puede activar la propiedad porque el propietario está inactivo.");
+        }
+
+        entity.setActivo(!entity.getActivo());
+        propiedadRepository.save(entity);
+        log.info("Propiedad con ID {} cambiado estado a activo: {}", entity.getId(), entity.getActivo());
+        return propiedadMapper.toResponseDTO(entity);
+    }
 
     //metodos privadps
 

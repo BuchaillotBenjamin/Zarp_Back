@@ -8,6 +8,7 @@ import com.mercadopago.resources.preference.Preference;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.example.zarp_back.model.dto.credencialesMP.CredencialesMPDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.service.AuditoriaService;
 import org.example.zarp_back.service.MercadoPagoService;
@@ -44,17 +45,18 @@ public class MercadoPagoController {
     @PostMapping("/webhook/notification")
     public ResponseEntity<String> mercadoPagoWebhook(HttpServletRequest request) {
         try {
-            String signatureHeader = request.getHeader("x-signature");
+            //TODO: VER TEMA DE LA FIRMA DEL WEBHOOK
+           /* String signatureHeader = request.getHeader("x-signature");
             String requestId = request.getHeader("x-request-id");
             String dataId = request.getParameter("data.id");
-
+*/
             String rawBody = new BufferedReader(new InputStreamReader(request.getInputStream()))
                     .lines().collect(Collectors.joining("\n"));
 
-            if (!mercadoPagoService.isValidWebhookSignature(signatureHeader, requestId, dataId)) {
+           /* if (!mercadoPagoService.isValidWebhookSignature(signatureHeader, requestId, dataId)) {
                 log.warn("Firma inválida en webhook. Rechazado.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Firma inválida");
-            }
+            }*/
 
             log.info("Webhook de Mercado Pago validado correctamente");
 
@@ -74,20 +76,11 @@ public class MercadoPagoController {
         }
     }
 
-    @PostMapping("/createAuthClient/{clienteId}")
-    public ResponseEntity<String> createAuthClient(@PathVariable Long clienteId, HttpServletRequest request) throws MPException, MPApiException {
-        String uid = (String) request.getAttribute("firebaseUid");
-        log.info("UID: {} inició autorización de cliente ID {}", uid, clienteId);
-
-        String authUrl = mercadoPagoService.createAuthorizationClient(clienteId);
-        auditoriaService.registrar(uid, "Cliente", "Iniciar autorización Mercado Pago", clienteId.toString());
-        return ResponseEntity.ok(authUrl);
-    }
-
-    @GetMapping("/webhook/getAuthClient")
-    public ResponseEntity<Boolean> getAuthUrl(@RequestParam String code, @RequestParam String state) throws MPException, MPApiException {
-        Boolean authUrl = mercadoPagoService.getAuthorizationClient(code, state);
-        return ResponseEntity.ok(authUrl);
+    @PutMapping("/guardarCredenciales/{clienteId}")
+    public ResponseEntity<Boolean> guardarCuenta(@PathVariable Long clienteId, @Valid @RequestBody CredencialesMPDTO credencialesMP) throws MPException, MPApiException {
+        Boolean resultado = mercadoPagoService.guardarCuentaBancaria(clienteId, credencialesMP);
+        //TODO: AGREGAR CREDENCIALES
+        return ResponseEntity.ok(resultado);
     }
 
 }

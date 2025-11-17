@@ -32,6 +32,15 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
         super(servicio);
     }
 
+    @Override
+    @PostMapping("/save")
+    public ResponseEntity<ConversacionResponseDTO> save(@Valid @RequestBody ConversacionDTO dto) {
+        ConversacionResponseDTO response = conversacionService.save(dto);
+        messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente2().getId(), response);
+        messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente1().getId(), response);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/agregar-mensaje/{idConversacion}")
     public ResponseEntity<ConversacionResponseDTO> agregarMensaje(@Valid @RequestBody MensajeDTO mensajeDTO,
                                                                   @PathVariable Long idConversacion,
@@ -56,6 +65,17 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
         return ResponseEntity.ok(conversacionService.findByClienteId(clienteId));
     }
 
+    @GetMapping("/existe-conversacion/{cliente1Id}/{cliente2Id}")
+    public ResponseEntity<ConversacionResponseDTO> existeConversacion(@PathVariable Long cliente1Id, @PathVariable Long cliente2Id) {
+        ConversacionResponseDTO conversacion = conversacionService.getByClientesIds(cliente1Id, cliente2Id);
+        if (conversacion != null) {
+            return ResponseEntity.ok(conversacion);
+        } else {
+            ConversacionResponseDTO nuevaConversacion = conversacionService.saveConversacionVacia(cliente1Id, cliente2Id);
+            messagingTemplate.convertAndSend("/topic/conversaciones/save/"+nuevaConversacion.getCliente2().getId(), nuevaConversacion);
+            messagingTemplate.convertAndSend("/topic/conversaciones/save/"+nuevaConversacion.getCliente1().getId(), nuevaConversacion);
+            return ResponseEntity.ok(nuevaConversacion);
+        }
+    }
 
-    // Aquí puedes agregar métodos específicos para el controlador de Conversación si es necesario
 }

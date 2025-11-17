@@ -1,17 +1,14 @@
 package org.example.zarp_back.service;
 
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.config.exception.NotFoundException;
+import org.example.zarp_back.config.paypalConfig.PaypalConfig;
 import org.example.zarp_back.model.dto.reserva.ReservaDTO;
 import org.example.zarp_back.model.dto.reserva.ReservaResponseDTO;
 import org.example.zarp_back.model.entity.*;
@@ -20,11 +17,8 @@ import org.example.zarp_back.model.enums.EstadoPayout;
 import org.example.zarp_back.model.enums.Rol;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
-import org.example.zarp_back.repository.ReservaPayoutPendienteRepository;
 import org.example.zarp_back.repository.ReservaRepository;
-import org.example.zarp_back.service.utils.CryptoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,65 +26,29 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.paypal.core.PayPalEnvironment;
-import com.paypal.core.PayPalHttpClient;
-import com.paypal.http.HttpResponse;
-import com.paypal.orders.AmountWithBreakdown;
-import com.paypal.orders.Order;
-import com.paypal.orders.OrderRequest;
-import com.paypal.orders.PurchaseUnitRequest;
-import com.paypal.orders.OrdersCaptureRequest;
-import com.paypal.orders.OrdersCreateRequest;
-import org.springframework.web.util.UriComponentsBuilder;
-
 @Service
 @Slf4j
 public class PaypalService {
     @Autowired
     private ClienteRepository clienteRepository;
-
     @Autowired
     private PropiedadRepository propiedadRepository;
-
     @Autowired
     private ReservaService reservaService;
-
-    @Autowired
-    private CryptoUtils cryptoUtils;
-
     @Autowired
     private ReservaRepository reservaRepository;
-
     @Autowired
-    private ReservaPayoutPendienteRepository reservaPayoutPendienteRepository;
-
-    @Value("${paypal.client-id}")
-    private String clientId;
-
-    @Value("${paypal.client-secret}")
-    private String clientSecret;
-
-    @Value("${paypal.mode}")
-    private String environment;
-
-    @Value("${api.url}")
-    private String apiUrl;
-
-    @Value("${mercadopago.back_url.success}")
-    private String backUrlSuccess;
-
-    @Value("${mercadopago.back_url.failure}")
-    private String backUrlFailure;
-
-    private PayPalHttpClient payPalHttpClient;
+    private PaypalConfig paypalConfig;
+    @Autowired
+    private PagoPendienteService pagoPendienteService;
 
     private String accessToken;
     private Instant tokenExpiry;
-
     private RestTemplate restTemplate = new RestTemplate();
 
 
     private final Map <String, ReservaDTO> reservasTemporales = new HashMap();
+
     @Autowired
     private ClienteService clienteService;
 
@@ -100,43 +58,41 @@ public class PaypalService {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new NotFoundException("Reserva no encontrada"));
 
-
         Cliente anfitrion = reserva.getPropiedad().getPropietario();
-
-
         String emailDestino = anfitrion.getCredencialesPP().getMailPaypal();
 
         if (emailDestino == null || !emailDestino.contains("@")) {
             log.error("Email de destinatario inválido: {}", emailDestino);
+            pagoPendienteService.save(reservaId);
+            log.info("Pago pendiente creado por email inválido para reserva ID: {}", reservaId);
             throw new IllegalArgumentException("El email del destinatario no es válido");
         }
 
-        // Cálculo de comisión y conversión
-        double precioTotal = reserva.getPrecioTotal(); // Ej: $87.000
+        double precioTotal = reserva.getPrecioTotal();
         double comision = precioTotal * 0.10;
         double montoAnfitrion = precioTotal - comision;
 
         if (montoAnfitrion <= 0) {
             log.error("Monto inválido para payout: {}", montoAnfitrion);
+            pagoPendienteService.save(reservaId);
+            log.info("Pago pendiente creado por monto inválido para reserva ID: {}", reservaId);
             throw new IllegalArgumentException("El monto del payout debe ser mayor a cero");
         }
 
-        BigDecimal cotizacionVenta = obtenerCotizacionDolar(); // Ej: $870
+        BigDecimal cotizacionVenta = obtenerCotizacionDolar();
         BigDecimal montoEnPesos = BigDecimal.valueOf(montoAnfitrion);
         BigDecimal montoUSD = montoEnPesos.divide(cotizacionVenta, 2, RoundingMode.HALF_UP);
         String montoFormateado = String.format(Locale.US, "%.2f", montoUSD);
 
-
         log.info("Monto convertido a USD: {} (ARS={} / cotización={})", montoFormateado, montoAnfitrion, cotizacionVenta);
         String tempId = UUID.randomUUID().toString();
 
-        // Construir cuerpo del payout
         Map<String, Object> payoutItem = new HashMap<>();
         payoutItem.put("recipient_type", "EMAIL");
-        payoutItem.put("amount", Map.of("value", montoFormateado, "currency", "USD")); // ← moneda corregida
+        payoutItem.put("amount", Map.of("value", montoFormateado, "currency", "USD"));
         payoutItem.put("receiver", emailDestino);
         payoutItem.put("note", "Pago por reserva #" + reserva.getPropiedad().getNombre() + ". Comisión retenida: $" + String.format("%.2f", comision));
-        payoutItem.put("sender_item_id",reservaId.toString());
+        payoutItem.put("sender_item_id", reservaId.toString());
 
         Map<String, Object> payoutBody = new HashMap<>();
         payoutBody.put("sender_batch_header", Map.of(
@@ -145,7 +101,6 @@ public class PaypalService {
         ));
         payoutBody.put("items", List.of(payoutItem));
 
-        // Autenticación
         String accessToken = getOrRefreshAccessToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -153,18 +108,19 @@ public class PaypalService {
         headers.setBearerAuth(accessToken);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payoutBody, headers);
-
-        String url = "https://api-m." + (environment.equals("sandbox") ? "sandbox." : "") + "paypal.com/v1/payments/payouts";
+        String url = "https://api-m." + (paypalConfig.getEnvironment().equals("sandbox") ? "sandbox." : "") + "paypal.com/v1/payments/payouts";
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
             Map<String, Object> body = response.getBody();
 
             log.info("Payout creado: monto anfitrión={}, comisión={}, itemId={}", montoFormateado, comision, tempId);
-
             return body != null ? body.get("batch_header").toString() : "Sin respuesta";
+
         } catch (Exception e) {
             log.error("Error al crear payout: {}", e.getMessage(), e);
+            pagoPendienteService.save(reservaId);
+            log.info("Pago pendiente creado para reserva ID: {}", reservaId);
             throw new RuntimeException("No se pudo crear el payout");
         }
     }
@@ -180,15 +136,14 @@ public class PaypalService {
         switch (eventType) {
             case "PAYMENT.PAYOUTS-ITEM.SUCCEEDED":
                 log.info("Payout exitoso para itemId={}", senderItemId);
-                ReservaPayoutPendiente reservaPayoutPendiente = reservaPayoutPendienteRepository.findByReservaId(Long.parseLong(senderItemId));
-                reservaPayoutPendiente.setActivo(false);
-                reservaPayoutPendienteRepository.save(reservaPayoutPendiente);
                 break;
             case "PAYMENT.PAYOUTS-ITEM.FAILED":
                 log.info("Payout fallido para itemId={}", senderItemId);
+                pagoPendienteService.save(Long.parseLong(senderItemId));
                 break;
             case "PAYMENT.PAYOUTS-ITEM.UNCLAIMED":
                 log.info("Payout no reclamado para itemId={}", senderItemId);
+                pagoPendienteService.save(Long.parseLong(senderItemId));
                 break;
             default:
                 log.warn("Evento no esperado: {}", eventType);
@@ -237,8 +192,8 @@ public class PaypalService {
                         "custom_id", tempId
                 )),
                 "application_context", Map.of(
-                        "return_url", backUrlSuccess ,
-                        "cancel_url", backUrlFailure
+                        "return_url", paypalConfig.getBackUrlSuccess(),
+                        "cancel_url", paypalConfig.getBackUrlFailure()
                 )
         );
 
@@ -339,14 +294,8 @@ public class PaypalService {
         switch (estado) {
             case PAGADO:
                 reservaGuardada = reservaService.save(reserva);
-
-                ReservaPayoutPendiente reservaPayoutPendiente = new ReservaPayoutPendiente().builder()
-                        .reservaId(reservaGuardada.getId())
-                        .build();
-                reservaPayoutPendienteRepository.save(reservaPayoutPendiente);
+                log.info("Creando ReservaPayout para reserva ID: {}", reservaGuardada.getId());
                 createPayout(reservaGuardada.getId());
-                log.info("ReservaPayoutPendiente creada para reserva ID: {}", reservaGuardada.getId());
-
                 reservaService.cambiarEstado(reservaGuardada.getId(), Estado.RESERVADA);
                 log.info("Reserva creada con ID: {}", reservaGuardada.getId());
                 break;
@@ -387,7 +336,7 @@ public class PaypalService {
     }
 
     private String obtenerAccessToken() {
-        String auth = clientId + ":" + clientSecret;
+        String auth = paypalConfig.getClientId() + ":" + paypalConfig.getClientSecret();
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
         HttpHeaders headers = new HttpHeaders();
@@ -399,7 +348,7 @@ public class PaypalService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        String url = "https://api-m." + (environment.equals("sandbox") ? "sandbox." : "") + "paypal.com/v1/oauth2/token";
+        String url = "https://api-m." + (paypalConfig.getEnvironment().equals("sandbox") ? "sandbox." : "") + "paypal.com/v1/oauth2/token";
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
         Map<String, Object> responseBody = response.getBody();
@@ -469,6 +418,5 @@ public class PaypalService {
         Map<String, Object> body = response.getBody();
         return new BigDecimal(body.get("venta").toString());
     }
-
 
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.zarp_back.model.entity.Base;
 import org.example.zarp_back.model.interfaces.GenericoController;
 import org.example.zarp_back.model.interfaces.GenericoService;
+import org.example.zarp_back.service.utils.WebSocketsNotificacion;
 import org.example.zarp_back.service.AuditoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
     protected S s;
     @Autowired
-    protected SimpMessagingTemplate messagingTemplate;
+    protected WebSocketsNotificacion webSocketsNotificacion;
     @Autowired
     protected AuditoriaService auditoriaService;
     protected abstract String entidadNombre();
@@ -37,7 +38,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         log.info("UID del usuario autenticado: " + uid);
 
         R response = s.save(dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/save", response);
+        webSocketsNotificacion.NotificarSave(entidadNombre(), response);
         auditoriaService.registrar(uid, entidadNombre(), "CREATE", response.toString());
         return ResponseEntity.ok(response);
     }
@@ -47,7 +48,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         String uid = (String) request.getAttribute("firebaseUid");
         log.info("UID del usuario autenticado: " + uid);
         R response = s.update(id, dto);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/update", response);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         auditoriaService.registrar(uid, entidadNombre(), "UPDATE", response.toString());
         return ResponseEntity.ok(response);
     }
@@ -58,7 +59,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         String uid = (String) request.getAttribute("firebaseUid");
         log.info("UID del usuario autenticado: " + uid);
         R response = s.delete(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/delete", response);
+        webSocketsNotificacion.NotificarDelete(entidadNombre(), response);
         auditoriaService.registrar(uid, entidadNombre(), "DELETE", response.toString());
         return ResponseEntity.ok(response);
     }
@@ -78,12 +79,11 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
     @Override
     @PatchMapping("/toggleActivo/{id}")
-    public ResponseEntity<R> toggleActivo(@PathVariable ID id, HttpServletRequest request) {
+    public ResponseEntity<R> toggleActivo(@PathVariable ID id) {
         String uid = (String) request.getAttribute("firebaseUid");
         log.info("UID del usuario autenticado: " + uid);
-
-        R response = s.toggleActivo(id);
-        messagingTemplate.convertAndSend("/topic/" + entidadNombre() + "/update", response);
+        R response= s.toggleActivo(id);
+        webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         auditoriaService.registrar(uid, entidadNombre(), "TOGGLE_ACTIVO", response.toString());
         return ResponseEntity.ok(response);
     }

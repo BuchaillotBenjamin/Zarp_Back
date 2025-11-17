@@ -2,6 +2,8 @@ package org.example.zarp_back.model.dto.cliente;
 
 import lombok.*;
 import org.example.zarp_back.model.dto.imagen.ImagenResponseDTO;
+import org.example.zarp_back.model.entity.CredencialesMP;
+import org.example.zarp_back.model.entity.CredencialesPP;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
 import org.example.zarp_back.model.enums.Rol;
 
@@ -22,5 +24,7 @@ public class ClienteResponseDTO {
     private Boolean documentoVerificado;
     private ImagenResponseDTO fotoPerfil;
     private AutorizacionesCliente autorizaciones;
+    private CredencialesMP credencialesMP;
+    private CredencialesPP credencialesPP;
 
 }

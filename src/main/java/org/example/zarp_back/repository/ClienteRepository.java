@@ -15,6 +15,5 @@ public interface ClienteRepository extends GenericoRepository<Cliente, Long> {
 
     Optional<Cliente> findByUid(String uid);
 
-    List<Cliente> findByCredencialesMP_TokenExpirationBefore(LocalDateTime fecha);
 
 }

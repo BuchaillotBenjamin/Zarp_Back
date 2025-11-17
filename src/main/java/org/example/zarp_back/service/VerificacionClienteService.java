@@ -3,7 +3,6 @@ package org.example.zarp_back.service;
 import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.config.mappers.VerificacionClienteMapper;
-import org.example.zarp_back.model.dto.imagen.ImagenDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteResponseDTO;
 import org.example.zarp_back.model.entity.Cliente;
@@ -24,8 +23,6 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
     @Autowired
     private VerificacionClienteRepository verificacionClienteRepository;
-    @Autowired
-    private VerificacionClienteMapper verificacionClienteMapper;
     @Autowired
     private ClienteRepository clienteRepository;
     @Autowired
@@ -74,9 +71,9 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
         //cliente
         verificacionCliente.setCliente(cliente);
 
-        verificacionClienteRepository.save(verificacionCliente);
+        VerificacionCliente verificacionPersistida = verificacionClienteRepository.save(verificacionCliente);
 
-        return verificacionClienteMapper.toResponseDTO(verificacionCliente);
+        return toResponseDTODesencriptado(verificacionPersistida);
     }
 
     public List<VerificacionClienteResponseDTO> getVerificacionesActivas() {
@@ -101,10 +98,13 @@ public class VerificacionClienteService extends GenericoServiceImpl<Verificacion
 
         try {
             fotoFrontal.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoFrontal().getUrlImagen()));
+            fotoFrontal.setId(verificacionCliente.getFotoFrontal().getId());
 
             fotoDocumentoFrontal.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoDocumentoFrontal().getUrlImagen()));
+            fotoDocumentoFrontal.setId(verificacionCliente.getFotoDocumentoFrontal().getId());
 
             fotoDocumentoTrasero.setUrlImagen(cryptoUtils.decryptUrl(verificacionCliente.getFotoDocumentoTrasero().getUrlImagen()));
+            fotoDocumentoTrasero.setId(verificacionCliente.getFotoDocumentoTrasero().getId());
 
         } catch (Exception e) {
             throw new RuntimeException("Error al desencriptar las imágenes de la verificación." + e.getMessage());

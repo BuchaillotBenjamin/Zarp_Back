@@ -5,7 +5,6 @@ import org.example.zarp_back.config.exception.NotFoundException;
 import org.example.zarp_back.config.mappers.ClienteMapper;
 import org.example.zarp_back.model.dto.cliente.ClienteDTO;
 import org.example.zarp_back.model.dto.cliente.ClienteResponseDTO;
-import org.example.zarp_back.model.dto.verificacionCliente.VerificacionClienteDTO;
 import org.example.zarp_back.model.entity.Cliente;
 import org.example.zarp_back.model.entity.VerificacionCliente;
 import org.example.zarp_back.model.enums.AutorizacionesCliente;
@@ -36,6 +35,8 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     private VerificacionClienteService verificacionClienteService;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private PropiedadService propiedadService;
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         super(clienteRepository, clienteMapper);
@@ -157,24 +158,39 @@ public class ClienteService extends GenericoServiceImpl<Cliente, ClienteDTO, Cli
     public void actualizarAutorizaciones(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + clienteId));
-        Boolean updated = false;
+        boolean updated = false;
 
-        if (cliente.getAutorizaciones() == AutorizacionesCliente.AMBAS) {
-            return; // Ya tiene la autorización, no hacer nada
+        if (cliente.getCredencialesMP()!=null && cliente.getCredencialesPP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.AMBAS);
+            updated = true;
+        } else if (cliente.getCredencialesMP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
+            updated = true;
+        } else if (cliente.getCredencialesPP() != null) {
+            cliente.setAutorizaciones(AutorizacionesCliente.PAYPAL);
+            updated = true;
+        } else {
+            cliente.setAutorizaciones(AutorizacionesCliente.NINGUNA);
         }
-        if(cliente.getAutorizaciones() == AutorizacionesCliente.NINGUNA){
 
-            if(cliente.getCredencialesMP()!=null){
-                cliente.setAutorizaciones(AutorizacionesCliente.MERCADO_PAGO);
-                updated = true;
-            }
-
-        }
-        if (updated){
+        if (updated) {
             clienteRepository.save(cliente);
             log.info("Autorizaciones del cliente con id {} actualizadas a {}", clienteId, cliente.getAutorizaciones());
         }
+    }
 
+    @Override
+    @Transactional
+    public ClienteResponseDTO toggleActivo(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Entidad con el id " + id + " no encontrada"));
+        cliente.setActivo(!cliente.getActivo());
+        clienteRepository.save(cliente);
+
+        propiedadService.toggleActivoCliente(cliente.getActivo(), id);
+
+        log.info("Cliente con id {} cambiado estado activo a {}", id, cliente.getActivo());
+        return clienteMapper.toResponseDTO(cliente);
     }
 
     private void verificacionCompleta(long clienteId){

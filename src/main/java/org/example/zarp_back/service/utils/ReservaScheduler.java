@@ -3,6 +3,7 @@ package org.example.zarp_back.service.utils;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.model.enums.Estado;
 import org.example.zarp_back.repository.ReservaRepository;
+import org.example.zarp_back.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ public class ReservaScheduler {
 
     @Autowired
     private ReservaRepository reservaRepository;
+    @Autowired
+    private ReservaService reservaService;
 
     @Scheduled(cron = "0 0 0 * * *", zone = "America/Argentina/Buenos_Aires")
     public void actualizarEstadosReservas() {
@@ -42,7 +45,7 @@ public class ReservaScheduler {
                 }
                 if (update) {
                     try {
-                        reservaRepository.save(reserva);
+                        reservaService.cambiarEstado(reserva.getId(),reserva.getEstado());
                     } catch (Exception exception) {
                         System.out.println("Error al actualizar la reserva con id: " + reserva.getId());
                     }
