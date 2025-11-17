@@ -32,4 +32,29 @@ public class EmailService {
         helper.addAttachment(nombreAdjunto, new ByteArrayResource(adjunto));
         mailSender.send(mensaje);
     }
+
+    public void enviarMailConDosAdjuntos(
+            String para,
+            String asunto,
+            String cuerpo,
+            byte[] adjunto1,
+            String nombreAdjunto1,
+            byte[] adjunto2,
+            String nombreAdjunto2
+    ) throws MessagingException {
+        MimeMessage mensaje = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
+        helper.setTo(para);
+        helper.setSubject(asunto);
+        helper.setText(cuerpo);
+
+        // Primer PDF
+        helper.addAttachment(nombreAdjunto1, new ByteArrayResource(adjunto1));
+
+        // Segundo PDF
+        helper.addAttachment(nombreAdjunto2, new ByteArrayResource(adjunto2));
+
+        mailSender.send(mensaje);
+    }
+
 }

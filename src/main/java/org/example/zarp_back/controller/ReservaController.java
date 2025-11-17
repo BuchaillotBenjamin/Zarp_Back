@@ -46,7 +46,7 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
     //TODO: METODO TEMPORAL
     @GetMapping("/test-notificacion")
     public ResponseEntity<String> testNotificacion() throws Exception {
-        Reserva reserva = reservaRepository.findById(10L).orElseThrow();
+        Reserva reserva = reservaRepository.findById(1L).orElseThrow();
         notificacionService.notificarReservaCliente(reserva);
         notificacionService.notificarReservaPropietario(reserva);
         return ResponseEntity.ok("Correo enviado");

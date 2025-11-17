@@ -31,11 +31,11 @@ public class NotificacionService {
     public void notificarReservaCliente(Reserva reserva) throws MessagingException {
         String para = reserva.getCliente().getCorreoElectronico();
         String asunto = "Confirmación de Reserva";
-        String cuerpo="Adjunto encontrará la confirmación de su reserva.";
-        String nombrePdf="reserva_cliente.pdf";
+        String cuerpo="Adjunto encontrará la factura de su reserva.";
+        String nombreFactura="factura_reserva.pdf";
 
-        byte[] pdf = generarPdfReservaCliente(reserva);
-        emailService.enviarMailConAdjunto(para, asunto, cuerpo, pdf, nombrePdf);
+        byte[] factura = generarPdfFacturaReserva(reserva);
+        emailService.enviarMailConAdjunto(para, asunto, cuerpo, factura, nombreFactura);
     }
 
     public void notificarReservaPropietario(Reserva reserva) throws MessagingException {
@@ -47,7 +47,7 @@ public class NotificacionService {
         emailService.enviarMailConAdjunto(para, asunto, cuerpo, pdf, nombrePdf);
     }
 
-    private byte[] generarPdfReservaCliente(Reserva reserva) {
+   /* private byte[] generarPdfReservaCliente(Reserva reserva) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document();
             PdfWriter.getInstance(document, baos);
@@ -76,7 +76,7 @@ public class NotificacionService {
         } catch (Exception e) {
             throw new RuntimeException("Error al generar PDF de reserva para cliente", e);
         }
-    }
+    }*/
 
     private byte[] generarPdfReservaPropietario(Reserva reserva) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -110,6 +110,71 @@ public class NotificacionService {
             throw new RuntimeException("Error al generar PDF de reserva para propietario", e);
         }
     }
+
+    private byte[] generarPdfFacturaReserva(Reserva reserva) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            // Logo
+            InputStream logoStream = getClass().getResourceAsStream("/images/logo.png");
+            if (logoStream != null) {
+                byte[] logoBytes = logoStream.readAllBytes();
+                Image logo = Image.getInstance(logoBytes);
+                logo.scaleToFit(100, 100);
+                logo.setAlignment(Image.ALIGN_CENTER);
+                document.add(logo);
+            }
+
+            // Encabezado empresa
+            document.add(new Paragraph("ZARP"));
+            document.add(new Paragraph("Dirección: Boulogne Sur Mer 1234, Mendoza, Argentina"));
+            document.add(new Paragraph("Teléfono: +54 261 123-4567"));
+            document.add(new Paragraph("Correo: zarp.back@gmail.com"));
+            document.add(new Paragraph(" "));
+
+            // Título
+            Paragraph titulo = new Paragraph("Factura de Reserva");
+            titulo.setAlignment(Paragraph.ALIGN_CENTER);
+            document.add(titulo);
+            document.add(new Paragraph(" "));
+
+            // Información de la reserva
+            document.add(new Paragraph("Información de la Reserva:"));
+            document.add(new Paragraph("Fecha Inicio: " + reserva.getFechaInicio()));
+            document.add(new Paragraph("Fecha Fin: " + reserva.getFechaFin()));
+            document.add(new Paragraph("Método de Pago: " + reserva.getFormaPago()));
+            document.add(new Paragraph(" "));
+
+            // Datos del cliente
+            document.add(new Paragraph("Datos del Cliente:"));
+            document.add(new Paragraph("Nombre: " + reserva.getCliente().getNombreCompleto()));
+            document.add(new Paragraph("Correo: " + reserva.getCliente().getCorreoElectronico()));
+            document.add(new Paragraph(" "));
+
+            // Datos de la propiedad
+            document.add(new Paragraph("Propiedad:"));
+            document.add(new Paragraph("Nombre: " + reserva.getPropiedad().getNombre()));
+            document.add(new Paragraph("Dirección: " + reserva.getPropiedad().getDireccion().getCalle() + " " +
+                    reserva.getPropiedad().getDireccion().getNumero() + ", " +
+                    reserva.getPropiedad().getDireccion().getDepartamento() + ", " +
+                    reserva.getPropiedad().getDireccion().getProvincia()));
+            document.add(new Paragraph("Propietario: " + reserva.getPropiedad().getPropietario().getNombreCompleto()));
+            document.add(new Paragraph(" "));
+
+            // Totales
+            Paragraph totales = new Paragraph("Total de la Reserva: $" + reserva.getPrecioTotal());
+            totales.setAlignment(Paragraph.ALIGN_RIGHT);
+            document.add(totales);
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar PDF de factura de reserva", e);
+        }
+    }
+
 
     public void notifcarVerificacionDocumento(Long idCliente){
 
