@@ -29,25 +29,26 @@ public class FiltroFirebase extends OncePerRequestFilter {
         // rutas protegidas
         boolean isProtectedRoute =
                         path.contains("/save") ||                                          // GenericoControllerImpl
-                        path.contains("/update/") ||
-                        path.contains("/delete/") ||
-                        path.contains("/toggleActivo/") ||
+                        path.contains("/update") ||
+                        path.contains("/delete") ||
+                        path.contains("/toggleActivo") ||
                         path.contains("/activos") ||
-                        path.startsWith("/api/clientes/verificacion-correo/") ||           // ClienteControlle
-                        path.startsWith("/api/clientes/verificacion-documento/") ||        
+                        path.startsWith("/api/clientes/verificacion-correo") ||           // ClienteControlle
+                        path.startsWith("/api/clientes/verificacion-documento") ||
                         path.startsWith("/api/verificacionClientes/activas") ||            // VerificacionClienteController
                         path.startsWith("/api/mercadoPago/create-preference") ||           // MercadoPagoController
-                        path.startsWith("/api/mercadoPago/createAuthClient/") ||
-                        path.startsWith("/api/paypal/guardarDireccionPaypal/") ||          // PaypalController
+                        path.startsWith("/api/mercadoPago/guardarCredenciales") ||
+                        path.startsWith("/api/paypal/guardarDireccionPaypal") ||          // PaypalController
                         path.startsWith("/api/paypal/crearOrdenPago") ||
-                        path.startsWith("/api/conversaciones/agregar-mensaje/") ||         // ConversacionController
-                        path.startsWith("/api/conversaciones/cliente/") ||
-                        path.startsWith("/api/propiedades/reservas/") ||                   // PropiedadController
-                        path.startsWith("/api/propiedades/verificacion/") ||
+                        path.startsWith("/api/conversaciones/agregar-mensaje") ||         // ConversacionController
+                        path.startsWith("/api/conversaciones/cliente") ||
+                        path.startsWith("/api/propiedades/reservas") ||                   // PropiedadController
+                        path.startsWith("/api/propiedades/verificacion") ||
                         path.startsWith("/api/propiedades/aVerificar") ||
-                        path.startsWith("/api/reservas/cliente/") ||                       // ReservaController
-                        path.startsWith("/api/reservas/propiedad/") ||
-                        path.startsWith("/api/reservas/propietario/");
+                        path.startsWith("/api/reservas/cliente") ||                       // ReservaController
+                        path.startsWith("/api/reservas/propiedad") ||
+                        path.startsWith("/api/reservas/propietario")||
+                        path.startsWith("/api/pagosPendientes");                        // PagoPendienteController
         log.info("¿Ruta protegida?: {}", isProtectedRoute);
         return !isProtectedRoute;
     }
