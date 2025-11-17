@@ -166,7 +166,7 @@ public class MercadoPagoService {
 
         return exito;
     }
-
+/*
     //TODO: ARREGLAR ESTE METODO
     public boolean isValidWebhookSignature(String signatureHeader, String requestId, String dataId) {
         try {
@@ -215,7 +215,7 @@ public class MercadoPagoService {
             log.error("Error al validar firma del webhook", e);
             return false;
         }
-    }
+    }*/
 
     public boolean guardarCuentaBancaria(Long clienteId, CredencialesMPDTO credencialesMP) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -263,7 +263,7 @@ public class MercadoPagoService {
 
         return false;
     }
-
+/*
     private String bytesToHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {
@@ -272,5 +272,5 @@ public class MercadoPagoService {
             hexString.append(hex);
         }
         return hexString.toString();
-    }
+    }*/
 }
