@@ -36,12 +36,14 @@ public class ReservaController extends GenericoControllerImpl<Reserva, ReservaDT
         super(servicio);
     }
 
+    //TODO: METODO TEMPORAL
     @PutMapping("/finalizar/{id}")
     public ResponseEntity<ReservaResponseDTO> finalizarReserva(@PathVariable Long id) {
         ReservaResponseDTO reservaResponseDTO = reservaService.reservaFinalizada(id);
         return ResponseEntity.ok(reservaResponseDTO);
     }
 
+    //TODO: METODO TEMPORAL
     @GetMapping("/test-notificacion")
     public ResponseEntity<String> testNotificacion() throws Exception {
         Reserva reserva = reservaRepository.findById(10L).orElseThrow();

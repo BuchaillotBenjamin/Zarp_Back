@@ -77,8 +77,14 @@ public class MercadoPagoController {
     }
 
     @PutMapping("/guardarCredenciales/{clienteId}")
-    public ResponseEntity<Boolean> guardarCuenta(@PathVariable Long clienteId, @Valid @RequestBody CredencialesMPDTO credencialesMP) throws MPException, MPApiException {
+    public ResponseEntity<Boolean> guardarCuenta(@PathVariable Long clienteId, @Valid @RequestBody CredencialesMPDTO credencialesMP,HttpServletRequest request) throws MPException, MPApiException {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID del usuario autenticado: " + uid);
+
         Boolean resultado = mercadoPagoService.guardarCuentaBancaria(clienteId, credencialesMP);
+        if(resultado){
+            auditoriaService.registrar(uid, "Cliente", "Guardar credenciales Mercado Pago", clienteId.toString());
+        }
         //TODO: AGREGAR CREDENCIALES
         return ResponseEntity.ok(resultado);
     }

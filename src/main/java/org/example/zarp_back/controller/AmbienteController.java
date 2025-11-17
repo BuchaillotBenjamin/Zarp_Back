@@ -35,7 +35,6 @@ public class AmbienteController extends GenericoControllerImpl<Ambiente, Ambient
     @GetMapping("/activos")
     public ResponseEntity<List<AmbienteResponseDTO>> getActivos(HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
-
         log.info("UID del usuario autenticado: " + uid + " accedió a /api/ambientes/activos");
 
         List<AmbienteResponseDTO> ambientesActivos = ambienteServicio.getActivos();

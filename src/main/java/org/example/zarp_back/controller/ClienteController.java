@@ -61,7 +61,6 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         if (verificado){
             webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         }
-        }
         auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,response.toString());
 
         return ResponseEntity.ok(response);

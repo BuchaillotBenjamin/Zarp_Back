@@ -79,7 +79,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
     @Override
     @PatchMapping("/toggleActivo/{id}")
-    public ResponseEntity<R> toggleActivo(@PathVariable ID id) {
+    public ResponseEntity<R> toggleActivo(@PathVariable ID id, HttpServletRequest request) {
         String uid = (String) request.getAttribute("firebaseUid");
         log.info("UID del usuario autenticado: " + uid);
         R response= s.toggleActivo(id);

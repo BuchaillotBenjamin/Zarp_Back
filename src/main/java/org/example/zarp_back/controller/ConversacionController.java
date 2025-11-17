@@ -34,7 +34,10 @@ public class ConversacionController extends GenericoControllerImpl<Conversacion,
 
     @Override
     @PostMapping("/save")
-    public ResponseEntity<ConversacionResponseDTO> save(@Valid @RequestBody ConversacionDTO dto) {
+    public ResponseEntity<ConversacionResponseDTO> save(@Valid @RequestBody ConversacionDTO dto, HttpServletRequest request) {
+        String uid = (String) request.getAttribute("firebaseUid");
+        log.info("UID del usuario autenticado: " + uid);
+
         ConversacionResponseDTO response = conversacionService.save(dto);
         messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente2().getId(), response);
         messagingTemplate.convertAndSend("/topic/conversaciones/save/"+response.getCliente1().getId(), response);
