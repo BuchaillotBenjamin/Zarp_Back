@@ -19,7 +19,7 @@ public class WebConfig {
                                 "https://1480d5bc9d93.ngrok-free.app" // front en ngrok cambiar cada vez que se ejecuta el ngrok
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
+                        .allowedHeaders("Authorization","Content-Type","Accept","X-Requested-With")
                         .allowCredentials(true); // si usás cookies/sesiones
             }
         };

@@ -20,15 +20,21 @@ import java.util.Collections;
 @Slf4j
 public class FiltroFirebase extends OncePerRequestFilter {
 
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        log.info("Evaluando ruta: {}", path);
+        String method = request.getMethod();
+        log.info("Evaluando ruta: {} - método: {}", path, method);
+
+        // Dejar pasar siempre las preflight OPTIONS (no las filtramos)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            log.debug("Preflight OPTIONS - no se filtra");
+            return true;
+        }
 
         // rutas protegidas
         boolean isProtectedRoute =
-                        path.contains("/save") ||                                          // GenericoControllerImpl
+                path.contains("/save") ||                                          // GenericoControllerImpl
                         path.contains("/update") ||
                         path.contains("/delete") ||
                         path.contains("/toggleActivo") ||
@@ -50,18 +56,25 @@ public class FiltroFirebase extends OncePerRequestFilter {
                         path.startsWith("/api/reservas/propietario")||
                         path.startsWith("/api/pagosPendientes");                        // PagoPendienteController
 
-        if(path.startsWith("/api/clientes/save")){
+        if (path.startsWith("/api/clientes/save")) {
             isProtectedRoute = false;
         }
-        
+
         log.info("¿Ruta protegida?: {}", isProtectedRoute);
 
+        // shouldNotFilter -> true significa "NO ejecutar el filtro"
         return !isProtectedRoute;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // Dejar pasar OPTIONS en la implementación defensiva también
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String header = request.getHeader("Authorization");
         log.info("Authorization header received: {}", header);
