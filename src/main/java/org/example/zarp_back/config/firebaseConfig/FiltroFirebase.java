@@ -49,7 +49,13 @@ public class FiltroFirebase extends OncePerRequestFilter {
                         path.startsWith("/api/reservas/propiedad") ||
                         path.startsWith("/api/reservas/propietario")||
                         path.startsWith("/api/pagosPendientes");                        // PagoPendienteController
+
+        if(path.startsWith("/api/clientes/save")){
+            isProtectedRoute = false;
+        }
+        
         log.info("¿Ruta protegida?: {}", isProtectedRoute);
+
         return !isProtectedRoute;
     }
 
