@@ -39,7 +39,7 @@ public class PagoPendienteService {
         PagoPendiente pagosPendientes = PagoPendiente.builder()
                 .formaPago(reserva.getFormaPago())
                 .fechaCreacion(LocalDateTime.now())
-                .propietario(reserva.getCliente())
+                .propietario(reserva.getPropiedad().getPropietario())
                 .monto(reserva.getPrecioTotal()-comision)
                 .estadoPagosPendientes(EstadoPagosPendientes.PENDIENTE)
                 .empleado(null)

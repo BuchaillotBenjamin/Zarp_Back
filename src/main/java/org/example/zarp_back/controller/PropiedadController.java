@@ -42,9 +42,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
     }
 
     @GetMapping("/cliente/{idCliente}")
-    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesByCliente(@PathVariable Long idCliente, HttpServletRequest request) {
-        String uid = (String) request.getAttribute("firebaseUid");
-        log.info("UID: {} solicitó propiedades del cliente ID {}", uid, idCliente);
+    public ResponseEntity<List<PropiedadResponseDTO>> getPropiedadesByCliente(@PathVariable Long idCliente) {
 
         List<PropiedadResponseDTO> propiedades = propiedadService.getPropiedadesByCliente(idCliente);
         return ResponseEntity.ok(propiedades);
