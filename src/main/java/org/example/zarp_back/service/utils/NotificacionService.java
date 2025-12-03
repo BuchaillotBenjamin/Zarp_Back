@@ -12,6 +12,8 @@ import org.example.zarp_back.model.entity.Propiedad;
 import org.example.zarp_back.model.entity.Reserva;
 import org.example.zarp_back.repository.ClienteRepository;
 import org.example.zarp_back.repository.PropiedadRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.io.InputStream;
 @Service
 public class NotificacionService {
 
+    private static final Logger log = LoggerFactory.getLogger(NotificacionService.class);
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -29,22 +32,30 @@ public class NotificacionService {
     private PropiedadRepository propiedadRepository;
 
     public void notificarReservaCliente(Reserva reserva) throws MessagingException {
-        String para = reserva.getCliente().getCorreoElectronico();
-        String asunto = "Confirmación de Reserva";
-        String cuerpo="Adjunto encontrará la factura de su reserva.";
-        String nombreFactura="factura_reserva.pdf";
+        try {
+            String para = reserva.getCliente().getCorreoElectronico();
+            String asunto = "Confirmación de Reserva";
+            String cuerpo = "Adjunto encontrará la factura de su reserva.";
+            String nombreFactura = "factura_reserva.pdf";
 
-        byte[] factura = generarPdfFacturaReserva(reserva);
-        emailService.enviarMailConAdjunto(para, asunto, cuerpo, factura, nombreFactura);
+            byte[] factura = generarPdfFacturaReserva(reserva);
+            emailService.enviarMailConAdjunto(para, asunto, cuerpo, factura, nombreFactura);
+        }catch (Exception e){
+            log.error("Error al enviar notificación al cliente: {}", e.getMessage());
+        }
     }
 
     public void notificarReservaPropietario(Reserva reserva) throws MessagingException {
-        String para = reserva.getPropiedad().getPropietario().getCorreoElectronico();
-        String asunto = "Nueva Reserva en su Propiedad";
-        String cuerpo = "Adjunto encontrará los detalles de la nueva reserva en su propiedad.";
-        String nombrePdf="reserva_propietario.pdf";
-        byte[] pdf = generarPdfReservaPropietario(reserva);
-        emailService.enviarMailConAdjunto(para, asunto, cuerpo, pdf, nombrePdf);
+        try {
+            String para = reserva.getPropiedad().getPropietario().getCorreoElectronico();
+            String asunto = "Nueva Reserva en su Propiedad";
+            String cuerpo = "Adjunto encontrará los detalles de la nueva reserva en su propiedad.";
+            String nombrePdf = "reserva_propietario.pdf";
+            byte[] pdf = generarPdfReservaPropietario(reserva);
+            emailService.enviarMailConAdjunto(para, asunto, cuerpo, pdf, nombrePdf);
+        }catch (Exception e){
+            log.error("Error al enviar notificación al propietario: {}", e.getMessage());
+        }
     }
 
    /* private byte[] generarPdfReservaCliente(Reserva reserva) {
@@ -177,72 +188,86 @@ public class NotificacionService {
 
 
     public void notifcarVerificacionDocumento(Long idCliente){
+        try {
+            Cliente cliente = clienteRepository.findById(idCliente)
+                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + idCliente));
 
-        Cliente cliente = clienteRepository.findById(idCliente)
-                .orElseThrow(()-> new NotFoundException("Cliente no encontrado con id: " + idCliente));
+            String para = cliente.getCorreoElectronico();
+            String asunto = "Verificacion de Documento Exitosa";
+            String cuerpo = "Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
+                    "Nos complace informarte que la verificación de tu documento ha sido completada exitosamente.\n\n" +
+                    "Tu información ha sido validada y ahora podés continuar utilizando nuestros servicios.\n\n" +
+                    "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
+                    "Saludos cordiales,\n" +
+                    "Zarp Team";
 
-        String para = cliente.getCorreoElectronico();
-        String asunto = "Verificacion de Documento Exitosa";
-        String cuerpo="Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
-                "Nos complace informarte que la verificación de tu documento ha sido completada exitosamente.\n\n" +
-                "Tu información ha sido validada y ahora podés continuar utilizando nuestros servicios.\n\n" +
-                "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
-                "Saludos cordiales,\n" +
-                "Zarp Team";
-
-        emailService.enviarMail(para, asunto, cuerpo);
+            emailService.enviarMail(para, asunto, cuerpo);
+        }catch (Exception e){
+            log.error("Error al notificar verificación de documento: {}", e.getMessage());
+        }
 
     }
 
     public void notificarVerificacionPropiedad(Long idPropiedad){
-        Propiedad propiedad = propiedadRepository.findById(idPropiedad)
-                .orElseThrow(()-> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
+        try {
+            Propiedad propiedad = propiedadRepository.findById(idPropiedad)
+                    .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
 
-        String para = propiedad.getPropietario().getCorreoElectronico();
-        String asunto = "Verificacion de Propiedad Exitosa";
-        String cuerpo="Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
-                "Nos complace informarte que la verificación de tu propiedad ha sido completada exitosamente.\n\n" +
-                "La información ha sido validada y ya se encuentra disponible para ser rentada.\n\n" +
-                "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
-                "Saludos cordiales,\n" +
-                "Zarp Team";
+            String para = propiedad.getPropietario().getCorreoElectronico();
+            String asunto = "Verificacion de Propiedad Exitosa";
+            String cuerpo = "Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
+                    "Nos complace informarte que la verificación de tu propiedad ha sido completada exitosamente.\n\n" +
+                    "La información ha sido validada y ya se encuentra disponible para ser rentada.\n\n" +
+                    "Si tenés alguna duda o necesitás asistencia adicional, no dudes en contactarnos.\n\n" +
+                    "Saludos cordiales,\n" +
+                    "Zarp Team";
 
-        emailService.enviarMail(para, asunto, cuerpo);
+            emailService.enviarMail(para, asunto, cuerpo);
+        }catch (Exception e){
+            log.error("Error al notificar verificación de propiedad: {}", e.getMessage());
+        }
 
     }
 
     public void notificarRechazoDocumento(Long idCliente) {
 
-        Cliente cliente = clienteRepository.findById(idCliente)
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + idCliente));
+        try {
+            Cliente cliente = clienteRepository.findById(idCliente)
+                    .orElseThrow(() -> new NotFoundException("Cliente no encontrado con id: " + idCliente));
 
-        String para = cliente.getCorreoElectronico();
-        String asunto = "Verificación de Documento Rechazada";
-        String cuerpo = "Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
-                "Lamentamos informarte que la verificación de tu documento no ha sido aprobada.\n\n" +
-                "Por favor, revisá que la información y la calidad del documento sean correctas y volvé a intentarlo desde tu panel de usuario.\n\n" +
-                "Si necesitás ayuda para completar el proceso, no dudes en contactarnos.\n\n" +
-                "Saludos cordiales,\n" +
-                "Zarp Team";
+            String para = cliente.getCorreoElectronico();
+            String asunto = "Verificación de Documento Rechazada";
+            String cuerpo = "Estimado/a " + cliente.getNombreCompleto() + ",\n\n" +
+                    "Lamentamos informarte que la verificación de tu documento no ha sido aprobada.\n\n" +
+                    "Por favor, revisá que la información y la calidad del documento sean correctas y volvé a intentarlo desde tu panel de usuario.\n\n" +
+                    "Si necesitás ayuda para completar el proceso, no dudes en contactarnos.\n\n" +
+                    "Saludos cordiales,\n" +
+                    "Zarp Team";
 
-        emailService.enviarMail(para, asunto, cuerpo);
+            emailService.enviarMail(para, asunto, cuerpo);
+        }catch (Exception e){
+            log.error("Error al notificar rechazo de documento: {}", e.getMessage());
+        }
     }
 
     public void notificarRechazoPropiedad(Long idPropiedad) {
+        try {
+            Propiedad propiedad = propiedadRepository.findById(idPropiedad)
+                    .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
 
-        Propiedad propiedad = propiedadRepository.findById(idPropiedad)
-                .orElseThrow(() -> new NotFoundException("Propiedad no encontrada con id: " + idPropiedad));
+            String para = propiedad.getPropietario().getCorreoElectronico();
+            String asunto = "Verificación de Propiedad Rechazada";
+            String cuerpo = "Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
+                    "Lamentamos informarte que la verificación de tu propiedad no ha sido aprobada.\n\n" +
+                    "Para poder publicar tu propiedad, deberás registrarla nuevamente y esperar a que sea verificada por nuestro equipo.\n\n" +
+                    "Si necesitás asistencia para completar el proceso, estamos disponibles para ayudarte.\n\n" +
+                    "Saludos cordiales,\n" +
+                    "Zarp Team";
 
-        String para = propiedad.getPropietario().getCorreoElectronico();
-        String asunto = "Verificación de Propiedad Rechazada";
-        String cuerpo = "Estimado/a " + propiedad.getPropietario().getNombreCompleto() + ",\n\n" +
-                "Lamentamos informarte que la verificación de tu propiedad no ha sido aprobada.\n\n" +
-                "Para poder publicar tu propiedad, deberás registrarla nuevamente y esperar a que sea verificada por nuestro equipo.\n\n" +
-                "Si necesitás asistencia para completar el proceso, estamos disponibles para ayudarte.\n\n" +
-                "Saludos cordiales,\n" +
-                "Zarp Team";
-
-        emailService.enviarMail(para, asunto, cuerpo);
+            emailService.enviarMail(para, asunto, cuerpo);
+        }catch (Exception e){
+            log.error("Error al notificar rechazo de propiedad: {}", e.getMessage());
+        }
     }
 
 
