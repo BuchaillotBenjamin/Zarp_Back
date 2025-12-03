@@ -47,6 +47,7 @@ IntelliJ IDEA opcional recomendado
    mvn clean install
    mvn spring-boot:run
 ```
+---
 ## ✨ Características del sistema
 
 - **Publicación y administración de propiedades**  
