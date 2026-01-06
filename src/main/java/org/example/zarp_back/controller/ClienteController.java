@@ -47,7 +47,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
 
         ClienteResponseDTO response = clienteService.verificacionCorreo(id);
         webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
-        auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",response.toString());
+        /*auditoriaService.registrar(uid,entidadNombre(),"VERIFICACION_CORREO",response.toString());*/
         return ResponseEntity.ok(response);
     }
 
@@ -61,7 +61,7 @@ public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDT
         if (verificado){
             webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
         }
-        auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,response.toString());
+        /*auditoriaService.registrar(uid,entidadNombre(),verificado ? "VERIFICACION-DOCUMENTO-ACEPTADA" : "VERIFICACION-DOCUMENTO-RECHAZADA" ,response.toString());*/
 
         return ResponseEntity.ok(response);
     }

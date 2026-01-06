@@ -39,7 +39,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
 
         R response = s.save(dto);
         webSocketsNotificacion.NotificarSave(entidadNombre(), response);
-        auditoriaService.registrar(uid, entidadNombre(), "CREATE", response.toString());
+        /*auditoriaService.registrar(uid, entidadNombre(), "CREATE", response.toString());*/
         return ResponseEntity.ok(response);
     }
 
@@ -49,7 +49,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         log.info("UID del usuario autenticado: " + uid);
         R response = s.update(id, dto);
         webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
-        auditoriaService.registrar(uid, entidadNombre(), "UPDATE", response.toString());
+        /*auditoriaService.registrar(uid, entidadNombre(), "UPDATE", response.toString());*/
         return ResponseEntity.ok(response);
     }
 
@@ -60,7 +60,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         log.info("UID del usuario autenticado: " + uid);
         R response = s.delete(id);
         webSocketsNotificacion.NotificarDelete(entidadNombre(), response);
-        auditoriaService.registrar(uid, entidadNombre(), "DELETE", response.toString());
+        /*auditoriaService.registrar(uid, entidadNombre(), "DELETE", response.toString());*/
         return ResponseEntity.ok(response);
     }
 
@@ -84,7 +84,7 @@ public abstract class GenericoControllerImpl<E extends Base, D, R, ID extends Se
         log.info("UID del usuario autenticado: " + uid);
         R response= s.toggleActivo(id);
         webSocketsNotificacion.NotificarUpdate(entidadNombre(), response);
-        auditoriaService.registrar(uid, entidadNombre(), "TOGGLE_ACTIVO", response.toString());
+        /*auditoriaService.registrar(uid, entidadNombre(), "TOGGLE_ACTIVO", response.toString());*/
         return ResponseEntity.ok(response);
     }
 

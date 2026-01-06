@@ -43,7 +43,7 @@ public class PagoPendienteController {
 
         PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.toggleActivo(id);
         webSocketsNotificacion.NotificarUpdate(entidadNombre, pagoPendiente);
-        auditoriaService.registrar(uid,entidadNombre, "TOGGLE-ACTIVO", pagoPendiente.toString() );
+        /*auditoriaService.registrar(uid,entidadNombre, "TOGGLE-ACTIVO", pagoPendiente.toString() );*/
         return ResponseEntity.ok(pagoPendiente);
     }
 
@@ -54,7 +54,7 @@ public class PagoPendienteController {
 
         PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.iniciarPago(id, uidEmpleado);
         webSocketsNotificacion.NotificarUpdate(entidadNombre, pagoPendiente);
-        auditoriaService.registrar(uid,entidadNombre, "INICIAR-PAGO", pagoPendiente.toString() );
+        /*auditoriaService.registrar(uid,entidadNombre, "INICIAR-PAGO", pagoPendiente.toString() );*/
         return ResponseEntity.ok(pagoPendiente);
     }
 
@@ -65,7 +65,7 @@ public class PagoPendienteController {
 
         PagoPendienteResponseDTO pagoPendiente = pagoPendienteService.cambiarEstado(id);
         webSocketsNotificacion.NotificarUpdate(entidadNombre, pagoPendiente);
-        auditoriaService.registrar(uid,entidadNombre, "CAMBIAR-ESTADO", pagoPendiente.toString() );
+        /*auditoriaService.registrar(uid,entidadNombre, "CAMBIAR-ESTADO", pagoPendiente.toString() );*/
         return ResponseEntity.ok(pagoPendiente);
     }
 

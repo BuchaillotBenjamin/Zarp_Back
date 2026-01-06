@@ -80,7 +80,7 @@ public class PropiedadController extends GenericoControllerImpl<Propiedad, Propi
 
         webSocketsNotificacion.NotificarUpdate(entidadNombre(), propiedadActualizada);
 
-        auditoriaService.registrar(uid, "Propiedad", activar ? "Aprobar verificación" : "Rechazar verificación", propiedadActualizada.toString());
+        /*auditoriaService.registrar(uid, "Propiedad", activar ? "Aprobar verificación" : "Rechazar verificación", propiedadActualizada.toString());*/
         return ResponseEntity.ok(propiedadActualizada);
     }
 

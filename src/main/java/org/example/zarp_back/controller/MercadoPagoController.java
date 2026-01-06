@@ -38,7 +38,7 @@ public class MercadoPagoController {
         log.info("UID: {} inició la creación de una preferencia de pago para la reserva", uid);
 
         Preference preference = mercadoPagoService.createPreference(reserva);
-        auditoriaService.registrar(uid, "Reserva", "Crear preferencia de pago", "N/A");
+        /*auditoriaService.registrar(uid, "Reserva", "Crear preferencia de pago", "N/A");*/
         return ResponseEntity.ok(preference.getInitPoint());
     }
 
@@ -83,7 +83,7 @@ public class MercadoPagoController {
 
         Boolean resultado = mercadoPagoService.guardarCuentaBancaria(clienteId, credencialesMP);
         if(resultado){
-            auditoriaService.registrar(uid, "Cliente", "Guardar credenciales Mercado Pago", clienteId.toString());
+            /*auditoriaService.registrar(uid, "Cliente", "Guardar credenciales Mercado Pago", clienteId.toString());*/
         }
         //TODO: AGREGAR CREDENCIALES
         return ResponseEntity.ok(resultado);

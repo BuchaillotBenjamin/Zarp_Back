@@ -56,7 +56,7 @@ public class PaypalController {
         log.info("UID: {} guardó dirección PayPal para cliente ID {}", uid, clienteId);
 
         Boolean status = paypalService.guardarDireccionPaypal(clienteId, direccionPaypal);
-        auditoriaService.registrar(uid, "Cliente", "Guardar dirección PayPal", clienteId.toString());
+        /*auditoriaService.registrar(uid, "Cliente", "Guardar dirección PayPal", clienteId.toString());*/
         return ResponseEntity.ok("Guardado con éxito: " + status);
     }
 
@@ -68,7 +68,7 @@ public class PaypalController {
         log.info("UID: {} inició la creación de una orden de pago para la reserva", uid);
 
         String ordenId = paypalService.createPayPalOrder(reserva);
-        auditoriaService.registrar(uid, "Reserva", "Crear orden de pago", "N/A");
+        /*auditoriaService.registrar(uid, "Reserva", "Crear orden de pago", "N/A");*/
         return ResponseEntity.ok(ordenId);
     }
 
