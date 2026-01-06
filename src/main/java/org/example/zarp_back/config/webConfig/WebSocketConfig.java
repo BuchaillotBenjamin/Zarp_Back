@@ -1,6 +1,7 @@
 package org.example.zarp_back.config.webConfig;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -11,12 +12,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${cors.allowed-origins}")
+    private String alowedOrigins;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins(
                         "https://1480d5bc9d93.ngrok-free.app","http://localhost:5173",
-                        "http://127.0.0.1:5500"
+                        "http://127.0.0.1:5500",alowedOrigins
+
                 );
 
     }

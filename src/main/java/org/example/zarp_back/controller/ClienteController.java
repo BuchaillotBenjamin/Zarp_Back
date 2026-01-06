@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/clientes")
 @Slf4j
-@CrossOrigin(origins = "http://localhost:5173")
+/*@CrossOrigin(origins = "http://localhost:5173")*/
 public class ClienteController extends GenericoControllerImpl<Cliente, ClienteDTO, ClienteResponseDTO, Long, ClienteService> {
 
     @Autowired
