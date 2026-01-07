@@ -19,17 +19,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults())
+                .cors(Customizer.withDefaults())     // <= importante: permite que Spring Security use la configuración CORS
                 .csrf(csrf -> csrf.disable())
-
-                // ⬇️ DESACTIVA AUTENTICACIÓN POR DEFECTO DE SPRING
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(form -> form.disable())
-
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .anyRequest().permitAll() // TODAS las rutas son públicas por defecto (ajustá según necesites)
                 )
-
+                // Asegurate que el filtro de Firebase no bloquee OPTIONS previamente
                 .addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
